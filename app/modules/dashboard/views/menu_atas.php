@@ -23,7 +23,7 @@
                     $nama   = $row->nama;
                     $foto   = $row->foto;
                     ?>
-                    <img src="<?php echo base_url();?>assets/foto/user/<?php echo $foto;?>" style="width:18px;text-align:center;height:22px;" alt="<?php echo $nama;?>" /> 
+                    <img src="<?php echo base_url();?>assets/foto/pegawai/<?php echo $foto;?>" style="width:18px;text-align:center;height:22px;" alt="<?php echo $nama;?>" /> 
                     <span class="hidden-xs"><?php echo $nama;?></span> <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu animated fadeInLeft">

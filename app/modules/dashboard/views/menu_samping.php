@@ -10,7 +10,7 @@
                 $nama   = $row->nama;
                 $foto   = $row->foto;
                 ?>
-                <a class="fancybox" href="<?php echo base_url();?>assets/foto/user/<?php echo $foto;?>" style="width:80px;text-align:center;height:102px;" data-fancybox-group="gallery" title="<?php echo $nama;?>"><img src="<?php echo base_url();?>assets/foto/user/<?php echo $foto;?>" style="width:71px;" alt="" /></a>
+                <a class="fancybox" href="<?php echo base_url();?>assets/foto/pegawai/<?php echo $foto;?>" style="width:80px;text-align:center;height:102px;" data-fancybox-group="gallery" title="<?php echo $nama;?>"><img src="<?php echo base_url();?>assets/foto/pegawai/<?php echo $foto;?>" style="width:71px;" alt="" /></a>
             </div>
             <div class="info" style="text-align:center">
                 <?php echo $nama;?>

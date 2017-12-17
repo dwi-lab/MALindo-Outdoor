@@ -13,7 +13,7 @@ class Merk extends CI_Controller {
 			return TRUE;
 		}else{
 			$page = "merk";
-			$this->service->hak_aksessubmenux($page);
+			$this->service->hak_aksessubmenu($page);
 		}
 	}
 	public function index(){

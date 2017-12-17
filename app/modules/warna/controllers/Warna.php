@@ -13,7 +13,7 @@ class Warna extends CI_Controller {
 			return TRUE;
 		}else{
 			$page = "warna";
-			$this->service->hak_aksessubmenux($page);
+			$this->service->hak_aksessubmenu($page);
 		}
 	}
 	public function index(){
