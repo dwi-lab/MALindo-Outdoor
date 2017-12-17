@@ -1,9 +1,9 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-class Merk_model extends CI_Model {
-    var $table = 'tbl_merk';
-    var $column_order = array('id','merk',null);
-    var $column_search = array('merk'); 
+class Tipe_model extends CI_Model {
+    var $table = 'tbl_tipe';
+    var $column_order = array('id','tipe',null);
+    var $column_search = array('tipe');
     var $order = array('id' => 'desc');
     public function __construct(){
         parent::__construct();
