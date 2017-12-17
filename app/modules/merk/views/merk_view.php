@@ -74,7 +74,7 @@
 						<div class="form-group">
 							<label class="control-label col-md-3">Nama Merk</label>
 							<div class="col-md-6">
-								<input name="nama" id="nama" maxlength="15" placeholder="Masukan Nama Merk" class="form-control" type="text">
+								<input name="nama" id="nama" maxlength="30" placeholder="Masukan Nama Merk" class="form-control" type="text">
 								<span class="help-block"></span>
 							</div>
 						</div>
