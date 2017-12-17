@@ -98,6 +98,7 @@ class Pegawai extends CI_Controller {
 		$this->load->view("dashboard/dashboard_view",$isi);
 	}
 	public function proses_foto($kode){
+		// $this->hapusfoto($kode);
 		$filename  = 'assets/foto/pegawai/' . $kode . '.jpg';
 		$input_con = file_get_contents('php://input');
 		$result    = file_put_contents($filename,$input_con);
@@ -212,7 +213,7 @@ class Pegawai extends CI_Controller {
 	}
 	public function cekdata($kode=Null){
 		if($this->input->is_ajax_request()){
-			$ckdata = $this->db->get_where('view_pegawai',array('kode'=>$this->service->anti($kode)))->result();
+			$ckdata = $this->db->get_where('tbl_username',array('kode'=>$this->service->anti($kode)))->result();
 			if(count($ckdata)>0){
 				$data['say'] = "ok";
 			}else{
@@ -226,38 +227,35 @@ class Pegawai extends CI_Controller {
 		}
 	}
 	public function edit($kode){
-		$ckdata = $this->db->get_where('view_pegawai',array('kode'=>$kode));
+		$ckdata = $this->db->get_where('tbl_username',array('kode'=>$kode));
 		if(count($ckdata->result())>0){
-			$row                                 = $ckdata->row();
-			$isi['default']['kode']              = $row->kode;
-			$isi['default']['nama']              = $row->nama;
-			$isi['default']['no_identitas']      = $row->no_identitas;
-			$isi['default']['hp']                = $row->no_handphone;
-			$isi['default']['almt']              = $row->alamat;
-			$isi['default']['mail']              = $row->email;
-			$isi['default']['tgllahir']          = date("d-m-Y",strtotime($row->tgl_lahir));
-			$isi['jk']                           = $row->jns_kel;
-			$isi['option_kerja'][$row->id_kerja] = $row->kerja;
-			$isi['foto']                         = $row->foto;
-			$isi['cek']                          = "edit";
-			$isi['kelas']                        = "master";
-			$isi['namamenu']                     = "Data Pegawai";
-			$isi['page']                         = "pegawai";
-			$isi['link']                         = 'pegawai';
-			$isi['tombolsimpan']                 = 'Simpan';
-			$isi['tombolbatal']                  = 'Batal';
-			$isi['halaman']                      = "Add Data Pegawai";
-			$isi['judul']                        = "Halaman Add Data Pegawai";
-			$isi['content']                      = "form_";
-			$isi['action']                       = "../proses_edit";
-			$ckpekerjaan                         = $this->db->get('tbl_pekerjaan')->result();
-			if(count($ckpekerjaan)>0){
-				foreach ($ckpekerjaan as $Xxx) {
-					$isi['option_kerja'][$Xxx->id] = $Xxx->kerja;
-				}
-			}else{
-				$isi['option_kerja'][''] = "Data Pekerjaan Belum Tersedia";
-			}
+			$umenu = $this->db->get_where('tbl_usermenu',array('kode'=>$kode))->result();
+	        if(count($umenu)>0){
+	            foreach ($umenu as $key) {
+	                $isi['menunya'] = $key->menu;
+	                $isi['submenu'] = $key->menux;
+	            }
+	        }else{
+	            $isi['menunya'] = "";
+	            $isi['submenu'] = "";
+	        }
+			$row                    = $ckdata->row();
+			$isi['default']['kode'] = $row->kode;
+			$isi['default']['nama'] = $row->nama;
+			$isi['default']['mail'] = $row->email;
+			$isi['default']['hp']   = $row->no_handphone;
+			$isi['foto']            = $row->foto;
+			$isi['cek']             = "edit";
+			$isi['kelas']           = "master";
+			$isi['namamenu']        = "Data Pegawai";
+			$isi['page']            = "pegawai";
+			$isi['link']            = 'pegawai';
+			$isi['tombolsimpan']    = 'Simpan';
+			$isi['tombolbatal']     = 'Batal';
+			$isi['halaman']         = "Edit Data Pegawai";
+			$isi['judul']           = "Halaman Edit Data Pegawai";
+			$isi['content']         = "form_";
+			$isi['action']          = "../proses_edit";
 			$this->load->view("dashboard/dashboard_view",$isi);
 		}else{
 			redirect('_404','refresh');
@@ -265,12 +263,7 @@ class Pegawai extends CI_Controller {
 	}
 	public function proses_edit(){
 		$this->form_validation->set_rules('kode', 'Kode pegawai', 'htmlspecialchars|trim|required|min_length[1]|max_length[20]');
-		$this->form_validation->set_rules('no_identitas', 'No Identitas', 'htmlspecialchars|trim|required|min_length[1]|max_length[20]');
 		$this->form_validation->set_rules('nama', 'Nama pegawai', 'htmlspecialchars|trim|required|min_length[1]|max_length[50]');
-		$this->form_validation->set_rules('tgllahir', 'Tanggal Lahir', 'htmlspecialchars|trim|required|min_length[10]|max_length[10]');
-		$this->form_validation->set_rules('almt', 'Alamat', 'htmlspecialchars|trim|required|min_length[1]');
-		$this->form_validation->set_rules('kerja', 'Pekerjaan', 'htmlspecialchars|trim|required|min_length[1]');
-		$this->form_validation->set_rules('jk', 'Jenis Kelamin', 'htmlspecialchars|trim|required|min_length[1]');
 		$this->form_validation->set_rules('hp', 'No Handphone', 'htmlspecialchars|trim|required|min_length[1]|max_length[15]|is_natural');
 		$this->form_validation->set_rules('mail', 'Email', 'htmlspecialchars|trim|required|min_length[1]|max_length[50]|valid_email');
 		$this->form_validation->set_message('is_unique', '%s sudah ada sebelumnya');
@@ -279,36 +272,86 @@ class Pegawai extends CI_Controller {
 		$this->form_validation->set_message('max_length', '%s maximal %s karakter');
 		$this->form_validation->set_message('valid_email', '%s penulisan email tidak valid');
 		if ($this->form_validation->run() == TRUE){
-			$kode         = $this->service->anti(str_replace(" ", "", $this->input->post('kode')));
-			$nama         = $this->service->anti($this->input->post('nama'));
-			$tgl          = $this->service->anti($this->input->post('tgllahir'));
-			$tgla         = $this->service->anti(date("Y-m-d",strtotime($tgl)));
-			$alamat       = $this->service->anti($this->input->post('almt'));
-			$jk           = $this->service->anti($this->input->post('jk'));
-			$hp           = $this->service->anti($this->input->post('hp'));
-			$mail         = $this->service->anti($this->input->post('mail'));
-			$kerja        = $this->service->anti($this->input->post('kerja'));
-			$no_identitas = $this->service->anti($this->input->post('no_identitas'));
-			$simpan       = array(
-				'no_identitas' =>$no_identitas,
-				'nama'         =>$nama,
-				'tgl_lahir'    =>$tgla,
-				'jns_kel'      =>$jk,
-				'alamat'       =>$alamat,
-				'no_handphone' =>$hp,
-				'email'        =>$mail,
-				'id_kerja'     =>$kerja,
-				'tgl_daftar'   =>date("Y-m-d"),
-				'foto'         =>$kode . ".jpg");
+			$kode       = $this->service->anti(str_replace(" ", "", $this->input->post('kode')));
+			$nama       = $this->service->anti($this->input->post('nama'));
+			$hp         = $this->service->anti($this->input->post('hp'));
+			$mail       = $this->service->anti($this->input->post('mail'));
+			$acak       = rand(00,99);
+			$bersih     = $_FILES['foto']['name'];
+			$nm         = str_replace(" ","_","$bersih");
+			$pisah      = explode(".",$nm);
+			$nama_murni = $pisah[0];
+			$ubah       = $acak.$nama_murni;
+			$nama_fl    = $acak.$nm;
+			$tmpName    = $this->service->anti(str_replace(" ", "_", $_FILES['foto']['name']));
+			$nmfile     = "file_".time();
+			if($tmpName!=''){
+				$config['file_name']     = $nmfile;
+				$config['upload_path']   = 'assets/foto/pegawai';
+				$config['allowed_types'] = 'jpg';
+				$config['max_size']      = '1024';
+				$config['max_width']     = '0';
+				$config['max_height']    = '0';
+				$this->load->library('upload', $config);
+				$this->upload->initialize($config);
+				if ($this->upload->do_upload('foto')){
+					$gbr    = $this->upload->data();
+					$this->hapusfoto($kode);
+					$simpan = array(
+						'kode'         =>$kode,
+						'nama'         =>$nama,
+						'no_handphone' =>$hp,
+						'email'        =>$mail,
+						'foto'         =>$gbr['file_name']);
+				}else{
+					?>
+					<script type="text/javascript">
+						alert("Pastikan Type File jpg dan ukuran file maksimal 1mb");
+						window.location.reload();
+					</script>
+					<?php
+				}
+			}else{
+				$simpan       = array(
+					'kode'         =>$kode,
+					'nama'         =>$nama,
+					'no_handphone' =>$hp,
+					'email'        =>$mail,
+					'foto'         =>$kode . ".jpg");
+			}
 			$this->db->where('kode',$kode);
 			$this->db->update('tbl_username',$simpan);
+			$out   ="";
+	        $smenu = $this->input->post('submenu');
+	        for ($i=0; $i < count($smenu) ; $i++) { 
+	            $out .= $smenu[$i] . "|";
+	        }
+	        $in     = "";
+	        $smenux = $this->input->post('submenux');
+	        for ($ix=0; $ix < count($smenux) ; $ix++) { 
+	            $in .= $smenux[$ix] . "|";
+	        }
+            $ckdata = $this->db->get_where('tbl_usermenu',array('kode'=>$kode));
+	        if(count($ckdata->result())>0){
+	            $dt = array(
+	                'menu'  =>$out,
+	                'menux' =>$in);
+	            $this->db->where('kode',$kode);
+	            $this->db->update('tbl_usermenu', $dt);     
+	        }else{
+	            $dt = array(
+	                'kode'  =>$kode,
+	                'menu'  =>$out,
+	                'menux' =>$in);
+	            $this->db->insert('tbl_usermenu', $dt);
+	        }
 			redirect('pegawai','refresh');
 		}else{
 			$this->edit($this->input->post('kode'));
 		}
 	}
 	public function detil_pegawai($kode){
-		$ckdata = $this->db->get_where('view_pegawai',array('kode'=>$kode));
+		$ckdata = $this->db->get_where('tbl_username',array('kode'=>$kode));
 		if(count($ckdata->result())>0){
 			$row                 = $ckdata->row();
 			$isi['foto']         = $row->foto;

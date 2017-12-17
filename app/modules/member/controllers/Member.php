@@ -229,8 +229,8 @@ class Member extends CI_Controller {
 			$isi['link']                         = 'member';
 			$isi['tombolsimpan']                 = 'Simpan';
 			$isi['tombolbatal']                  = 'Batal';
-			$isi['halaman']                      = "Add Data Member";
-			$isi['judul']                        = "Halaman Add Data Member";
+			$isi['halaman']                      = "Edit Data Member";
+			$isi['judul']                        = "Halaman Edit Data Member";
 			$isi['content']                      = "form_";
 			$isi['action']                       = "../proses_edit";
 			$ckpekerjaan                         = $this->db->get('tbl_pekerjaan')->result();
