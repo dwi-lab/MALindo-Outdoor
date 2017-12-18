@@ -1,8 +1,28 @@
 var host = window.location.host;
 $BASE_URL = 'http://' + host + '/';
 jQuery(document).ready(function() {
-    
+    jQuery("#tambahstok").click(function() {
+        var no    = jQuery("#tbladdstok tr").length;
+        var stok  = jQuery("#stok").val();
+        var kode  = jQuery("#kode").val();
+        var warna = jQuery("#warna option:selected").text();
+        if (warna != "" && stok != "") {
+            jQuery('#tbladdstok > tbody:first').append("<tr id ='" + no + "''><td><input style='width:80px' class='form-control' type='text' readonly='readonly' value='" + kode + "' name='kodena[]' /><td><input style='width:180px' class='form-control' type='text' readonly='readonly' value='" + warna + "' name='warnana[]' /></td><td><input style='width:80px' readonly='readonly' class='form-control' type='text' value='" + stok + "' name='stokna[]'  /></td><td><input type='file' name='fotona[]' id='fotona' class='form-control' style='width:100px'/></td><td><button id='delRow' style=\"text-align:center\" class=\"btn btn-primary btn-xs m-r-5\" onclick=\"delrow('" + no + "');return false;\"><i class=\"fa fa-remove\"></i></button></td></tr>");
+            jQuery("#tombol").show("slow");
+            jQuery("#stok").val('');
+            $.gritter.add({title:"Informasi !",text: " Silahkan Tambahkan Foto Barang !<br/> maxsize : 1mb <br/> Type File : jpg"});return false;
+        } else {
+            $.gritter.add({
+                title: "Informasi !",
+                text: " Data Tidak Boleh Kosong !"
+            });
+            return false;
+        }
+    });
 })
+function delrow(id) {
+    jQuery("#" + id).remove();
+}
 function save(link) {
     $('#btnSave').text('Proses...');
     $('#btnSave').attr('disabled', true);
@@ -45,6 +65,7 @@ function save(link) {
         }
     });
 }
+
 function validAngka(a) {
     if (!/^[0-9.]+$/.test(a.value)) {
         a.value = a.value.substring(0, a.value.length - 1000);
