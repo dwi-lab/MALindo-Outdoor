@@ -10,6 +10,7 @@ $(function() {
     });
 });
 function download_stok() {
+    var page = "Import Stok Barang";
     var tipe = jQuery("#tipe").val();
     var merk = jQuery("#merk").val();
     if(tipe !="" && merk !=""){
@@ -29,13 +30,13 @@ function download_stok() {
         }); 
     }else if(tipe !="" && merk == ""){
         $.ajax({ 
-            url : $BASE_URL+'barang/cekdata/'+tipe, 
+            url : $BASE_URL+'barang/cekdata_tipe/'+tipe, 
             dataType : 'json', 
             type : 'post', 
             success : function(json) { 
                 $.unblockUI(); 
                 if (json.say == "ok") { 
-                    window.location.href = $BASE_URL+'barang/download_format_stok/'+tipe; 
+                    window.location.href = $BASE_URL+'barang/download_format_stok_tipe/'+tipe; 
                 }else{ 
                     $.gritter.add({title:"Informasi Pengeditan !",text: page+ " ini tidak ditemukan di database !"});
                     return false; 
@@ -44,13 +45,13 @@ function download_stok() {
         }); 
     }else if(tipe =="" && merk != ""){
         $.ajax({ 
-            url : $BASE_URL+'barang/cekdata/'+merk, 
+            url : $BASE_URL+'barang/cekdata_merk/'+merk, 
             dataType : 'json', 
             type : 'post', 
             success : function(json) { 
                 $.unblockUI(); 
                 if (json.say == "ok") { 
-                    window.location.href = $BASE_URL+'barang/download_format_stok/'+merk; 
+                    window.location.href = $BASE_URL+'barang/download_format_stok_merk/'+merk; 
                 }else{ 
                     $.gritter.add({title:"Informasi Pengeditan !",text: page+ " ini tidak ditemukan di database !"});
                     return false; 
@@ -59,13 +60,13 @@ function download_stok() {
         }); 
     }else if(tipe =="" && merk == ""){
         $.ajax({ 
-            url : $BASE_URL+'barang/cekdata/'+merk, 
+            url : $BASE_URL+'barang/cekdata_all', 
             dataType : 'json', 
             type : 'post', 
             success : function(json) { 
                 $.unblockUI(); 
                 if (json.say == "ok") { 
-                    window.location.href = $BASE_URL+'barang/download_format_stok/'+merk; 
+                    window.location.href = $BASE_URL+'barang/download_format_stok_all'; 
                 }else{ 
                     $.gritter.add({title:"Informasi Pengeditan !",text: page+ " ini tidak ditemukan di database !"});
                     return false; 
