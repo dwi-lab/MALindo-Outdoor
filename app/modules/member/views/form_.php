@@ -10,6 +10,7 @@
 <script src="<?php echo base_url();?>assets/js/form-plugins.min.js"></script>
 <script src="<?php echo base_url();?>assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
 <script src="<?php echo base_url();?>assets/js/webcam.js"></script>
+<script src="<?php echo base_url();?>assets/js/daftar.js"></script>
 <style>
 .datepicker{z-index:1151 !important;}
 </style>
@@ -107,6 +108,34 @@
 	                        </div>
 	                    </div>
 					</div>
+					<div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3">Provinsi * :</label>
+                        <div class="col-md-3 col-sm-3">
+                            <?php echo form_dropdown('provinsi',$option_provinsi,isset($default['provinsi']) ? $default['provinsi'] : '','id="provinsi" data-size="10" data-parsley-group="wizard-step-1" data-parsley-required="true" data-live-search="true" data-style="btn-white" class="default-select2 form-control"');?>
+                            <span style="color:red;"><?php echo form_error('provinsi');?></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3">Kabupaten / Kota * :</label>
+                        <div class="col-md-3 col-sm-3">
+                            <?php echo form_dropdown('kota',$option_kota,isset($default['kota']) ? $default['kota'] : '','id="kota" data-size="10" data-parsley-group="wizard-step-1" data-parsley-required="true" data-live-search="true" data-style="btn-white" class="default-select2 form-control"');?>
+                            <span style="color:red;"><?php echo form_error('kota');?></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3">Kecamatan * :</label>
+                        <div class="col-md-3 col-sm-3">
+                            <?php echo form_dropdown('kecamatan',$option_kecamatan,isset($default['kecamatan']) ? $default['kecamatan'] : '','id="kecamatan" data-size="10" data-parsley-group="wizard-step-1" data-parsley-required="true" data-live-search="true" data-style="btn-white" class="default-select2 form-control"');?>
+                            <span style="color:red;"><?php echo form_error('kecamatan');?></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3">Kelurahan * :</label>
+                        <div class="col-md-3 col-sm-3">
+                            <?php echo form_dropdown('kelurahan',$option_kelurahan,isset($default['kelurahan']) ? $default['kelurahan'] : '','id="kelurahan" data-size="10" data-parsley-group="wizard-step-1" data-parsley-required="true" data-live-search="true" data-style="btn-white" class="default-select2 form-control"');?>
+                            <span style="color:red;"><?php echo form_error('kelurahan');?></span>
+                        </div>
+                    </div>
 					<div
 					data-step         ="4"
 					data-intro        ="Masukan Alamat Tempat Tinggal Member."
@@ -118,6 +147,7 @@
 						<div class="col-md-5 col-sm-5">
                             <textarea class="form-control" minlength="1" data-parsley-required="true" id="almt" name="almt" rows="3"><?php echo set_value('almt',isset($default['almt']) ? $default['almt'] : ''); ?></textarea>
 	                            <span style="color:red;"><?php echo form_error('almt');?></span>
+	                            <span style="color:red;">* Cara Penulisan Alamat : Jalan di ikuti No Rumah RT dan RW</span>
 						</div>
 					</div>
 					<div

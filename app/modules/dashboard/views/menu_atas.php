@@ -1,7 +1,7 @@
 <div id="header" class="header navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
-        <a href="<?php echo base_url();?>dashboard" class="navbar-brand"><span class="navbar-logo"><i class="ion-ios-cloud"></i></span> <b>MAL</b> Indo</a>
+        <a href="<?php echo base_url();?>dashboard" class="navbar-brand"><span class="navbar-logo"><i class="ion-ios-cloud"></i></span> <b>MAL</b>indo</a>
             <button type="button" class="navbar-toggle" data-click="sidebar-toggled">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>

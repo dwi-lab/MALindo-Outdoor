@@ -79,16 +79,16 @@
         <div class="panel panel-inverse"> 
             <div class="panel-heading"> 
                 <div class="panel-heading-btn">
-                    <a href="<?php echo base_url();?>pegawai/add" 
+                    <button 
                     data-step         ="1" 
                     data-intro        ="Digunakan untuk menambah data."  
                     data-hint         ="Digunakan untuk menambah data." 
                     data-hintPosition ="top-middle" 
                     data-position     ="bottom-right-aligned"
-                    class="btn btn-primary btn-xs m-r-5" >
+                    class="btn btn-primary btn-xs m-r-5" onclick="tambah_data()">
                         <i class="fa fa-plus-circle"></i> 
                         Tambah Data
-                    </a>&nbsp;
+                    </button>&nbsp;
                     <button 
                     data-step         ="3" 
                     data-intro        ="Digunakan untuk reload data pada database."  
@@ -178,6 +178,56 @@
                 class="vertical-box">
                     <div id="calendar" class="vertical-box-column p-20 calendar"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modal_form" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Basic modal</h4>
+            </div>
+            <div class="modal-body">        
+                <div class="alert alert-info alert-styled-left">
+                    <small><span class="text-semibold">Pastikan Inputan Data Benar !</span></small>
+                </div>      
+                <form action="#" id="form" class="form-horizontal" enctype="multipart/form-data">
+                    <input type="text" value="" name="id"/> 
+                    <div class="form-group" id="photo-preview">
+                        <label class="control-label col-md-3">Foto</label>
+                        <div class="col-md-9">
+                            (No photo)
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3">Warna Barang * :</label>
+                            <div class="col-md-6">
+                            <?php echo form_dropdown('warna',$option_warna,isset($default['warna']) ? $default['warna'] : '','class="default-select2 form-control" style="width:100%" id="warna" name="warna" data-live-search="true" data-style="btn-white"');?>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3">Stok Barang * :</label>
+                            <div class="col-md-3">
+                            <input class="form-control" maxlength="15" style="text-align:right" type="text" id="stokna" minlength="1" name="stokna" />
+                        </div>
+                    </div>
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label id="label-photo" class="control-label col-md-3">Foto Barang</label>
+                            <div class="col-md-6">
+                                <input name="foto" type="file">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>                 
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnSave" onclick="save_detil('<?php echo $link;?>','barang','form')" class="btn btn-primary">Simpan</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
             </div>
         </div>
     </div>

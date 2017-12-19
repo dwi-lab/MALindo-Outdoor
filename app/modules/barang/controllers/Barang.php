@@ -301,9 +301,17 @@ class Barang extends CI_Controller {
 			redirect("_404","refresh");
 		}
 	}
+	public function hapus_data_detil($kode){
+		if($this->input->is_ajax_request()){
+			$this->barang_detil_model->hapus_by_id($kode);
+			echo json_encode(array("status" => TRUE));
+		}else{
+			redirect("_404","refresh");
+		}
+	}
 	function hapusfoto($x=null){
 		if($this->input->is_ajax_request()){
-			$ckdata = $this->db->get_where('tbl_barang',array('kode'=>$x));
+			$ckdata = $this->db->get_where('tbl_barang_stok',array('id'=>$x));
 			$row    = $ckdata->row();
 			$fotona = $row->foto;
 			if($fotona!='no.jpg'){
@@ -560,10 +568,62 @@ class Barang extends CI_Controller {
 			redirect("_404","refresh");
 		}
 	}
+	public function proses_edit_stok(){
+		if($this->input->is_ajax_request()){
+			$data         = array('stok'=>$this->input->post('stokna'),'id_warna' => $this->service->anti(htmlspecialchars($this->input->post('warna'))));
+			if(!empty($_FILES['foto']['name'])){
+				$this->hapus_foto($this->input->post('id'));
+				$upload       = $this->_do_upload();
+				$data['foto'] = $upload;
+	        }
+			$this->barang_detil_model->update(array('id' => $this->service->anti($this->input->post('id'))), $data);
+			$ckkode       = $this->db->get_where('tbl_barang_stok',array('id'=>$this->input->post('id')));
+			$rowKode      = $ckkode->row();
+			$kode_barang  = $rowKode->kode_barang;
+			$hitung_stok  = $this->db->query("SELECT SUM(stok) as total_stok FROM tbl_barang_stok WHERE kode_barang = '$kode_barang' GROUP BY kode_barang WITH ROLLUP");
+			$rowStok      = $hitung_stok->row();
+			$total_stokna = $rowStok->total_stok;
+			$update_stok  = array('total_stok'=>$total_stokna);
+			$this->db->where('kode',$kode_barang);
+			$this->db->update('tbl_barang',$update_stok);
+			/*Update Stok Barang di Table Barang*/
+			echo json_encode(array("status" => TRUE));
+		}else{
+			redirect("_404","refresh");
+		}
+	}
+	private function _do_upload(){
+		$pathfile                = $_SERVER['DOCUMENT_ROOT'];
+		$config['upload_path']   = $pathfile.'/assets/foto/barang';
+		$config['allowed_types'] = 'gif|jpg|jpeg|png';
+		$config['max_size']      = 2000;
+		$config['max_width']     = 2000;
+		$config['max_height']    = 2000;
+		$config['file_name']     = round(microtime(true) * 1000);
+        $this->upload->initialize($config);
+        $this->load->library('upload', $config);
+        if(!$this->upload->do_upload('foto')) {
+			$data['inputerror'][]   = 'foto';
+			$data['error_string'][] = 'Upload error: '.$this->upload->display_errors('','');
+			$data['status']         = FALSE;
+			echo json_encode($data);
+			exit();
+		}
+		return $this->upload->data('file_name');
+	}
 	public function detil_barang($kode){
 		$ckdata = $this->db->get_where('view_barang',array('kode'=>$kode));
 		if(count($ckdata->result())>0){
 			$this->session->set_userdata('kode_barang',$kode);
+			$isi['option_warna'][''] = "Pilih Warna Barang";
+			$cwarna                  = $this->db->get('tbl_warna')->result();
+			if(count($cwarna)>0){
+				foreach ($cwarna as $key) {
+					$isi['option_warna'][$key->id] = $key->warna;
+				}
+			}else{
+				$isi['option_warna'][''] = "Data Warna Belum Tersedia";
+			}
 			$row                = $ckdata->row();
 			$isi['kode']        = $kode;
 			$isi['nama']        = $row->nama_barang;
@@ -599,20 +659,20 @@ class Barang extends CI_Controller {
 				$row[] = $no . ".";
 				$row[] = "<center><a class='fancybox' href='".base_url()."assets/foto/barang/$rowx->foto' style='width:100px;text-align:center;height:102px;' data-fancybox-group='gallery' title='".$rowx->warna."'><img src='".base_url()."assets/foto/barang/$rowx->foto' style='width:71px;' alt=''/></a></center>";
 				$row[] = "<right>" . $rowx->warna . "</right>";
-				$row[] = number_format($rowx->stok);
+				$row[] = '<center>' . number_format($rowx->stok) . '</center>';
 				$row[] = '<center><a class="btn btn-xs m-r-5 btn-primary" href="javascript:void(0)" title="Edit Data"
 				data-step         ="5"
 				data-intro        ="Digunakan untuk mengedit data."
 				data-hint         ="Digunakan untuk mengedit data."
 				data-hintPosition ="top-middle"
 				data-position     ="bottom-right-aligned"
-				onclick="edit_barang('."'".$rowx->id."'".',\'Data barang\',\'barang\')"><i class="icon-pencil"></i></a><a class="btn btn-xs m-r-5 btn-danger " href="javascript:void(0)" title="Hapus Data"
+				onclick="edit_barang_detil(\'Data Barang\',\'barang\',\'edit_data_detil\','."'".$rowx->id."'".')"><i class="icon-pencil"></i></a><a class="btn btn-xs m-r-5 btn-danger " href="javascript:void(0)" title="Hapus Data"
 				data-step         ="6"
 				data-intro        ="Digunakan untuk menghapus data."
 				data-hint         ="Digunakan untuk menghapus data."
 				data-hintPosition ="top-middle"
 				data-position     ="bottom-right-aligned"
-				onclick="hapus_data(\'Data barang\',\'barang\',\'hapus_data\','."'".$rowx->id."'".')"><i class="icon-remove icon-white"></i></a></center>';
+				onclick="hapus_data(\'Data barang\',\'barang\',\'hapus_data_detil\','."'".$rowx->id."'".')"><i class="icon-remove icon-white"></i></a></center>';
 				$data[] = $row;
 			}
 			$output = array(
@@ -798,6 +858,14 @@ class Barang extends CI_Controller {
 					}
 			}
 			redirect($_SERVER['HTTP_REFERER']);
+		}
+	}
+	public function edit_data_detil($id){
+		if($this->input->is_ajax_request()){
+			$data = $this->barang_detil_model->get_by_id($id);
+			echo json_encode($data);
+		}else{
+			redirect("_404","refresh");
 		}
 	}
 }

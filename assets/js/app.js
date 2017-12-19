@@ -65,7 +65,47 @@ function save(link) {
         }
     });
 }
-
+function save_detil(page,link,formid){
+    $('#btnSave').text('proses menyimpan data...'); 
+    $('#btnSave').attr('disabled',true);
+    var url;
+    if(save_method == 'add') {
+        url = $BASE_URL+ page+"/proses_add_stok"; 
+    } else {
+        url = $BASE_URL+ page+"/proses_edit_stok"; 
+    }
+    var formData = new FormData($(formid)[0]);
+    $.ajax({
+        url : url,
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        dataType: "JSON",
+        success: function(data){
+            if(data.status ==  true ) {
+                $('#modal_form').modal('hide');
+                reload_table();
+            }else if(data.status == false ){
+                for (var i = 0; i < data.inputerror.length; i++){
+                    $('[name="'+data.inputerror[i]+'"]').parent().parent().addClass('has-error'); 
+                    $('[name="'+data.inputerror[i]+'"]').next().text(data.error_string[i]); 
+                }
+            }else if(data.status == 'NoAktived'){
+                $.gritter.add({title:"Informasi !",text: " Data Tidak Boleh Kosong !"});return false;
+            }else{
+                alert('tidak bisa di update data sudah tersedia');              
+            }
+            $('#btnSave').text('Simpan'); 
+            $('#btnSave').attr('disabled',false); 
+        },
+        error: function (jqXHR, textStatus, errorThrown){
+            alert('Error adding / update data');
+            $('#btnSave').text('Simpan'); 
+            $('#btnSave').attr('disabled',false); 
+        }
+    });
+}
 function validAngka(a) {
     if (!/^[0-9.]+$/.test(a.value)) {
         a.value = a.value.substring(0, a.value.length - 1000);

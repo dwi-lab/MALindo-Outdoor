@@ -86,19 +86,81 @@ class Member extends CI_Controller {
 			redirect("_404","refresh");
 		}
 	}
+	public function getKabkot($kode){
+        if($this->input->is_ajax_request()){
+			$return = "";
+			$kodex = $this->service->anti($kode);
+			$data = $this->db->query("SELECT * FROM tbl_kabupaten WHERE province_id = '$kodex'")->result();
+			if(count($data)>0){
+				$return = "<option value='' class=\"form-control selectpicker\" data-size=\"100\" id=\"kota\" data-parsley-required=\"true\" data-live-search=\"true\" data-style=\"btn-white\"> Pilih Kab / Kota </option>";
+				foreach ($data as $key) {
+					$return .= '<option class="form-control selectpicker" data-size="100" id="kota" data-parsley-required="true" data-live-search="true" data-style="btn-white" value="' .$key->id.'">' . $key->name . '</option>';
+				}
+			}else{
+				$return .= '<option class="form-control selectpicker" data-size="100" id="kota" data-parsley-required="true" data-live-search="true" data-style="btn-white" value="">Data Kabupaten / Kota Tidak Ditemukan</option>';
+			}
+			print $return;
+		}else{
+			redirect("_404","refresh");
+		}
+	}
+	public function getKec($kode){
+        if($this->input->is_ajax_request()){
+			$return = "";
+			$kodex = $this->service->anti($kode);
+			$data = $this->db->query("SELECT * FROM tbl_kecamatan WHERE regency_id = '$kodex'")->result();
+			if(count($data)>0){
+				$return = "<option value='' class=\"form-control selectpicker\" data-size=\"100\" id=\"kecamatan\" data-parsley-required=\"true\" data-live-search=\"true\" data-style=\"btn-white\"> Pilih Kecamatan </option>";
+				foreach ($data as $key) {
+					$return .= '<option class="form-control selectpicker" data-size="100" id="kecamatan" data-parsley-required="true" data-live-search="true" data-style="btn-white" value="' .$key->id.'">' . $key->name . '</option>';
+				}
+			}else{
+				$return .= '<option class="form-control selectpicker" data-size="100" id="kecamatan" data-parsley-required="true" data-live-search="true" data-style="btn-white" value="">Data Kecamatan Tidak Ditemukan</option>';
+			}
+			print $return;
+		}else{
+			redirect("_404","refresh");
+		}
+	}
+	public function getKel($kode){
+        if($this->input->is_ajax_request()){
+			$return = "";
+			$kodex  = $this->service->anti($kode);
+			$data   = $this->db->query("SELECT * FROM tbl_kelurahan WHERE district_id = '$kodex'")->result();
+			if(count($data)>0){
+				$return = "<option value='' class=\"form-control selectpicker\" data-size=\"100\" id=\"kelurahan\" data-parsley-required=\"true\" data-live-search=\"true\" data-style=\"btn-white\"> Pilih Kelurahan </option>";
+				foreach ($data as $key) {
+					$return .= '<option class="form-control selectpicker" data-size="100" id="kelurahan" data-parsley-required="true" data-live-search="true" data-style="btn-white" value="' .$key->id.'">' . $key->name . '</option>';
+				}
+			}else{
+				$return .= '<option class="form-control selectpicker" data-size="100" id="kelurahan" data-parsley-required="true" data-live-search="true" data-style="btn-white" value="">Data Kelurahan Tidak Ditemukan</option>';
+			}
+			print $return;
+		}else{
+			redirect("_404","refresh");
+		}
+	}
 	public function add(){
-		$isi['jk']           = "";
-		$isi['cek']          = "add";
-		$isi['kelas']        = "master";
-		$isi['namamenu']     = "Data Member";
-		$isi['page']         = "member";
-		$isi['link']         = 'member';
-		$isi['tombolsimpan'] = 'Simpan';
-		$isi['tombolbatal']  = 'Batal';
-		$isi['halaman']      = "Add Data Member";
-		$isi['judul']        = "Halaman Add Data Member";
-		$isi['content']      = "form_";
-		$isi['action']       = "proses_add";
+		$isi['option_kota']['']      = "Pilih Kabupaten / Kota";
+		$isi['option_kecamatan'][''] = "Pilih Kecamatan";
+		$isi['option_kelurahan'][''] = "Pilih Kelurahan";
+		$isi['option_provinsi']['']  = "Pilih Provinsi";
+		$isi['jk']                   = "";
+		$isi['cek']                  = "add";
+		$isi['kelas']                = "master";
+		$isi['namamenu']             = "Data Member";
+		$isi['page']                 = "member";
+		$isi['link']                 = 'member';
+		$isi['tombolsimpan']         = 'Simpan';
+		$isi['tombolbatal']          = 'Batal';
+		$isi['halaman']              = "Add Data Member";
+		$isi['judul']                = "Halaman Add Data Member";
+		$isi['content']              = "form_";
+		$isi['action']               = "proses_add";
+		$provinsi = $this->db->get('tbl_propinsi')->result();
+		foreach ($provinsi as $row) {
+			$isi['option_provinsi'][$row->id] = $row->name;
+		}
 		$ahhhhhh             = $this->db->query("SELECT SUBSTR(MAX(kode_member),-6) as nona FROM tbl_member")->result();
  		foreach ($ahhhhhh as $zzz) {
  			$xx = substr($zzz->nona, 3, 6);
@@ -154,6 +216,10 @@ class Member extends CI_Controller {
 			$mail         = $this->service->anti($this->input->post('mail'));
 			$kerja        = $this->service->anti($this->input->post('kerja'));
 			$no_identitas = $this->service->anti($this->input->post('no_identitas'));
+			$prov         = $this->service->anti($this->input->post('provinsi'));
+			$kota         = $this->service->anti($this->input->post('kota'));
+			$kecamatan    = $this->service->anti($this->input->post('kecamatan'));
+			$kelurahan    = $this->service->anti($this->input->post('kelurahan'));
 			$simpan       = array(
 				'kode_member'  =>$kode,
 				'no_identitas' =>$no_identitas,
@@ -165,6 +231,10 @@ class Member extends CI_Controller {
 				'email'        =>$mail,
 				'id_kerja'     =>$kerja,
 				'tgl_daftar'   =>date("Y-m-d"),
+				'id_prov'      =>$prov,
+				'id_kota'      =>$kota,
+				'id_kec'       =>$kecamatan,
+				'id_kel'       =>$kelurahan,
 				'foto'         =>$kode . ".jpg");
 			$this->db->insert('tbl_member',$simpan);
 			redirect('member','refresh');

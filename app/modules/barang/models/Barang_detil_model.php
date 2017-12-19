@@ -2,6 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Barang_detil_model extends CI_Model {
     var $table         = 'view_barang_detil';
+    var $table_        = 'tbl_barang_stok';
     var $column_order  = array('id',null,'warna','stok',null);
     var $column_search = array('id','warna','stok'); 
     var $order         = array('id' => 'desc');
