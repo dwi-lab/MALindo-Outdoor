@@ -564,19 +564,25 @@ class Barang extends CI_Controller {
 	public function detil_barang($kode){
 		$ckdata = $this->db->get_where('view_barang',array('kode'=>$kode));
 		if(count($ckdata->result())>0){
-			$row                 = $ckdata->row();
-			$isi['kode']         = $kode;
-			$isi['nama']         = $row->nama_barang;
-			$isi['tglbeli']      = $row->tgl_beli;
-			$isi['kelas']        = "master";
-			$isi['namamenu']     = "Data Barang";
-			$isi['page']         = "barang";
-			$isi['link']         = 'barang';
-			$isi['actionhapus']  = 'hapus';
-			$isi['actionedit']   = 'edit';
-			$isi['halaman']      = "Detil Data Barang";
-			$isi['judul']        = "Halaman Detil Data Barang";
-			$isi['content']      = "detil_barang";
+			$row                = $ckdata->row();
+			$isi['kode']        = $kode;
+			$isi['nama']        = $row->nama_barang;
+			$isi['tipe']        = $row->tipe;
+			$isi['merk']        = $row->merk;
+			$isi['tglbeli']     = $row->tgl_beli;
+			$isi['hrgbeli']     = $row->hrg_beli;
+			$isi['hrgsewa']     = $row->hrg_sewa;
+			$isi['hrgsusut']    = $row->biaya_penyusutan;
+			$isi['stoktot']     = $row->total_stok;
+			$isi['kelas']       = "master";
+			$isi['namamenu']    = "Data Barang";
+			$isi['page']        = "barang";
+			$isi['link']        = 'barang';
+			$isi['actionhapus'] = 'hapus';
+			$isi['actionedit']  = 'edit';
+			$isi['halaman']     = "Detil Data Barang";
+			$isi['judul']       = "Halaman Detil Data Barang";
+			$isi['content']     = "detil_barang";
 			$this->load->view("dashboard/dashboard_view",$isi);
 		}else{
 			redirect('_404','refresh');

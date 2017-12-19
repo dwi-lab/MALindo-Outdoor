@@ -24,14 +24,14 @@
     class="profile-section">
         <div class="profile-left">
             <div class="profile-image">
-                <?php
-                if($foto==""){
-                    $fotox = "no.jpg";
-                }else{
-                    $fotox = $foto;
-                }
-                ?>
-                <img src="<?php echo base_url();?>assets/foto/member/<?php echo $fotox;?>" style="width:200px;text-align:center;height:180px;">
+               <!--  <?php
+               if($foto==""){
+                   $fotox = "no.jpg";
+               }else{
+                   $fotox = $foto;
+               }
+               ?>
+               <img src="<?php echo base_url();?>assets/foto/member/<?php echo $fotox;?>" style="width:200px;text-align:center;height:180px;"> -->
                 <i class="fa fa-user hide"></i>
             </div>
         </div>
@@ -43,58 +43,45 @@
                             <tr>
                                 <th></th>
                                 <th>
-                                    <h4><?php echo $nama;?> <small><?php echo $no_identitas;?></small></h4>
+                                    <h4><?php echo $nama;?> </h4>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="highlight">
-                                <td class="field">Kode Member</td>
-                                <td><?php echo $kode_member;?></td>
+                                <td class="field">Kode Barang</td>
+                                <td><?php echo $kode;?></td>
                             </tr>
                             <tr class="highlight">
-                                <td class="field">Jenis Kelamin</td>
-                                <td><?php if($jk=='1'){echo 'Laki-Laki';}else{echo 'Perempuan';};?></td>
+                                <td class="field">Tipe Barang</td>
+                                <td><?php echo $tipe;?></td>
                             </tr>
                             <tr class="highlight">
-                                <td class="field">Tanggal Lahir</td>
-                                <td><?php echo date("d-m-Y",strtotime($tgllahir));?></td>
+                                <td class="field">Merk Barang</td>
+                                <td><?php echo $merk;?></td>
                             </tr>
                             <tr class="highlight">
-                                <td class="field">Umur</td>
-                                <td><?php echo $umur;?> Tahun</td>
+                                <td class="field">Tanggal Beli</td>
+                                <td><?php echo date("d-m-Y",strtotime($tglbeli));?></td>
                             </tr>
                             <tr class="highlight">
-                                <td class="field">Alamat</td>
-                                <td><?php echo $almt;?></td>
+                                <td class="field">Harga Beli</td>
+                                <td>Rp. <?php echo number_format($hrgbeli) ;?></td>
                             </tr>
                             <tr class="highlight">
-                                <td class="field">Pekerjaan</td>
-                                <td><?php echo $kerja;?></td>
+                                <td class="field">Biaya Penyusutan</td>
+                                <td>Rp. <?php echo number_format($hrgsusut) ;?></td>
                             </tr>
                             <tr class="highlight">
-                                <td class="field">No Handphone</td>
-                                <td><?php echo $hp;?></td>
+                                <td class="field">Harga Sewa</td>
+                                <td>Rp. <?php echo number_format($hrgsewa) ;?></td>
                             </tr>
                             <tr class="highlight">
-                                <td class="field">E-mail</td>
-                                <td><?php echo $mail;?></td>
-                            </tr>
-                            <tr class="highlight">
-                                <td class="field">Tanggal Daftar</td>
-                                <td><?php echo date("d-m-Y",strtotime($tgldaftar));?></td>
+                                <td class="field">Total Stok</td>
+                                <td><?php echo number_format($stoktot) ;?></td>
                             </tr>
                         </tbody>
                     </table>
-                    <div class="panel-heading-btn"> 
-                        <br/> 
-                        <a class="btn btn-xs m-r-5 btn-primary" href="<?php echo base_url();?>member/edit/<?php echo $kode_member;?>" title="Edit Data" 
-                        data-step         ="2" 
-                        data-intro        ="Digunakan untuk mengedit data."  
-                        data-hint         ="Digunakan untuk mengedit data." 
-                        data-hintPosition ="top-middle" 
-                        data-position     ="bottom-right-aligned"><i class="icon-pencil"></i>&nbsp;Edit Data Member</a>
-                    </div>  
                 </div>
             </div>
         </div>
@@ -148,24 +135,6 @@
                 data-step         ="5" 
                 data-intro        ="History Pengembalian Barang."  
                 data-hint         ="History Pengembalian Barang." 
-                data-hintPosition ="top-middle" 
-                data-position     ="bottom-right-aligned"
-                class="vertical-box">
-                    <div id="calendar" class="vertical-box-column p-20 calendar"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-12"> 
-        <div class="panel panel-inverse">
-            <div class="panel-heading">
-                <h4 class="panel-title">List Barang</h4>
-            </div>
-            <div class="panel-body p-0">
-                <div 
-                data-step         ="6" 
-                data-intro        ="List Barang Yang Pernah Di Pinjam."  
-                data-hint         ="List Barang Yang Pernah Di Pinjam." 
                 data-hintPosition ="top-middle" 
                 data-position     ="bottom-right-aligned"
                 class="vertical-box">
