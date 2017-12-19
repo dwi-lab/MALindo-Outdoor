@@ -11,12 +11,11 @@ $(function() {
             "type": "POST",
             "data": function ( data ) {
                 data.tipe  = $('#tipe').val();
-                // data.warna = $('#warna').val();
                 data.merk  = $('#merk').val();
             }
         },
         "columnDefs": [{ 
-            "targets": [ 1,6,0 ],
+            "targets": [ 6,0 ],
             "orderable": false, 
             "className": "text-center",
         },
@@ -33,9 +32,6 @@ $(function() {
     jQuery("#tipe").change(function(){
         table.ajax.reload(null,false); 
     });
-    /*jQuery("#warna").change(function(){
-        table.ajax.reload(null,false); 
-    });*/
     jQuery("#merk").change(function(){
         table.ajax.reload(null,false); 
     });
@@ -66,7 +62,6 @@ function reload_table(){
     });
     setTimeout(function () {
         jQuery('[name ="tipe"]').select2("val", "");
-        // jQuery('[name ="warna"]').select2("val", "");
         jQuery('[name ="merk"]').select2("val", "");
         jQuery("#filter_pencarian").hide("slow");
         table.ajax.reload(null,false);
