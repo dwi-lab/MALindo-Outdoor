@@ -42,6 +42,10 @@ class Barang_model extends CI_Model {
             $this->db->order_by(key($order), $order[key($order)]);
         }
     }
+    public function update($where, $data){
+        $this->db->update($this->table_, $data, $where);
+        return $this->db->affected_rows();
+    }
     function get_datatables(){
         $this->_get_datatables_query();
         if($_POST['length'] != -1)
@@ -53,6 +57,12 @@ class Barang_model extends CI_Model {
         $this->_get_datatables_query();
         $query = $this->db->get();
         return $query->num_rows();
+    }
+    public function get_by_id($id){
+        $this->db->from($this->table);
+        $this->db->where('kode',$id);
+        $query = $this->db->get();
+        return $query->row();
     }
     public function count_all(){
         $this->db->from($this->table);

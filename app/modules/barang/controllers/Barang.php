@@ -57,6 +57,22 @@ class Barang extends CI_Controller {
 		}else{
 			$isi['option_merk'][''] = "Data Merk Belum Tersedia";
 		}
+		$cktipeX = $this->db->get('tbl_tipe')->result();
+		if(count($cktipeX)>0){
+			foreach ($cktipeX as $row) {
+				$isi['option_tipeX'][$row->id] = $row->tipe;
+			}
+		}else{
+			$isi['option_tipeX'][''] = "Data Tipe Barang Belum Tersedia";
+		}
+		$ckmerkX = $this->db->get('tbl_merk')->result();
+		if(count($ckmerkX)>0){
+			foreach ($ckmerkX as $roww) {
+				$isi['option_merkX'][$roww->id] = $roww->merk;
+			}
+		}else{
+			$isi['option_merkX'][''] = "Data Merk Belum Tersedia";
+		}
 		$this->load->view("dashboard/dashboard_view",$isi);
 	}
 	public function getData(){
@@ -81,7 +97,7 @@ class Barang extends CI_Controller {
 				data-hint         ="Digunakan untuk mengedit data."
 				data-hintPosition ="top-middle"
 				data-position     ="bottom-right-aligned"
-				onclick="edit_barang('."'".$rowx->kode."'".',\'Data Barang\',\'barang\')"><i class="icon-pencil"></i></a><a class="btn btn-xs m-r-5 btn-danger " href="javascript:void(0)" title="Hapus Data"
+				onclick="edit_barang(\'Data Barang\',\'barang\',\'edit_data\','."'".$rowx->kode."'".')"><i class="icon-pencil"></i></a><a class="btn btn-xs m-r-5 btn-danger " href="javascript:void(0)" title="Hapus Data"
 				data-step         ="7"
 				data-intro        ="Digunakan untuk menghapus data."
 				data-hint         ="Digunakan untuk menghapus data."
@@ -103,6 +119,14 @@ class Barang extends CI_Controller {
 				"data"            => $data,
 				);
 			echo json_encode($output);
+		}else{
+			redirect("_404","refresh");
+		}
+	}
+	public function edit_data($id){
+		if($this->input->is_ajax_request()){
+			$data = $this->barang_model->get_by_id($id);
+			echo json_encode($data);
 		}else{
 			redirect("_404","refresh");
 		}
@@ -354,13 +378,13 @@ class Barang extends CI_Controller {
 	public function download_format_stok($tipe=NULL,$merk=NULL){
 		$objPHPExcel = new PHPExcel();
 		$data   = $this->db->query("
-			SELECT 
+			SELECT
 			a.kode as KODE_BARANG,
 			a.nama_barang as NAMA_BARANG,
 			a.merk as MERK_BARANG,
 			a.tipe as TIPE_BARANG,
 			a.warna as WARNA_BARANG,
-			a.stok as STOK_BARANG 
+			a.stok as STOK_BARANG
 			FROM view_barang_detil a WHERE a.id_merk = '$merk' AND a.id_tipe = '$tipe'");
 		$fields = $data->list_fields();
 		$col    = 0;
@@ -393,13 +417,13 @@ class Barang extends CI_Controller {
 	public function download_format_stok_tipe($tipe=NULL){
 		$objPHPExcel = new PHPExcel();
 		$data   = $this->db->query("
-			SELECT 
+			SELECT
 			a.kode as KODE_BARANG,
 			a.nama_barang as NAMA_BARANG,
 			a.merk as MERK_BARANG,
 			a.tipe as TIPE_BARANG,
 			a.warna as WARNA_BARANG,
-			a.stok as STOK_BARANG 
+			a.stok as STOK_BARANG
 			FROM view_barang_detil a WHERE a.id_tipe = '$tipe'");
 		$fields = $data->list_fields();
 		$col    = 0;
@@ -432,13 +456,13 @@ class Barang extends CI_Controller {
 	public function download_format_stok_merk($merk=NULL){
 		$objPHPExcel = new PHPExcel();
 		$data   = $this->db->query("
-			SELECT 
+			SELECT
 			a.kode as KODE_BARANG,
 			a.nama_barang as NAMA_BARANG,
 			a.merk as MERK_BARANG,
 			a.tipe as TIPE_BARANG,
 			a.warna as WARNA_BARANG,
-			a.stok as STOK_BARANG 
+			a.stok as STOK_BARANG
 			FROM view_barang_detil a WHERE a.id_merk = '$merk'");
 		$fields = $data->list_fields();
 		$col    = 0;
@@ -471,13 +495,13 @@ class Barang extends CI_Controller {
 	public function download_format_stok_all(){
 		$objPHPExcel = new PHPExcel();
 		$data   = $this->db->query("
-			SELECT 
+			SELECT
 			a.kode as KODE_BARANG,
 			a.nama_barang as NAMA_BARANG,
 			a.merk as MERK_BARANG,
 			a.tipe as TIPE_BARANG,
 			a.warna as WARNA_BARANG,
-			a.stok as STOK_BARANG 
+			a.stok as STOK_BARANG
 			FROM view_barang_detil a ");
 		$fields = $data->list_fields();
 		$col    = 0;
@@ -507,86 +531,20 @@ class Barang extends CI_Controller {
         header('Content-Disposition: attachment;filename="' . $nfile . '"');
         $objWriter->save("php://output");
 	}
-	public function edit($kode){
-		$ckdata = $this->db->get_where('view_barang',array('kode'=>$kode));
-		if(count($ckdata->result())>0){
-			$row                                 = $ckdata->row();
-			$isi['default']['kode']              = $row->kode;
-			$isi['default']['nama']              = $row->nama;
-			$isi['default']['no_identitas']      = $row->no_identitas;
-			$isi['default']['hp']                = $row->no_handphone;
-			$isi['default']['almt']              = $row->alamat;
-			$isi['default']['mail']              = $row->email;
-			$isi['default']['tglbeli']          = date("d-m-Y",strtotime($row->tgl_lahir));
-			$isi['jk']                           = $row->jns_kel;
-			$isi['option_warna'][$row->id_kerja] = $row->kerja;
-			$isi['foto']                         = $row->foto;
-			$isi['cek']                          = "edit";
-			$isi['kelas']                        = "master";
-			$isi['namamenu']                     = "Data Barang";
-			$isi['page']                         = "barang";
-			$isi['link']                         = 'barang';
-			$isi['tombolsimpan']                 = 'Simpan';
-			$isi['tombolbatal']                  = 'Batal';
-			$isi['halaman']                      = "Edit Data Barang";
-			$isi['judul']                        = "Halaman Edit Data Barang";
-			$isi['content']                      = "form_";
-			$isi['action']                       = "../proses_edit";
-			$ckpekerjaan                         = $this->db->get('tbl_warna')->result();
-			if(count($ckpekerjaan)>0){
-				foreach ($ckpekerjaan as $Xxx) {
-					$isi['option_warna'][$Xxx->id] = $Xxx->kerja;
-				}
-			}else{
-				$isi['option_warna'][''] = "Data Pekerjaan Belum Tersedia";
-			}
-			$this->load->view("dashboard/dashboard_view",$isi);
-		}else{
-			redirect('_404','refresh');
-		}
-	}
 	public function proses_edit(){
-		$this->form_validation->set_rules('kode', 'Kode barang', 'htmlspecialchars|trim|required|min_length[1]|max_length[20]');
-		$this->form_validation->set_rules('no_identitas', 'No Identitas', 'htmlspecialchars|trim|required|min_length[1]|max_length[20]');
-		$this->form_validation->set_rules('nama', 'Nama barang', 'htmlspecialchars|trim|required|min_length[1]|max_length[50]');
-		$this->form_validation->set_rules('tglbeli', 'Tanggal Beli', 'htmlspecialchars|trim|required|min_length[10]|max_length[10]');
-		$this->form_validation->set_rules('almt', 'Alamat', 'htmlspecialchars|trim|required|min_length[1]');
-		$this->form_validation->set_rules('kerja', 'Pekerjaan', 'htmlspecialchars|trim|required|min_length[1]');
-		$this->form_validation->set_rules('jk', 'Jenis Kelamin', 'htmlspecialchars|trim|required|min_length[1]');
-		$this->form_validation->set_rules('hp', 'No Handphone', 'htmlspecialchars|trim|required|min_length[1]|max_length[15]|is_natural');
-		$this->form_validation->set_rules('mail', 'Email', 'htmlspecialchars|trim|required|min_length[1]|max_length[50]|valid_email');
-		$this->form_validation->set_message('is_unique', '%s sudah ada sebelumnya');
-		$this->form_validation->set_message('required', '%s tidak boleh kosong');
-		$this->form_validation->set_message('min_length', '%s minimal %s karakter');
-		$this->form_validation->set_message('max_length', '%s maximal %s karakter');
-		$this->form_validation->set_message('valid_email', '%s penulisan email tidak valid');
-		if ($this->form_validation->run() == TRUE){
-			$kode         = $this->service->anti(str_replace(" ", "", $this->input->post('kode')));
-			$nama         = $this->service->anti($this->input->post('nama'));
-			$tgl          = $this->service->anti($this->input->post('tglbeli'));
-			$tgla         = $this->service->anti(date("Y-m-d",strtotime($tgl)));
-			$alamat       = $this->service->anti($this->input->post('almt'));
-			$jk           = $this->service->anti($this->input->post('jk'));
-			$hp           = $this->service->anti($this->input->post('hp'));
-			$mail         = $this->service->anti($this->input->post('mail'));
-			$kerja        = $this->service->anti($this->input->post('kerja'));
-			$no_identitas = $this->service->anti($this->input->post('no_identitas'));
-			$simpan       = array(
-				'no_identitas' =>$no_identitas,
-				'nama'         =>$nama,
-				'tgl_lahir'    =>$tgla,
-				'jns_kel'      =>$jk,
-				'alamat'       =>$alamat,
-				'no_handphone' =>$hp,
-				'email'        =>$mail,
-				'id_kerja'     =>$kerja,
-				'tgl_daftar'   =>date("Y-m-d"),
-				'foto'         =>$kode . ".jpg");
-			$this->db->where('kode',$kode);
-			$this->db->update('tbl_barang',$simpan);
-			redirect('barang','refresh');
+		if($this->input->is_ajax_request()){
+			$data = array(
+				'id_tipe'          =>$this->input->post('tipeX'),
+				'id_merk'          =>$this->input->post('merkX'),
+				'tgl_beli'         =>date("Y-m-d",strtotime($this->input->post('tgl_beli'))),
+				'hrg_beli'         =>str_replace(".", "", $this->input->post('hrgbeli')),
+				'biaya_penyusutan' =>str_replace(".", "", $this->input->post('hrgsusut')),
+				'hrg_sewa'         =>str_replace(".", "", $this->input->post('hrgsewa')),
+				'nama_barang'      => $this->service->anti(htmlspecialchars($this->input->post('nama'))));
+			$this->barang_model->update(array('kode' => $this->service->anti($this->input->post('id'))), $data);
+			echo json_encode(array("status" => TRUE));
 		}else{
-			$this->edit($this->input->post('kode'));
+			redirect("_404","refresh");
 		}
 	}
 	public function detil_barang($kode){

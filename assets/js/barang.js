@@ -68,38 +68,34 @@ function reload_table(){
         jQuery.unblockUI();
     }, 100);
 }
-function edit_barang(id,page,link){ 
-    bootbox.confirm("Yakin Akan Mengedit " +page+ " Berikut ?", 
-    function(result) { 
-        if (result) { 
-            $.blockUI({ 
-                css: { 
-                    border: 'none', 
-                    padding: '15px', 
-                    backgroundColor: '#000', '-webkit-border-radius': '10px', '-moz-border-radius': '10px', 
-                    opacity: 2, 
-                    color: '#fff' 
-                }, 
-                message : 'Sedang Melakukan Pengecekan Data <br/> Mohon menunggu ... ' 
-            }); 
-            setTimeout(function(){ 
-                $.unblockUI(); 
-            },1000); 
-            $.ajax({ 
-                url : $BASE_URL+link+'/cekdata/'+id, 
-                dataType : 'json', 
-                type : 'post', 
-                success : function(json) { 
-                    $.unblockUI(); 
-                    if (json.say == "ok") { 
-                        window.location.href = $BASE_URL+link+'/edit/'+id; 
-                    }else{ 
-                        $.gritter.add({title:"Informasi Pengeditan !",text: page+ " ini tidak ditemukan di database !"});
-                        return false; 
-                    } 
-                } 
-            }); 
-        } 
+function edit_barang(page,link,action,id){ 
+    save_method = 'update';
+    $('#form')[0].reset();
+    $('.form-group').removeClass('has-error');
+    $('.help-block').empty();
+    $.ajax({
+        url : $BASE_URL+link+"/"+action+"/" + id,
+        type: "GET",
+        dataType: "JSON",
+        success: function(data){
+            $('[name="nama"]').val(data.nama_barang);
+            $('[name="hrgbeli"]').val(data.hrg_beli);
+            $('[name="hrgsusut"]').val(data.biaya_penyusutan);
+            $('[name="hrgsewa"]').val(data.hrg_sewa);
+            var tgl_beli = new Date(data.tgl_beli); 
+            $("#tgl_beli").datepicker({
+                dateFormat: 'dd-mm-yy'
+            }).datepicker('setDate', tgl_beli)
+            jQuery('[name="tipeX"]').select2("val", data.id_tipe);
+            jQuery('[name="merkX"]').select2("val", data.id_merk);
+            $('[name="id"]').val(data.kode);
+            $('#modal_form').modal('show');
+            $('.modal-title').text('Edit Data Barang');
+            $('[name="kode"]').attr('disabled',false);
+        },
+        error: function (jqXHR, textStatus, errorThrown){
+            alert('Error get data from ajax');
+        }
     });
 }
 function detil_barang(id,page,link){ 
