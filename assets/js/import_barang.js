@@ -14,13 +14,13 @@ function download_stok() {
     var merk = jQuery("#merk").val();
     if(tipe !="" && merk !=""){
         $.ajax({ 
-            url : $BASE_URL+link+'/cekdata/'+id, 
+            url : $BASE_URL+'barang/cekdata/'+tipe+"/"+merk, 
             dataType : 'json', 
             type : 'post', 
             success : function(json) { 
                 $.unblockUI(); 
                 if (json.say == "ok") { 
-                    window.location.href = $BASE_URL+link+'/edit/'+id; 
+                    window.location.href = $BASE_URL+'barang/download_format_stok/'+tipe+"/"+merk; 
                 }else{ 
                     $.gritter.add({title:"Informasi Pengeditan !",text: page+ " ini tidak ditemukan di database !"});
                     return false; 
@@ -28,9 +28,50 @@ function download_stok() {
             } 
         }); 
     }else if(tipe !="" && merk == ""){
-
-    }else{
-        
+        $.ajax({ 
+            url : $BASE_URL+'barang/cekdata/'+tipe, 
+            dataType : 'json', 
+            type : 'post', 
+            success : function(json) { 
+                $.unblockUI(); 
+                if (json.say == "ok") { 
+                    window.location.href = $BASE_URL+'barang/download_format_stok/'+tipe; 
+                }else{ 
+                    $.gritter.add({title:"Informasi Pengeditan !",text: page+ " ini tidak ditemukan di database !"});
+                    return false; 
+                } 
+            } 
+        }); 
+    }else if(tipe =="" && merk != ""){
+        $.ajax({ 
+            url : $BASE_URL+'barang/cekdata/'+merk, 
+            dataType : 'json', 
+            type : 'post', 
+            success : function(json) { 
+                $.unblockUI(); 
+                if (json.say == "ok") { 
+                    window.location.href = $BASE_URL+'barang/download_format_stok/'+merk; 
+                }else{ 
+                    $.gritter.add({title:"Informasi Pengeditan !",text: page+ " ini tidak ditemukan di database !"});
+                    return false; 
+                } 
+            } 
+        }); 
+    }else if(tipe =="" && merk == ""){
+        $.ajax({ 
+            url : $BASE_URL+'barang/cekdata/'+merk, 
+            dataType : 'json', 
+            type : 'post', 
+            success : function(json) { 
+                $.unblockUI(); 
+                if (json.say == "ok") { 
+                    window.location.href = $BASE_URL+'barang/download_format_stok/'+merk; 
+                }else{ 
+                    $.gritter.add({title:"Informasi Pengeditan !",text: page+ " ini tidak ditemukan di database !"});
+                    return false; 
+                } 
+            } 
+        }); 
     }
 
 }
