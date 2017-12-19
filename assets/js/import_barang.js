@@ -15,7 +15,7 @@ function download_stok() {
     var merk = jQuery("#merk").val();
     if(tipe !="" && merk !=""){
         $.ajax({ 
-            url : $BASE_URL+'barang/cekdata/'+tipe+"/"+merk, 
+            url : $BASE_URL+'barang/cekbarang/'+tipe+"/"+merk, 
             dataType : 'json', 
             type : 'post', 
             success : function(json) { 
@@ -30,7 +30,7 @@ function download_stok() {
         }); 
     }else if(tipe !="" && merk == ""){
         $.ajax({ 
-            url : $BASE_URL+'barang/cekdata_tipe/'+tipe, 
+            url : $BASE_URL+'barang/cekbarang_tipe/'+tipe, 
             dataType : 'json', 
             type : 'post', 
             success : function(json) { 
@@ -45,7 +45,7 @@ function download_stok() {
         }); 
     }else if(tipe =="" && merk != ""){
         $.ajax({ 
-            url : $BASE_URL+'barang/cekdata_merk/'+merk, 
+            url : $BASE_URL+'barang/cekbarang_merk/'+merk, 
             dataType : 'json', 
             type : 'post', 
             success : function(json) { 
@@ -60,7 +60,7 @@ function download_stok() {
         }); 
     }else if(tipe =="" && merk == ""){
         $.ajax({ 
-            url : $BASE_URL+'barang/cekdata_all', 
+            url : $BASE_URL+'barang/cekbarang_all', 
             dataType : 'json', 
             type : 'post', 
             success : function(json) { 

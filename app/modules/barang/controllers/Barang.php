@@ -314,7 +314,7 @@ class Barang extends CI_Controller {
 			redirect("_404","refresh");
 		}
 	}
-	public function cekdata_all(){
+	public function cekbarang_all(){
 		if($this->input->is_ajax_request()){
 			$ckdata = $this->db->get('view_barang')->result();
 			if(count($ckdata)>0){
@@ -329,7 +329,22 @@ class Barang extends CI_Controller {
 			redirect("_404","refresh");
 		}
 	}
-	public function cekdata($tipe,$merk){
+	public function cekdata($kode=NULL){
+		if($this->input->is_ajax_request()){
+			$ckdata = $this->db->get_where('view_barang',array('kode'=>$kode))->result();
+			if(count($ckdata)>0){
+				$data['say'] = "ok";
+			}else{
+				$data['say'] = "NotOk";
+			}
+			if('IS_AJAX'){
+				echo json_encode($data);
+			}
+		}else{
+			redirect("_404","refresh");
+		}
+	}
+	public function cekbarang($tipe,$merk){
 		if($this->input->is_ajax_request()){
 			$ckdata = $this->db->get_where('view_barang',array('id_tipe'=>$tipe,'id_merk'=>$merk))->result();
 			if(count($ckdata)>0){
@@ -344,7 +359,7 @@ class Barang extends CI_Controller {
 			redirect("_404","refresh");
 		}
 	}
-	public function cekdata_merk($merk){
+	public function cekbarang_merk($merk){
 		if($this->input->is_ajax_request()){
 			$ckdata = $this->db->get_where('view_barang',array('id_merk'=>$merk))->result();
 			if(count($ckdata)>0){
@@ -359,7 +374,7 @@ class Barang extends CI_Controller {
 			redirect("_404","refresh");
 		}
 	}
-	public function cekdata_tipe($tipe){
+	public function cekbarang_tipe($tipe){
 		if($this->input->is_ajax_request()){
 			$ckdata = $this->db->get_where('view_barang',array('id_tipe'=>$tipe))->result();
 			if(count($ckdata)>0){
