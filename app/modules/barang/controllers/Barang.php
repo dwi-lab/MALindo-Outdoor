@@ -610,6 +610,27 @@ class Barang extends CI_Controller {
 			redirect("_404","refresh");
 		}
 	}
+	public function proses_add_stok(){
+		if($this->input->is_ajax_request()){
+			$kode_barang  = $this->session->userdata('kode_barang');
+			$data         = array('kode_barang'=>$kode_barang,'stok'=>$this->input->post('stokna'),'id_warna' => $this->service->anti(htmlspecialchars($this->input->post('warna'))));
+			if(!empty($_FILES['foto']['name'])){
+				$upload       = $this->_do_upload();
+				$data['foto'] = $upload;
+	        }
+			$this->barang_detil_model->simpan($data);
+			$hitung_stok  = $this->db->query("SELECT SUM(stok) as total_stok FROM tbl_barang_stok WHERE kode_barang = '$kode_barang' GROUP BY kode_barang WITH ROLLUP");
+			$rowStok      = $hitung_stok->row();
+			$total_stokna = $rowStok->total_stok;
+			$update_stok  = array('total_stok'=>$total_stokna);
+			$this->db->where('kode',$kode_barang);
+			$this->db->update('tbl_barang',$update_stok);
+			/*Update Stok Barang di Table Barang*/
+			echo json_encode(array("status" => TRUE));
+		}else{
+			redirect("_404","refresh");
+		}
+	}
 	private function _do_upload(){
 		$pathfile                = $_SERVER['DOCUMENT_ROOT'];
 		$config['upload_path']   = $pathfile.'/assets/foto/barang';
