@@ -296,7 +296,6 @@ class Barang extends CI_Controller {
 	}
 	public function hapus_data($kode){
 		if($this->input->is_ajax_request()){
-			$this->hapusfoto($kode);
 			$this->barang_model->hapus_by_kode($kode);
 			echo json_encode(array("status" => TRUE));
 		}else{
