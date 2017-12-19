@@ -763,24 +763,35 @@ class Barang extends CI_Controller {
 					NULL,
 					TRUE,
 					FALSE);
-					$total_stok = "0";
+					/*$total_stok = "0";
 					$ckstokawal = $this->db->get_where('tbl_barang',array('kode'=>$rowData[0][0]))->result();
 					foreach ($ckstokawal as $keyStok) {
-						$total_stok        = $keyStok->total_stok;
+						// $total_stok        = $keyStok->total_stok;
 						$total_stok        += $rowData[0][5];
 						$update_stok_total = array('total_stok'=>$total_stok);
 						$this->db->where('kode',$rowData[0][0]);
 						$this->db->update('tbl_barang',$update_stok_total);
 					}
+					$total_stok        += $rowData[0][5];
+					$update_stok_total = array('total_stok'=>$total_stok);
+					$this->db->where('kode',$rowData[0][0]);
+					$this->db->update('tbl_barang',$update_stok_total);*/
 					$update_stok = array(
 						'stok'          =>$rowData[0][5]
 					);
 					$ckwarna = $this->db->get_where('tbl_warna',array('warna'=>$rowData[0][4]))->result();
 					foreach ($ckwarna as $keyWarna) {
-						$idWarna = $keyWarna->id;
-						$this->db->where('kode_barang',$rowData[0][0]);
+						$idWarna     = $keyWarna->id;
+						$kode_barang = $rowData[0][0];
+						$this->db->where('kode_barang',$kode_barang);
 						$this->db->where('id_warna',$idWarna);
 						$this->db->update('tbl_barang_stok',$update_stok);
+						$hitung_stok = $this->db->query("SELECT SUM(stok) as total_stok FROM tbl_barang_stok WHERE kode_barang = '$kode_barang' GROUP BY kode_barang WITH ROLLUP");
+						$rowStok = $hitung_stok->row();
+						$total_stokna = $rowStok->total_stok;
+						$update_stok = array('total_stok'=>$total_stokna);
+						$this->db->where('kode',$kode_barang);
+						$this->db->update('tbl_barang',$update_stok);
 					}
 			}
 			redirect($_SERVER['HTTP_REFERER']);
