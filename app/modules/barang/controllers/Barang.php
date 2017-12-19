@@ -763,19 +763,6 @@ class Barang extends CI_Controller {
 					NULL,
 					TRUE,
 					FALSE);
-					/*$total_stok = "0";
-					$ckstokawal = $this->db->get_where('tbl_barang',array('kode'=>$rowData[0][0]))->result();
-					foreach ($ckstokawal as $keyStok) {
-						// $total_stok        = $keyStok->total_stok;
-						$total_stok        += $rowData[0][5];
-						$update_stok_total = array('total_stok'=>$total_stok);
-						$this->db->where('kode',$rowData[0][0]);
-						$this->db->update('tbl_barang',$update_stok_total);
-					}
-					$total_stok        += $rowData[0][5];
-					$update_stok_total = array('total_stok'=>$total_stok);
-					$this->db->where('kode',$rowData[0][0]);
-					$this->db->update('tbl_barang',$update_stok_total);*/
 					$update_stok = array(
 						'stok'          =>$rowData[0][5]
 					);
