@@ -731,4 +731,59 @@ class Barang extends CI_Controller {
 			redirect($_SERVER['HTTP_REFERER']);
 		}
 	}
+	public function proses_import_stok(){
+		$fileName                = $this->input->post('file', TRUE);
+		$config['upload_path']   = './dokumen/';
+		$config['file_name']     = $fileName;
+		$config['allowed_types'] = 'xlsx';
+		$config['max_size']      = 100000;
+		$this->load->library('upload', $config);
+		$this->upload->initialize($config);
+		if (!$this->upload->do_upload('file')) {
+			$error = array('error' => $this->upload->display_errors());
+			$this->session->set_flashdata('msg',
+				'<br/><div class=\"alert alert-warning fade in\">
+				<font color="red"><b>Ada Kesalahan Dalam Import Data Barang</b></font></div>');
+			redirect($_SERVER['HTTP_REFERER']);
+		}else {
+			$media         = $this->upload->data();
+			$inputFileName = 'dokumen/'.$media['file_name'];
+			try {
+				$inputFileType = IOFactory::identify($inputFileName);
+				$objReader     = IOFactory::createReader($inputFileType);
+				$objPHPExcel   = $objReader->load($inputFileName);
+			} catch(Exception $e) {
+				die('Error loading file "'.pathinfo($inputFileName,PATHINFO_BASENAME).'": '.$e->getMessage());
+			}
+			$sheet         = $objPHPExcel->getSheet(0);
+			$highestRow    = $sheet->getHighestRow();
+			$highestColumn = $sheet->getHighestColumn();
+			for ($row = 1; $row <= $highestRow; $row++){
+				$rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row,
+					NULL,
+					TRUE,
+					FALSE);
+					$total_stok = "0";
+					$ckstokawal = $this->db->get_where('tbl_barang',array('kode'=>$rowData[0][0]))->result();
+					foreach ($ckstokawal as $keyStok) {
+						$total_stok        = $keyStok->total_stok;
+						$total_stok        += $rowData[0][5];
+						$update_stok_total = array('total_stok'=>$total_stok);
+						$this->db->where('kode',$rowData[0][0]);
+						$this->db->update('tbl_barang',$update_stok_total);
+					}
+					$update_stok = array(
+						'stok'          =>$rowData[0][5]
+					);
+					$ckwarna = $this->db->get_where('tbl_warna',array('warna'=>$rowData[0][4]))->result();
+					foreach ($ckwarna as $keyWarna) {
+						$idWarna = $keyWarna->id;
+						$this->db->where('kode_barang',$rowData[0][0]);
+						$this->db->where('id_warna',$idWarna);
+						$this->db->update('tbl_barang_stok',$update_stok);
+					}
+			}
+			redirect($_SERVER['HTTP_REFERER']);
+		}
+	}
 }

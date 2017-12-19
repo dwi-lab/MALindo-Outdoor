@@ -98,7 +98,7 @@
           <button type="button" class="close" data-dismiss="alert">&times;</button>
           Form ini digunakan untuk <strong><a href="#">import </a></strong>Stok Barang sesuai dengan format pengisian data Stok Barang yang sudah disediakan.
         </div>
-        <form class="form-inline" action="<?php echo base_url();?>barang/proses_import" enctype="multipart/form-data" method="POST">
+        <form class="form-inline" action="<?php echo base_url();?>barang/proses_import_stok" enctype="multipart/form-data" method="POST">
           <div class="form-group m-r-10">
             <input 
             data-step         ="2" 
