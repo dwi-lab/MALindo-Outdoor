@@ -4,6 +4,7 @@ class Barang extends CI_Controller {
 		parent::__construct();
 		date_default_timezone_set('Asia/Jakarta');
 		$this->load->model('barang_model');
+		$this->load->model('barang_detil_model');
 		$this->load->library(array('PHPExcel/IOFactory'));
 		$submenu = "Data Barang";
 		$menu    = "master";
@@ -84,12 +85,10 @@ class Barang extends CI_Controller {
 				$no++;
 				$row      = array();
 				$row[]    = $no . ".";
-				/*$row[]  = "<center><a class='fancybox' href='".base_url()."assets/foto/barang/$rowx->foto' style='width:100px;text-align:center;height:102px;' data-fancybox-group='gallery' title='".$rowx->nama_barang."'><img src='".base_url()."assets/foto/barang/$rowx->foto' style='width:71px;' alt=''/></a></center>";*/
 				$row[]    = "<right>" . $rowx->kode . "</right>";
 				$row[]    = $rowx->nama_barang;
 				$row[]    = $rowx->tipe;
 				$row[]    = $rowx->merk;
-				// $row[] = $rowx->warna;
 				$row[]    = $rowx->total_stok;
 				$row[]    = '<center><a class="btn btn-xs m-r-5 btn-primary" href="javascript:void(0)" title="Edit Data"
 				data-step         ="6"
@@ -564,6 +563,7 @@ class Barang extends CI_Controller {
 	public function detil_barang($kode){
 		$ckdata = $this->db->get_where('view_barang',array('kode'=>$kode));
 		if(count($ckdata->result())>0){
+			$this->session->set_userdata('kode_barang',$kode);
 			$row                = $ckdata->row();
 			$isi['kode']        = $kode;
 			$isi['nama']        = $row->nama_barang;
@@ -586,6 +586,44 @@ class Barang extends CI_Controller {
 			$this->load->view("dashboard/dashboard_view",$isi);
 		}else{
 			redirect('_404','refresh');
+		}
+	}
+	public function getDataDetil(){
+		if($this->input->is_ajax_request()){
+			$list = $this->barang_detil_model->get_datatables();
+			$data = array();
+			$no   = $_POST['start'];
+			foreach ($list as $rowx) {
+				$no++;
+				$row   = array();
+				$row[] = $no . ".";
+				$row[] = "<center><a class='fancybox' href='".base_url()."assets/foto/barang/$rowx->foto' style='width:100px;text-align:center;height:102px;' data-fancybox-group='gallery' title='".$rowx->warna."'><img src='".base_url()."assets/foto/barang/$rowx->foto' style='width:71px;' alt=''/></a></center>";
+				$row[] = "<right>" . $rowx->warna . "</right>";
+				$row[] = number_format($rowx->stok);
+				$row[] = '<center><a class="btn btn-xs m-r-5 btn-primary" href="javascript:void(0)" title="Edit Data"
+				data-step         ="5"
+				data-intro        ="Digunakan untuk mengedit data."
+				data-hint         ="Digunakan untuk mengedit data."
+				data-hintPosition ="top-middle"
+				data-position     ="bottom-right-aligned"
+				onclick="edit_barang('."'".$rowx->id."'".',\'Data barang\',\'barang\')"><i class="icon-pencil"></i></a><a class="btn btn-xs m-r-5 btn-danger " href="javascript:void(0)" title="Hapus Data"
+				data-step         ="6"
+				data-intro        ="Digunakan untuk menghapus data."
+				data-hint         ="Digunakan untuk menghapus data."
+				data-hintPosition ="top-middle"
+				data-position     ="bottom-right-aligned"
+				onclick="hapus_data(\'Data barang\',\'barang\',\'hapus_data\','."'".$rowx->id."'".')"><i class="icon-remove icon-white"></i></a></center>';
+				$data[] = $row;
+			}
+			$output = array(
+				"draw"            => $_POST['draw'],
+				"recordsTotal"    => $this->barang_detil_model->count_all(),
+				"recordsFiltered" => $this->barang_detil_model->count_filtered(),
+				"data"            => $data,
+				);
+			echo json_encode($output);
+		}else{
+			redirect("_404","refresh");
 		}
 	}
 	public function download_format(){
