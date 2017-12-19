@@ -281,35 +281,55 @@ class Member extends CI_Controller {
 	public function edit($kode){
 		$ckdata = $this->db->get_where('view_member',array('kode_member'=>$kode));
 		if(count($ckdata->result())>0){
-			$row                                 = $ckdata->row();
-			$isi['default']['kode']              = $row->kode_member;
-			$isi['default']['nama']              = $row->nama;
-			$isi['default']['no_identitas']      = $row->no_identitas;
-			$isi['default']['hp']                = $row->no_handphone;
-			$isi['default']['almt']              = $row->alamat;
-			$isi['default']['mail']              = $row->email;
-			$isi['default']['tgllahir']          = date("d-m-Y",strtotime($row->tgl_lahir));
-			$isi['jk']                           = $row->jns_kel;
-			$isi['option_kerja'][$row->id_kerja] = $row->kerja;
-			$isi['foto']                         = $row->foto;
-			$isi['cek']                          = "edit";
-			$isi['kelas']                        = "master";
-			$isi['namamenu']                     = "Data Member";
-			$isi['page']                         = "member";
-			$isi['link']                         = 'member';
-			$isi['tombolsimpan']                 = 'Simpan';
-			$isi['tombolbatal']                  = 'Batal';
-			$isi['halaman']                      = "Edit Data Member";
-			$isi['judul']                        = "Halaman Edit Data Member";
-			$isi['content']                      = "form_";
-			$isi['action']                       = "../proses_edit";
-			$ckpekerjaan                         = $this->db->get('tbl_pekerjaan')->result();
+			$row                                   = $ckdata->row();
+			$isi['default']['kode']                = $row->kode_member;
+			$isi['default']['nama']                = $row->nama;
+			$isi['default']['no_identitas']        = $row->no_identitas;
+			$isi['default']['hp']                  = $row->no_handphone;
+			$isi['default']['almt']                = $row->alamat;
+			$isi['default']['mail']                = $row->email;
+			$isi['default']['tgllahir']            = date("d-m-Y",strtotime($row->tgl_lahir));
+			$isi['jk']                             = $row->jns_kel;
+			$isi['option_kerja'][$row->id_kerja]   = $row->kerja;
+			$isi['foto']                           = $row->foto;
+			$isi['option_provinsi'][$row->id_prov] = $row->provinsi;
+			$isi['option_kota'][$row->id_kota]     = $row->kota;
+			$isi['option_kecamatan'][$row->id_kec] = $row->kecamatan;
+			$isi['option_kelurahan'][$row->id_kel] = $row->kelurahan;
+			$isi['cek']                            = "edit";
+			$isi['kelas']                          = "master";
+			$isi['namamenu']                       = "Data Member";
+			$isi['page']                           = "member";
+			$isi['link']                           = 'member';
+			$isi['tombolsimpan']                   = 'Simpan';
+			$isi['tombolbatal']                    = 'Batal';
+			$isi['halaman']                        = "Edit Data Member";
+			$isi['judul']                          = "Halaman Edit Data Member";
+			$isi['content']                        = "form_";
+			$isi['action']                         = "../proses_edit";
+			$ckkab = $this->db->get_where('tbl_kabupaten',array('province_id'=>$row->id_prov))->result();
+			foreach ($ckkab as $keyKab) {
+				$isi['option_kota'][$keyKab->id] = $keyKab->name;
+			}
+			$ckkec = $this->db->get_where('tbl_kecamatan',array('regency_id'=>$row->id_kota))->result();
+			foreach ($ckkec as $keyKec) {
+				$isi['option_kecamatan'][$keyKec->id] = $keyKec->name;
+			}
+			$ckkel = $this->db->get_where('tbl_kelurahan',array('district_id'=>$row->id_kec))->result();
+			foreach ($ckkel as $keyKel) {
+				$isi['option_kelurahan'][$keyKel->id] = $keyKel->name;
+			}
+			$ckpekerjaan                           = $this->db->get('tbl_pekerjaan')->result();
 			if(count($ckpekerjaan)>0){
 				foreach ($ckpekerjaan as $Xxx) {
 					$isi['option_kerja'][$Xxx->id] = $Xxx->kerja;
 				}
 			}else{
 				$isi['option_kerja'][''] = "Data Pekerjaan Belum Tersedia";
+			}
+			$provinsi = $this->db->get('tbl_propinsi')->result();
+			foreach ($provinsi as $rowx) {
+				$isi['option_provinsi'][$rowx->id] = $rowx->name;
 			}
 			$this->load->view("dashboard/dashboard_view",$isi);
 		}else{
@@ -342,6 +362,10 @@ class Member extends CI_Controller {
 			$mail         = $this->service->anti($this->input->post('mail'));
 			$kerja        = $this->service->anti($this->input->post('kerja'));
 			$no_identitas = $this->service->anti($this->input->post('no_identitas'));
+			$prov         = $this->service->anti($this->input->post('provinsi'));
+			$kota         = $this->service->anti($this->input->post('kota'));
+			$kecamatan    = $this->service->anti($this->input->post('kecamatan'));
+			$kelurahan    = $this->service->anti($this->input->post('kelurahan'));
 			$simpan       = array(
 				'no_identitas' =>$no_identitas,
 				'nama'         =>$nama,
@@ -351,6 +375,10 @@ class Member extends CI_Controller {
 				'no_handphone' =>$hp,
 				'email'        =>$mail,
 				'id_kerja'     =>$kerja,
+				'id_prov'      =>$prov,
+				'id_kota'      =>$kota,
+				'id_kec'       =>$kecamatan,
+				'id_kel'       =>$kelurahan,
 				'tgl_daftar'   =>date("Y-m-d"),
 				'foto'         =>$kode . ".jpg");
 			$this->db->where('kode_member',$kode);
@@ -375,6 +403,10 @@ class Member extends CI_Controller {
 			$isi['hp']           = $row->no_handphone;
 			$isi['tgllahir']     = $row->tgl_lahir;
 			$isi['tgldaftar']    = $row->tgl_daftar;
+			$isi['provinsi']     = $row->provinsi;
+			$isi['kota']         = $row->kota;
+			$isi['kecamatan']    = $row->kecamatan;
+			$isi['kelurahan']    = $row->kelurahan;
 			$isi['umur']         = $this->service->umur(date("d-m-Y",strtotime($row->tgl_lahir)));
 			$isi['kelas']        = "master";
 			$isi['namamenu']     = "Data Member";

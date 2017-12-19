@@ -61,12 +61,28 @@
                                 <td><?php echo date("d-m-Y",strtotime($tgllahir));?></td>
                             </tr>
                             <tr class="highlight">
-                                <td class="field">Umur</td>
-                                <td><?php echo $umur;?> Tahun</td>
+                                <td class="field">Provinsi</td>
+                                <td><?php echo $provinsi;?></td>
+                            </tr>
+                            <tr class="highlight">
+                                <td class="field">Kota</td>
+                                <td><?php echo $kota;?></td>
+                            </tr>
+                            <tr class="highlight">
+                                <td class="field">Kecamatan</td>
+                                <td><?php echo $kecamatan;?></td>
+                            </tr>
+                            <tr class="highlight">
+                                <td class="field">Kelurahan</td>
+                                <td><?php echo $kelurahan;?></td>
                             </tr>
                             <tr class="highlight">
                                 <td class="field">Alamat</td>
                                 <td><?php echo $almt;?></td>
+                            </tr>
+                            <tr class="highlight">
+                                <td class="field">Umur</td>
+                                <td><?php echo $umur;?> Tahun</td>
                             </tr>
                             <tr class="highlight">
                                 <td class="field">Pekerjaan</td>

@@ -280,9 +280,15 @@ class Barang extends CI_Controller {
 								'foto'        =>$namafoto);
 							$this->db->insert('tbl_barang_stok',$simpanstokbarang);
 						}
-						$total_stok  = "0";
+						/*$total_stok  = "0";
 						$total_stok  += $this->input->post('stokna')[$key];
 						$update_stok = array('total_stok'=>$total_stok);
+						$this->db->where('kode',$kode);
+						$this->db->update('tbl_barang',$update_stok);*/
+						$hitung_stok  = $this->db->query("SELECT SUM(stok) as total_stok FROM tbl_barang_stok WHERE kode_barang = '$kode' GROUP BY kode_barang WITH ROLLUP");
+						$rowStok      = $hitung_stok->row();
+						$total_stokna = $rowStok->total_stok;
+						$update_stok  = array('total_stok'=>$total_stokna);
 						$this->db->where('kode',$kode);
 						$this->db->update('tbl_barang',$update_stok);
 		            }
@@ -564,6 +570,18 @@ class Barang extends CI_Controller {
 				'nama_barang'      => $this->service->anti(htmlspecialchars($this->input->post('nama'))));
 			$this->barang_model->update(array('kode' => $this->service->anti($this->input->post('id'))), $data);
 			echo json_encode(array("status" => TRUE));
+		}else{
+			redirect("_404","refresh");
+		}
+	}
+	function hapus_foto($x=null){
+		if($this->input->is_ajax_request()){
+			$ckdata = $this->db->get_where('tbl_barang_stok',array('id'=>$x));
+			$row    = $ckdata->row();
+			$fotona = $row->foto;
+			if($fotona!='no.jpg'){
+				unlink('./assets/foto/barang/' . $fotona);
+			}
 		}else{
 			redirect("_404","refresh");
 		}

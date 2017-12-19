@@ -194,7 +194,7 @@
                     <small><span class="text-semibold">Pastikan Inputan Data Benar !</span></small>
                 </div>      
                 <form action="#" id="form" class="form-horizontal" enctype="multipart/form-data">
-                    <input type="text" value="" name="id"/> 
+                    <input type="hidden" value="" name="id"/> 
                     <div class="form-group" id="photo-preview">
                         <label class="control-label col-md-3">Foto</label>
                         <div class="col-md-9">
