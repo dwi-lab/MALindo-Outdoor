@@ -68,19 +68,51 @@
 					</div>
 					<div
 					data-step         ="2"
-					data-intro        ="Masukan No Identitas KTP atau Identitas Lainnya"
+					data-intro        ="Masukan No Identitas KTP atau Identitas Lainnya , Maksimal dan Minimal 16 karakter"
 					data-hint         ="Masukan No Identitas KTP atau Identitas Lainnya"
 					data-hintPosition ="top-middle"
 					data-position     ="bottom-right-aligned"
 					class="form-group">
 						<label class="control-label col-md-3 col-sm-3">No Identitas</label>
 						<div class="col-md-2 col-sm-2">
-							<input class="form-control" type="text" id="no_identitas" style="text-align:right" minlength="1" maxlength='20' name="no_identitas" value="<?php echo set_value('no_identitas',isset($default['no_identitas']) ? $default['no_identitas'] : ''); ?>" data-type="no_identitas" data-parsley-required="true" data-parsley-type="number" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+							<input class="form-control" type="text" id="no_identitas" style="text-align:right" minlength="16" maxlength='16' name="no_identitas" value="<?php echo set_value('no_identitas',isset($default['no_identitas']) ? $default['no_identitas'] : ''); ?>" data-type="no_identitas" data-parsley-required="true" data-parsley-type="number" data-parsley-minlength="16" data-parsley-maxlength="16"/>
                             <span style="color:red;"><?php echo form_error('no_identitas');?></span>
 						</div>
 					</div>
+					<?php
+					if($cek=='edit'){
+						?>
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3">Foto Identitas :</label>
+							<div class="col-md-2 col-sm-2">
+							<?php
+								if($foto_identitas==""){
+									$fotoxx = "no.jpg";
+								}else{
+									$fotoxx = $foto_identitas;
+								}
+							?>
+								<img src="<?php echo base_url();?>assets/foto/identitas/<?php echo $fotoxx;?>" style="width:150px;text-align:center;height:180px;">
+							</div>
+						</div>
+						<?php
+					}
+					?>
 					<div
-					data-step         ="2"
+					data-step         ="3"
+					data-intro        ="Masukan Foto Identitas Member. Type File jpg max : 1 Mb"
+					data-hint         ="Masukan Foto Identitas Member. Type File jpg max : 1 Mb"
+					data-hintPosition ="top-middle"
+					data-position     ="bottom-right-aligned"
+					class="form-group">
+						<label class="control-label col-md-3 col-sm-3">Bukti Identitas :<br/><b><span class="small"><font color="red">* Type Format jpg | png <br/> Max File Size : 1 Mb<br/></font></span></b></label>
+						<div class="col-md-3 col-sm-3">
+                            <input name="MAX_FILE_SIZE" value="9999999999" type="hidden">
+				            <input type="file" id="identitas" name="identitas" />
+						</div>
+					</div>
+					<div
+					data-step         ="4"
 					data-intro        ="Masukan Nama Member."
 					data-hint         ="Masukan Nama Member."
 					data-hintPosition ="top-middle"
@@ -93,9 +125,9 @@
 						</div>
 					</div>
 					<div
-					data-step         ="3"
-					data-intro        ="Masukan Tanggal Lahir Guru. Format Tanggal dd-mm-yyyy."
-					data-hint         ="Masukan Tanggal Lahir Guru. Format Tanggal dd-mm-yyyy."
+					data-step         ="5"
+					data-intro        ="Masukan Tanggal Lahir. Format Tanggal dd-mm-yyyy."
+					data-hint         ="Masukan Tanggal Lahir. Format Tanggal dd-mm-yyyy."
 					data-hintPosition ="top-middle"
 					data-position     ="bottom-right-aligned"
 					class="form-group">
@@ -108,28 +140,48 @@
 	                        </div>
 	                    </div>
 					</div>
-					<div class="form-group">
+					<div 
+					data-step         ="6"
+					data-intro        ="Pilih Lokasi Provinsi."
+					data-hintPosition ="top-middle"
+					data-position     ="bottom-right-aligned"
+					class="form-group">
                         <label class="control-label col-md-3 col-sm-3">Provinsi * :</label>
                         <div class="col-md-3 col-sm-3">
                             <?php echo form_dropdown('provinsi',$option_provinsi,isset($default['provinsi']) ? $default['provinsi'] : '','id="provinsi" data-size="10" data-parsley-group="wizard-step-1" data-parsley-required="true" data-live-search="true" data-style="btn-white" class="default-select2 form-control"');?>
                             <span style="color:red;"><?php echo form_error('provinsi');?></span>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div 
+					data-step         ="7"
+					data-intro        ="Pilih Lokasi Kota / Kabupaten."
+					data-hintPosition ="top-middle"
+					data-position     ="bottom-right-aligned"
+					class="form-group">
                         <label class="control-label col-md-3 col-sm-3">Kabupaten / Kota * :</label>
                         <div class="col-md-3 col-sm-3">
                             <?php echo form_dropdown('kota',$option_kota,isset($default['kota']) ? $default['kota'] : '','id="kota" data-size="10" data-parsley-group="wizard-step-1" data-parsley-required="true" data-live-search="true" data-style="btn-white" class="default-select2 form-control"');?>
                             <span style="color:red;"><?php echo form_error('kota');?></span>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div 
+					data-step         ="8"
+					data-intro        ="Pilih Lokasi Kecamatan."
+					data-hintPosition ="top-middle"
+					data-position     ="bottom-right-aligned"
+					class="form-group">
                         <label class="control-label col-md-3 col-sm-3">Kecamatan * :</label>
                         <div class="col-md-3 col-sm-3">
                             <?php echo form_dropdown('kecamatan',$option_kecamatan,isset($default['kecamatan']) ? $default['kecamatan'] : '','id="kecamatan" data-size="10" data-parsley-group="wizard-step-1" data-parsley-required="true" data-live-search="true" data-style="btn-white" class="default-select2 form-control"');?>
                             <span style="color:red;"><?php echo form_error('kecamatan');?></span>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div 
+					data-step         ="9"
+					data-intro        ="Pilih Lokasi Kelurahan."
+					data-hintPosition ="top-middle"
+					data-position     ="bottom-right-aligned"
+					class="form-group">
                         <label class="control-label col-md-3 col-sm-3">Kelurahan * :</label>
                         <div class="col-md-3 col-sm-3">
                             <?php echo form_dropdown('kelurahan',$option_kelurahan,isset($default['kelurahan']) ? $default['kelurahan'] : '','id="kelurahan" data-size="10" data-parsley-group="wizard-step-1" data-parsley-required="true" data-live-search="true" data-style="btn-white" class="default-select2 form-control"');?>
@@ -137,7 +189,7 @@
                         </div>
                     </div>
 					<div
-					data-step         ="4"
+					data-step         ="10"
 					data-intro        ="Masukan Alamat Tempat Tinggal Member."
 					data-hint         ="Masukan Alamat Tempat Tinggal Member."
 					data-hintPosition ="top-middle"
@@ -151,9 +203,9 @@
 						</div>
 					</div>
 					<div
-					data-step         ="5"
-					data-intro        ="Pilih Jenis Kelamin Guru."
-					data-hint         ="Pilih Jenis Kelamin Guru."
+					data-step         ="11"
+					data-intro        ="Pilih Jenis Kelamin."
+					data-hint         ="Pilih Jenis Kelamin."
 					data-hintPosition ="top-middle"
 					data-position     ="bottom-right-aligned"
 					class="form-group">
@@ -165,9 +217,9 @@
 						</div>
 					</div>
 					<div
-					data-step         ="5"
-					data-intro        ="Pilih Jenis Kelamin Guru."
-					data-hint         ="Pilih Jenis Kelamin Guru."
+					data-step         ="12"
+					data-intro        ="Pilih Pekerjaan."
+					data-hint         ="Pilih Pekerjaan."
 					data-hintPosition ="top-middle"
 					data-position     ="bottom-right-aligned"
 					class="form-group">
@@ -178,9 +230,9 @@
 						</div>
 					</div>
 					<div
-					data-step         ="6"
-					data-intro        ="Masukan No Handphone Guru. Data inputan hanya karakter angka. max : 16 karakter </br> ex : 08123455555"
-					data-hint         ="Masukan No Handphone Guru. Data inputan hanya karakter angka. max : 16 karakter </br> ex : 08123455555"
+					data-step         ="13"
+					data-intro        ="Masukan No Handphone. Data inputan hanya karakter angka. max : 16 karakter </br> ex : 08123455555"
+					data-hint         ="Masukan No Handphone. Data inputan hanya karakter angka. max : 16 karakter </br> ex : 08123455555"
 					data-hintPosition ="top-middle"
 					data-position     ="bottom-right-aligned"
 					class="form-group">
@@ -191,9 +243,9 @@
 						</div>
 					</div>
 					<div
-					data-step         ="7"
-					data-intro        ="Masukan E-mail Guru. </br> ex : member@gmail.com"
-					data-hint         ="Masukan E-mail Guru. </br> ex : member@gmail.com"
+					data-step         ="14"
+					data-intro        ="Masukan E-mail. </br> ex : member@gmail.com"
+					data-hint         ="Masukan E-mail. </br> ex : member@gmail.com"
 					data-hintPosition ="top-middle"
 					data-position     ="bottom-right-aligned"
 					class="form-group">
@@ -204,9 +256,8 @@
 						</div>
 					</div>
 					<div
-					data-step         ="7"
-					data-intro        ="Masukan E-mail Guru. </br> ex : member@gmail.com"
-					data-hint         ="Masukan E-mail Guru. </br> ex : member@gmail.com"
+					data-step         ="15"
+					data-intro        ="Silahkan Lakukan Pengambilan Foto Member"
 					data-hintPosition ="top-middle"
 					data-position     ="bottom-right-aligned"
 					class="form-group">
@@ -244,7 +295,7 @@
 						<label class="control-label col-md-3 col-sm-3"></label>
 						<div class="col-md-3 col-sm-3">
 							<button type="submit"
-							data-step         ="9"
+							data-step         ="16"
 							data-intro        ="Jika data inputan sudah benar silahkan klik tombol simpan untuk menyimpan data member."
 							data-hint         ="Jika data inputan sudah benar silahkan klik tombol simpan untuk menyimpan data member."
 							data-hintPosition ="top-middle"

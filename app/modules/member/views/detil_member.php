@@ -23,7 +23,7 @@
     data-position     ="bottom-right-aligned"
     class="profile-section">
         <div class="profile-left">
-            <div class="profile-image">
+            <div class="profile-image" title="Foto Profile">
                 <?php
                 if($foto==""){
                     $fotox = "no.jpg";
@@ -32,6 +32,18 @@
                 }
                 ?>
                 <img src="<?php echo base_url();?>assets/foto/member/<?php echo $fotox;?>" style="width:200px;text-align:center;height:180px;">
+                <i class="fa fa-user hide"></i>
+            </div>
+            <br/>
+            <div class="profile-image" title="Foto Identitas">
+                <?php
+                if($foto_identitas==""){
+                    $foto_identitas = "no.jpg";
+                }else{
+                    $foto_identitas = $foto_identitas;
+                }
+                ?>
+                <img src="<?php echo base_url();?>assets/foto/identitas/<?php echo $foto_identitas;?>" style="width:200px;text-align:center;height:180px;">
                 <i class="fa fa-user hide"></i>
             </div>
         </div>

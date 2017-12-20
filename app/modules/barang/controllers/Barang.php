@@ -307,9 +307,19 @@ class Barang extends CI_Controller {
 			redirect("_404","refresh");
 		}
 	}
-	public function hapus_data_detil($kode){
+	public function hapus_data_detil($id){
 		if($this->input->is_ajax_request()){
-			$this->barang_detil_model->hapus_by_id($kode);
+			$ckkode       = $this->db->get_where('tbl_barang_stok',array('id'=>$id));
+			$rowKode      = $ckkode->row();
+			$stok_barang  = $rowKode->stok;
+			$kode_barang  = $rowKode->kode_barang;
+			$hitung_stok  = $this->db->query("SELECT SUM(stok) as total_stok FROM tbl_barang_stok WHERE kode_barang = '$kode_barang' GROUP BY kode_barang WITH ROLLUP");
+			$rowStok      = $hitung_stok->row();
+			$total_stokna = $rowStok->total_stok - $stok_barang;
+			$update_stok  = array('total_stok'=>$total_stokna);
+			$this->db->where('kode',$kode_barang);
+			$this->db->update('tbl_barang',$update_stok);
+			$this->barang_detil_model->hapus_by_id($id);
 			echo json_encode(array("status" => TRUE));
 		}else{
 			redirect("_404","refresh");

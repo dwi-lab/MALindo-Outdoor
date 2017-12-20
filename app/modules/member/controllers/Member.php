@@ -192,7 +192,7 @@ class Member extends CI_Controller {
 	}
 	public function proses_add(){
 		$this->form_validation->set_rules('kode', 'Kode Member', 'htmlspecialchars|trim|required|min_length[1]|max_length[20]|is_unique[tbl_member.kode_member]');
-		$this->form_validation->set_rules('no_identitas', 'No Identitas', 'htmlspecialchars|trim|required|min_length[1]|max_length[20]|is_unique[tbl_member.no_identitas]');
+		$this->form_validation->set_rules('no_identitas', 'No Identitas', 'htmlspecialchars|trim|required|min_length[16]|max_length[16]|is_unique[tbl_member.no_identitas]');
 		$this->form_validation->set_rules('nama', 'Nama Member', 'htmlspecialchars|trim|required|min_length[1]|max_length[50]');
 		$this->form_validation->set_rules('tgllahir', 'Tanggal Lahir', 'htmlspecialchars|trim|required|min_length[10]|max_length[10]');
 		$this->form_validation->set_rules('almt', 'Alamat', 'htmlspecialchars|trim|required|min_length[1]');
@@ -220,23 +220,60 @@ class Member extends CI_Controller {
 			$kota         = $this->service->anti($this->input->post('kota'));
 			$kecamatan    = $this->service->anti($this->input->post('kecamatan'));
 			$kelurahan    = $this->service->anti($this->input->post('kelurahan'));
-			$simpan       = array(
-				'kode_member'  =>$kode,
-				'no_identitas' =>$no_identitas,
-				'nama'         =>$nama,
-				'tgl_lahir'    =>$tgla,
-				'jns_kel'      =>$jk,
-				'alamat'       =>$alamat,
-				'no_handphone' =>$hp,
-				'email'        =>$mail,
-				'id_kerja'     =>$kerja,
-				'tgl_daftar'   =>date("Y-m-d"),
-				'id_prov'      =>$prov,
-				'id_kota'      =>$kota,
-				'id_kec'       =>$kecamatan,
-				'id_kel'       =>$kelurahan,
-				'foto'         =>$kode . ".jpg");
-			$this->db->insert('tbl_member',$simpan);
+			$acak         = rand(00,99);
+			$bersih       = $_FILES['identitas']['name'];
+			$nm           = str_replace(" ","_","$bersih");
+			$pisah        = explode(".",$nm);
+			$nama_murni   = $pisah[0];
+			$ubah         = $acak.$nama_murni;
+			$nama_fl      = $acak.$nm;
+			$tmpName      = $this->service->anti(str_replace(" ", "_", $_FILES['identitas']['name']));
+			$nmfile       = "file_".time();
+			if($tmpName!=''){
+				$config['file_name']     = $nmfile;
+				$config['upload_path']   = 'assets/foto/identitas';
+				$config['allowed_types'] = 'jpg';
+				$config['max_size']      = '1024';
+				$config['max_width']     = '0';
+				$config['max_height']    = '0';
+				$this->load->library('upload', $config);
+				$this->upload->initialize($config);
+				if ($this->upload->do_upload('identitas')){
+					$gbr  = $this->upload->data();
+					$simpan       = array(
+						'kode_member'    =>$kode,
+						'no_identitas'   =>$no_identitas,
+						'nama'           =>$nama,
+						'tgl_lahir'      =>$tgla,
+						'jns_kel'        =>$jk,
+						'alamat'         =>$alamat,
+						'no_handphone'   =>$hp,
+						'email'          =>$mail,
+						'id_kerja'       =>$kerja,
+						'tgl_daftar'     =>date("Y-m-d"),
+						'id_prov'        =>$prov,
+						'id_kota'        =>$kota,
+						'id_kec'         =>$kecamatan,
+						'id_kel'         =>$kelurahan,
+						'foto_identitas' =>$gbr['file_name'],
+						'foto'           =>$kode . ".jpg");
+					$this->db->insert('tbl_member',$simpan);
+				}else{
+					?>
+					<script type="text/javascript">
+						alert("Foto Identitas Tidak Boleh Kosong, Pastikan Type File jpg dan ukuran file maksimal 1mb");
+						window.location.href="<?php echo base_url();?>member/add";
+					</script>
+					<?php
+				}
+			}else{
+				?>
+				<script type="text/javascript">
+					alert("Foto Identitas Tidak Boleh Kosong, Pastikan Type File jpg dan ukuran file maksimal 1mb");
+					window.location.href="<?php echo base_url();?>member/add";
+				</script>
+				<?php
+			}
 			redirect('member','refresh');
 		}else{
 			$this->add();
@@ -245,6 +282,7 @@ class Member extends CI_Controller {
 	public function hapus_data($kode){
 		if($this->input->is_ajax_request()){
 			$this->hapusfoto($kode);
+			$this->hapusfoto_identias($kode);
 			$this->member_model->hapus_by_kode_member($kode);
 			echo json_encode(array("status" => TRUE));
 		}else{
@@ -258,6 +296,18 @@ class Member extends CI_Controller {
 			$fotona = $row->foto;
 			if($fotona!='no.jpg'){
 				unlink('./assets/foto/member/' . $fotona);
+			}
+		}else{
+			redirect("_404","refresh");
+		}
+	}
+	function hapusfoto_identias($x=null){
+		if($this->input->is_ajax_request()){
+			$ckdata = $this->db->get_where('tbl_member',array('kode_member'=>$x));
+			$row    = $ckdata->row();
+			$fotona = $row->foto_identitas;
+			if($fotona!='no.jpg'){
+				unlink('./assets/foto/identitas/' . $fotona);
 			}
 		}else{
 			redirect("_404","refresh");
@@ -281,6 +331,7 @@ class Member extends CI_Controller {
 	public function edit($kode){
 		$ckdata = $this->db->get_where('view_member',array('kode_member'=>$kode));
 		if(count($ckdata->result())>0){
+			$this->session->userdata('kode_member',$kode);
 			$row                                   = $ckdata->row();
 			$isi['default']['kode']                = $row->kode_member;
 			$isi['default']['nama']                = $row->nama;
@@ -292,6 +343,7 @@ class Member extends CI_Controller {
 			$isi['jk']                             = $row->jns_kel;
 			$isi['option_kerja'][$row->id_kerja]   = $row->kerja;
 			$isi['foto']                           = $row->foto;
+			$isi['foto_identitas']                 = $row->foto_identitas;
 			$isi['option_provinsi'][$row->id_prov] = $row->provinsi;
 			$isi['option_kota'][$row->id_kota]     = $row->kota;
 			$isi['option_kecamatan'][$row->id_kec] = $row->kecamatan;
@@ -338,7 +390,7 @@ class Member extends CI_Controller {
 	}
 	public function proses_edit(){
 		$this->form_validation->set_rules('kode', 'Kode Member', 'htmlspecialchars|trim|required|min_length[1]|max_length[20]');
-		$this->form_validation->set_rules('no_identitas', 'No Identitas', 'htmlspecialchars|trim|required|min_length[1]|max_length[20]');
+		$this->form_validation->set_rules('no_identitas', 'No Identitas', 'htmlspecialchars|trim|required|min_length[16]|max_length[16]');
 		$this->form_validation->set_rules('nama', 'Nama Member', 'htmlspecialchars|trim|required|min_length[1]|max_length[50]');
 		$this->form_validation->set_rules('tgllahir', 'Tanggal Lahir', 'htmlspecialchars|trim|required|min_length[10]|max_length[10]');
 		$this->form_validation->set_rules('almt', 'Alamat', 'htmlspecialchars|trim|required|min_length[1]');
@@ -366,57 +418,106 @@ class Member extends CI_Controller {
 			$kota         = $this->service->anti($this->input->post('kota'));
 			$kecamatan    = $this->service->anti($this->input->post('kecamatan'));
 			$kelurahan    = $this->service->anti($this->input->post('kelurahan'));
-			$simpan       = array(
-				'no_identitas' =>$no_identitas,
-				'nama'         =>$nama,
-				'tgl_lahir'    =>$tgla,
-				'jns_kel'      =>$jk,
-				'alamat'       =>$alamat,
-				'no_handphone' =>$hp,
-				'email'        =>$mail,
-				'id_kerja'     =>$kerja,
-				'id_prov'      =>$prov,
-				'id_kota'      =>$kota,
-				'id_kec'       =>$kecamatan,
-				'id_kel'       =>$kelurahan,
-				'tgl_daftar'   =>date("Y-m-d"),
-				'foto'         =>$kode . ".jpg");
+			$acak         = rand(00,99);
+			$bersih       = $_FILES['identitas']['name'];
+			$nm           = str_replace(" ","_","$bersih");
+			$pisah        = explode(".",$nm);
+			$nama_murni   = $pisah[0];
+			$ubah         = $acak.$nama_murni;
+			$nama_fl      = $acak.$nm;
+			$tmpName      = $this->service->anti(str_replace(" ", "_", $_FILES['identitas']['name']));
+			$nmfile       = "file_".time();
+			if($tmpName!=''){
+				$config['file_name']     = $nmfile;
+				$config['upload_path']   = 'assets/foto/identitas';
+				$config['allowed_types'] = 'jpg';
+				$config['max_size']      = '1024';
+				$config['max_width']     = '0';
+				$config['max_height']    = '0';
+				$this->load->library('upload', $config);
+				$this->upload->initialize($config);
+				if ($this->upload->do_upload('identitas')){
+					$gbr  = $this->upload->data();
+					$simpan       = array(
+						'kode_member'    =>$kode,
+						'no_identitas'   =>$no_identitas,
+						'nama'           =>$nama,
+						'tgl_lahir'      =>$tgla,
+						'jns_kel'        =>$jk,
+						'alamat'         =>$alamat,
+						'no_handphone'   =>$hp,
+						'email'          =>$mail,
+						'id_kerja'       =>$kerja,
+						'tgl_daftar'     =>date("Y-m-d"),
+						'id_prov'        =>$prov,
+						'id_kota'        =>$kota,
+						'id_kec'         =>$kecamatan,
+						'id_kel'         =>$kelurahan,
+						'foto_identitas' =>$gbr['file_name'],
+						'foto'           =>$kode . ".jpg");
+				}else{
+					?>
+					<script type="text/javascript">
+						alert("Foto Identitas Tidak Boleh Kosong, Pastikan Type File jpg dan ukuran file maksimal 1mb");
+						window.location.href="<?php echo base_url();?>member/add";
+					</script>
+					<?php
+				}
+			}else{
+				$simpan       = array(
+					'kode_member'    =>$kode,
+					'no_identitas'   =>$no_identitas,
+					'nama'           =>$nama,
+					'tgl_lahir'      =>$tgla,
+					'jns_kel'        =>$jk,
+					'alamat'         =>$alamat,
+					'no_handphone'   =>$hp,
+					'email'          =>$mail,
+					'id_kerja'       =>$kerja,
+					'tgl_daftar'     =>date("Y-m-d"),
+					'id_prov'        =>$prov,
+					'id_kota'        =>$kota,
+					'id_kec'         =>$kecamatan,
+					'id_kel'         =>$kelurahan,
+					'foto'           =>$kode . ".jpg");
+			}
 			$this->db->where('kode_member',$kode);
 			$this->db->update('tbl_member',$simpan);
 			redirect('member','refresh');
 		}else{
-			$this->edit($this->input->post('kode'));
+			$this->edit($this->session->userdata('kode_member'));
 		}
 	}
 	public function detil_member($kode){
 		$ckdata = $this->db->get_where('view_member',array('kode_member'=>$kode));
 		if(count($ckdata->result())>0){
-			$row                 = $ckdata->row();
-			$isi['foto']         = $row->foto;
-			$isi['kode_member']  = $kode;
-			$isi['no_identitas'] = $row->no_identitas;
-			$isi['nama']         = $row->nama;
-			$isi['almt']         = $row->alamat;
-			$isi['mail']         = $row->email;
-			$isi['jk']           = $row->jns_kel;
-			$isi['kerja']        = $row->kerja;
-			$isi['hp']           = $row->no_handphone;
-			$isi['tgllahir']     = $row->tgl_lahir;
-			$isi['tgldaftar']    = $row->tgl_daftar;
-			$isi['provinsi']     = $row->provinsi;
-			$isi['kota']         = $row->kota;
-			$isi['kecamatan']    = $row->kecamatan;
-			$isi['kelurahan']    = $row->kelurahan;
-			$isi['umur']         = $this->service->umur(date("d-m-Y",strtotime($row->tgl_lahir)));
-			$isi['kelas']        = "master";
-			$isi['namamenu']     = "Data Member";
-			$isi['page']         = "member";
-			$isi['link']         = 'member';
-			$isi['actionhapus']  = 'hapus';
-			$isi['actionedit']   = 'edit';
-			$isi['halaman']      = "Detil Data Member";
-			$isi['judul']        = "Halaman Detil Data Member";
-			$isi['content']      = "detil_member";
+			$row                   = $ckdata->row();
+			$isi['foto_identitas'] = $row->foto_identitas;
+			$isi['foto']           = $row->foto;
+			$isi['kode_member']    = $kode;
+			$isi['no_identitas']   = $row->no_identitas;
+			$isi['nama']           = $row->nama;
+			$isi['almt']           = $row->alamat;
+			$isi['mail']           = $row->email;
+			$isi['jk']             = $row->jns_kel;
+			$isi['kerja']          = $row->kerja;
+			$isi['hp']             = $row->no_handphone;
+			$isi['tgllahir']       = $row->tgl_lahir;
+			$isi['tgldaftar']      = $row->tgl_daftar;
+			$isi['provinsi']       = $row->provinsi;
+			$isi['kota']           = $row->kota;
+			$isi['kecamatan']      = $row->kecamatan;
+			$isi['kelurahan']      = $row->kelurahan;
+			$isi['umur']           = $this->service->umur(date("d-m-Y",strtotime($row->tgl_lahir)));
+			$isi['kelas']          = "master";
+			$isi['namamenu']       = "Data Member";
+			$isi['page']           = "member";
+			$isi['link']           = 'member';
+			$isi['actionhapus']    = 'hapus';
+			$isi['actionedit']     = 'edit';
+			$isi['halaman']        = "Detil Data Member";
+			$isi['judul']          = "Halaman Detil Data Member";
+			$isi['content']        = "detil_member";
 			$this->load->view("dashboard/dashboard_view",$isi);
 		}else{
 			redirect('_404','refresh');

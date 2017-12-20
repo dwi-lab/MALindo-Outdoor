@@ -115,10 +115,10 @@ class Pegawai extends CI_Controller {
 		$this->form_validation->set_message('max_length', '%s maximal %s karakter');
 		$this->form_validation->set_message('valid_email', '%s penulisan email tidak valid');
 		if ($this->form_validation->run() == TRUE){
-			$kode         = $this->service->anti(str_replace(" ", "", $this->input->post('kode')));
-			$nama         = $this->service->anti($this->input->post('nama'));
-			$hp           = $this->service->anti($this->input->post('hp'));
-			$mail         = $this->service->anti($this->input->post('mail'));
+			$kode       = $this->service->anti(str_replace(" ", "", $this->input->post('kode')));
+			$nama       = $this->service->anti($this->input->post('nama'));
+			$hp         = $this->service->anti($this->input->post('hp'));
+			$mail       = $this->service->anti($this->input->post('mail'));
 			$acak       = rand(00,99);
 			$bersih     = $_FILES['foto']['name'];
 			$nm         = str_replace(" ","_","$bersih");
