@@ -69,7 +69,6 @@
 					<div
 					data-step         ="2"
 					data-intro        ="Masukan No Identitas KTP atau Identitas Lainnya , Maksimal dan Minimal 16 karakter"
-					data-hint         ="Masukan No Identitas KTP atau Identitas Lainnya"
 					data-hintPosition ="top-middle"
 					data-position     ="bottom-right-aligned"
 					class="form-group">
