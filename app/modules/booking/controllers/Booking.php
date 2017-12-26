@@ -76,6 +76,27 @@ class Booking extends CI_Controller {
 			redirect("_404","refresh");
 		}
 	}
+	public function cekLama($mulai,$selesai){
+		if($mulai !="" && $selesai != ""){
+			$mulai   = $this->service->anti(date("Y-m-d",strtotime($mulai)));
+			$selesai = $this->service->anti(date("Y-m-d",strtotime($selesai)));
+			$startx  = new DateTIme($mulai);
+			$endx    = new DateTime($selesai);
+			$lama    = $endx->diff($startx);
+			$lama    = $lama->format("%d")+0;
+			$cklama  = $this->db->get_where('tbl_disc',array('durasi'=>$lama));
+			if(count($cklama->result())>0){
+				$row = $cklama->row();
+				$lamana = $row->durasi;
+				$diskon = $row->disc;
+				echo $lamana . "|" . $diskon;
+			}else{
+				echo "NotOk";
+			}
+		}else{
+			echo "NotOk";
+		}
+	}
 	public function add(){
 		$isi['option_warna'][''] = "Pilih Warna Barang";
 		$cwarna                  = $this->db->get('tbl_warna')->result();
@@ -132,18 +153,18 @@ class Booking extends CI_Controller {
 						foreach ($ckbooking as $xxx) {
 							$status_booking = $xxx->status_booking;
 							if($status_booking == 1){
-									$data['message'][] = array(
-											'id'            => $row->kode_member,
-											'value'         => $row->nama . " | " . $row->kode_member,
-											'dir'           => 'member',
-											'nama'          => $row->nama,
-											'no_handphone'  => $row->no_handphone,
-											'no_identitas'  => $row->no_identitas,
-											'kode'          => $row->kode_member,
-											'alamat'        => $row->alamat,
-											'status_pinjam' => "Member bersangkutan sudah melakukan booking sebelumnya namun belum di proses",
-											'status_warna'  =>'3',
-											'foto'          => $row->foto);
+								$data['message'][] = array(
+										'id'            => $row->kode_member,
+										'value'         => $row->nama . " | " . $row->kode_member,
+										'dir'           => 'member',
+										'nama'          => $row->nama,
+										'no_handphone'  => $row->no_handphone,
+										'no_identitas'  => $row->no_identitas,
+										'kode'          => $row->kode_member,
+										'alamat'        => $row->alamat,
+										'status_pinjam' => "Member bersangkutan sudah melakukan booking sebelumnya namun belum di proses",
+										'status_warna'  =>'3',
+										'foto'          => $row->foto);
 							}else{
 								$data['message'][] = array(
 									'id'            => $row->kode_member,
@@ -154,7 +175,7 @@ class Booking extends CI_Controller {
 									'no_identitas'  => $row->no_identitas,
 									'kode'          => $row->kode_member,
 									'alamat'        => $row->alamat,
-									'status_pinjam' => "Silahkan Masukan Kode Barang yang akan di Bookin.",
+									'status_pinjam' => "Silahkan Masukan Kode Barang yang akan di Booking.",
 									'status_warna'  =>'1',
 									'foto'          => $row->foto);
 							}
@@ -174,7 +195,7 @@ class Booking extends CI_Controller {
 										'no_identitas'  => $row->no_identitas,
 										'kode'          => $row->kode_member,
 										'alamat'        => $row->alamat,
-										'status_pinjam' => "Silahkan Masukan Kode Barang yang akan di Bookin.",
+										'status_pinjam' => "Silahkan Masukan Kode Barang yang akan di Booking.",
 										'status_warna'  =>'1',
 										'foto'          => $row->foto);
 								}elseif ($status==1) {
@@ -203,7 +224,7 @@ class Booking extends CI_Controller {
 											'no_identitas'  => $row->no_identitas,
 											'kode'          => $row->kode_member,
 											'alamat'        => $row->alamat,
-											'status_pinjam' => "Silahkan Masukan Kode Barang yang akan di Bookin.",
+											'status_pinjam' => "Silahkan Masukan Kode Barang yang akan di Booking.",
 											'status_warna'  =>'1',
 											'foto'          => $row->foto);
 									}else{
@@ -232,7 +253,7 @@ class Booking extends CI_Controller {
 								'no_identitas'  => $row->no_identitas,
 								'kode'          => $row->kode_member,
 								'alamat'        => $row->alamat,
-								'status_pinjam' => "Silahkan Masukan Kode Barang yang akan di Bookin.",
+								'status_pinjam' => "Silahkan Masukan Kode Barang yang akan di Booking.",
 								'status_warna'  =>'1',
 								'foto'          => $row->foto);
 						}
@@ -245,6 +266,36 @@ class Booking extends CI_Controller {
 	            echo json_encode($data);
 	        }
 	    }else{
+	    	redirect('_404','refresh');
+	    }
+	}
+	public function getBarang($kode,$warna){
+		if($this->input->is_ajax_request()){
+			$warna = $this->service->anti($warna);
+			$ckinfobarang = $this->db->query("SELECT * FROM view_barang_detil WHERE kode = '$kode' AND id_warna = '$warna'")->result();
+			if(count($ckinfobarang)>0){
+				foreach ($ckinfobarang as $key) {
+					echo $key->stok . "|" . $key->warna . "|" . $key->foto;
+				}
+			}else{
+				echo "NotOk";
+			}
+		}else{
+	    	redirect('_404','refresh');
+	    }
+	}
+	public function cekDiskon(){
+		if($this->input->is_ajax_request()){
+			$now    = date("Y-m-d");
+			$diskon = $this->db->query("SELECT * FROM tbl_disc_momen WHERE tgl_mulai <= '$now' AND tgl_selesai >= '$now'")->result();
+			if(count($diskon)>0){
+				foreach ($diskon as $key) {
+					echo $key->diskon . "|" . "Diskon Momen : " . $key->nama_diskon . " dari tanggal " . date("d-m-Y",strtotime($key->tgl_mulai)) . " s/d " . date("d-m-Y",strtotime($key->tgl_selesai));
+				}
+			}else{
+				echo "NotOk";				
+			}
+		}else{
 	    	redirect('_404','refresh');
 	    }
 	}
@@ -273,5 +324,21 @@ class Booking extends CI_Controller {
 	    }else{
 	    	redirect('_404','refresh');
 	    }
+	}
+	public function proses_add(){
+		$kode_booking  = $this->input->post('kode_booking');
+		$info_member   = $this->input->post('nama');
+		$pch           = explode("|", $info_member);
+		$kode_member   = $pch[1];
+		$nama_barangna = $this->input->post('nama_barangna');
+		for ($i=0; $i < $nama_barangna ; $i++) { 
+			$ckkodebarang = $this->db->get_where('tbl_barang',array('nama_barang'=>$nama_barangna[$i]));
+			$row          = $ckkodebarang->row();
+			$kode_barang  = $row->kode;
+			$warna        = $this->input->post('warnana');
+			$ckwarna      = $this->db->get_where('view_barang_detil',array('warna'=>$warna[$i],'kode'=>$kode_barang));
+			$rowWarna     = $ckwarna->row();
+			$kode_warna   = $rowWarna->id_warna;
+		}
 	}
 }

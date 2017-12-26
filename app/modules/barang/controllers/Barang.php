@@ -280,11 +280,6 @@ class Barang extends CI_Controller {
 								'foto'        =>$namafoto);
 							$this->db->insert('tbl_barang_stok',$simpanstokbarang);
 						}
-						/*$total_stok  = "0";
-						$total_stok  += $this->input->post('stokna')[$key];
-						$update_stok = array('total_stok'=>$total_stok);
-						$this->db->where('kode',$kode);
-						$this->db->update('tbl_barang',$update_stok);*/
 						$hitung_stok  = $this->db->query("SELECT SUM(stok) as total_stok FROM tbl_barang_stok WHERE kode_barang = '$kode' GROUP BY kode_barang WITH ROLLUP");
 						$rowStok      = $hitung_stok->row();
 						$total_stokna = $rowStok->total_stok;

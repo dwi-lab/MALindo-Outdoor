@@ -18,8 +18,27 @@
         $(".datepicker").datepicker({
             todayHighlight: !0
         });
+        jQuery('#subtotal_').priceFormat({
+	        prefix: '',
+	        centsSeparator: ',',
+	        thousandsSeparator: '.'
+	    });
+	    jQuery('#bayar').priceFormat({
+	        prefix: '',
+	        centsSeparator: ',',
+	        thousandsSeparator: '.'
+	    });
+	    jQuery('#sisa').priceFormat({
+	        prefix: '',
+	        centsSeparator: ',',
+	        thousandsSeparator: '.'
+	    });
+        $('#tglmulai').datepicker();
+    	$('#tglselesai').datepicker();
         jQuery("#informasi").hide('');
         jQuery("#tombol").hide('');
+        jQuery("#ket_disc").hide('');
+        jQuery("#ket_disc_lama").hide('');
         jQuery("#informasi_barang").hide('');
         jQuery("#informasi_barang_detil").hide('');
         jQuery("#status").hide('');
@@ -104,14 +123,133 @@
             },
             minLength:3,
             select: function(event,ui){
-                jQuery('#kode_barang').val(ui.item.nama+" | " + ui.item.kode);
+                jQuery('#kode_barang').val(ui.item.kode);
                 jQuery('#nama_barang').val(ui.item.nama);
                 jQuery('#hrg_sewa').val(ui.item.harga);
 				jQuery("#informasi_barang_detil").show('slow');
-            	document.getElementById('qty').focus();
+            	document.getElementById('warna').focus();
                 return false;
             }
         })
+        jQuery("#warna").change(function(){
+			var warna = jQuery("#warna").val();
+			var kode  = jQuery("#kode_barang").val();
+	        if(warna!=""){
+	            jQuery.blockUI({
+	                css: { 
+	                    border: 'none', 
+	                    padding: '15px', 
+	                    backgroundColor: '#000', 
+	                    '-webkit-border-radius': '10px', 
+	                    '-moz-border-radius': '10px', 
+	                    opacity: 0.5, 
+	                    color: '#fff' 
+	                },
+	                message : 'Sedang Melakukan Pengecekan Data, Mohon menunggu ... '
+	            });
+	            setTimeout(function(){
+	            	jQuery.post($BASE_URL+"booking/getBarang/"+kode+"/"+warna,
+		            function(data){
+		                jQuery.unblockUI();
+		                var dt = data.split("|");
+		                jQuery("#stok_barang").val(dt[0]);
+		                jQuery("#warna_barang").val(dt[1]);
+		                jQuery("#foto_barang").val(dt[2]);
+						var foto         = jQuery("#foto_barang").val();
+						var warna_barang = jQuery("#warna_barang").val();
+						var stok         = jQuery("#stok_barang").val();
+						if(stok=='NotOk'){
+				            $.gritter.add({title:"Informasi Barang !",text: "Data Tidak Ditemukan Untuk Saat Ini !"});
+			                jQuery("#qty").val('');
+				            return false;
+		                }else if(stok <= 0){
+				            $.gritter.add({title:"Informasi Barang !",text: "Stok Barang Tersebut Tidak Tersedia"});return false;
+		                }else{
+			                document.getElementById('qty').focus();
+			                jQuery("#qty").val('');
+				            $.gritter.add({title:"Informasi Barang !",text: "Warna Barang : " + warna_barang + "<br/> Stok Barang : " + stok,image:'<?php echo base_url();?>assets/foto/barang/'+foto});
+				            return false;
+		                }
+		            });
+	            },500);
+                jQuery.unblockUI();
+	        }
+	    });
+	    jQuery("#tglselesai").change(function(){
+			var mulai   = jQuery("#tglsewa").val();
+			var selesai = jQuery("#tglselesaisewa").val();
+			if(mulai != "" && selesai != ""){
+				jQuery.post($BASE_URL+"booking/cekLama/"+mulai+"/"+selesai,
+	            function(data){
+					var dt        = data.split("|");
+					jQuery("#lama_pinjam").val(dt[0]);
+					jQuery("#disc_lama_pinjam").val(dt[1]);
+					var lama      = jQuery("#lama_pinjam").val();
+					var disc_lama = jQuery("#disc_lama_pinjam").val();
+	                if(lama=='NotOk'){
+						jQuery("#disc_lama_pinjam").val('');
+	                    document.getElementById("ket_diskon_lama").innerHTML = "<b>Tidak Ada Diskon</b>";
+	                }else{
+	                    document.getElementById("ket_diskon_lama").innerHTML = "<b> Diskon Dengan Lama Pinjam " + lama + " Hari adalah "+ disc_lama +" % </b>";
+	                }
+			        jQuery("#ket_disc_lama").show('slow');
+			        /*Hitung Subtotal*/
+					var diskon_momen = jQuery("#disc").val();
+					var diskon_lama  = jQuery("#disc_lama_pinjam").val();
+					var total        = jQuery("#subtotal").unmask();
+					if(diskon_momen!="" && diskon_lama==""){
+						var h        = (parseInt(diskon_momen) / 100) * total;
+						var subtotal = parseInt(total) - parseInt(h);
+					}else if(diskon_lama!="" && diskon_momen==""){
+						var h        = (parseInt(diskon_lama) / 100) * total;
+						var subtotal = parseInt(total) - parseInt(h);
+					}else if(diskon_lama!="" && diskon_momen!=""){
+						var m        = (parseInt(diskon_momen) / 100) * total;
+						var subtotal_momen = parseInt(total) - parseInt(m);
+						var l        = (parseInt(diskon_lama) / 100) * total;
+						var subtotal_lama = parseInt(total) - parseInt(l);
+						var subtotal = parseInt(total) - ((parseInt(subtotal_momen) + parseInt(subtotal_lama)));
+					}else{
+						var subtotal = total;
+					}
+					jQuery("#subtotal_").val(subtotal);
+					jQuery('#subtotal_').priceFormat({
+				        prefix: '',
+				        centsSeparator: ',',
+				        thousandsSeparator: '.'
+				    });
+                    return false;
+	            });
+			}else{
+	            $.gritter.add({title:"Informasi !",text: "Pastikan Tanggal Pinjam dan Tanggal Selesai Pinjam Sudah Terisi"});
+			}
+	    });
+	    jQuery("#qty").change(function(){
+			var stok  = jQuery("#stok_barang").val();
+			var qty   = jQuery("#qty").val();
+			var warna = jQuery("#warna_barang").val();
+			if(warna!=""){
+				if(qty!="" || qty > 0){
+					if(qty <= stok){
+						$.gritter.add({title:"Informasi Barang !",text: "Silahkan Klik Tombol Tambah untuk menambah Barang."});
+			            return false;
+					}else{
+						$.gritter.add({title:"Informasi Barang !",text: "Jumlah Barang Melebihi Stok Barang !"});
+						jQuery("#qty").val('0');
+		                document.getElementById('qty').focus();
+			            return false;
+					}
+				}else{
+		            $.gritter.add({title:"Informasi Barang !",text: "Masukan Jumlah Barang yang akan di booking !"});
+	                document.getElementById('qty').focus();
+		            return false;
+				}
+			}else{
+				$.gritter.add({title:"Informasi Barang !",text: "Masukan Jumlah Barang yang akan di booking !"});
+                document.getElementById('warna').focus();
+	            return false;
+			}
+	    });
     });
 </script>
 <div class="row">
@@ -150,7 +288,12 @@
 					?>
 					<div class="form-group">
 	                    <input class="form-control" type="hidden" id="status_warna" name="status_warna" />
+	                    <input class="form-control" type="hidden" id="nama_diskon" name="nama_diskon" />
+	                    <input class="form-control" type="hidden" id="tot_diskon" name="tot_diskon" />
 	                    <input class="form-control" type="hidden" id="foto" name="foto" />
+	                    <input class="form-control" type="hidden" id="stok_barang" name="stok_barang" />
+	                    <input class="form-control" type="hidden" id="foto_barang" name="foto_barang" />
+	                    <input class="form-control" type="hidden" id="warna_barang" name="warna_barang" />
 						<label class="control-label col-md-3 col-sm-3">Kode Booking</label>
 						<div class="col-md-2 col-sm-2">
 							<input class="form-control" type="text" readonly="readonly" id="kode" minlength="1" maxlength='20' name="kode" value="<?php echo set_value('kode',isset($default['kode']) ? $default['kode'] : ''); ?>"  data-type="kode" data-parsley-required="true" data-parsley-minlength="1" data-parsley-maxlength="20"/>
@@ -204,25 +347,28 @@
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Harga Sewa</label>
 								<div class="col-md-2 col-sm-2">
-									<input class="form-control" type="text" id="hrg_sewa" minlength="1" readonly="readonly" maxlength='20' name="hrg_sewa" data-type="text" data-parsley-required="true" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+									<div class="input-group">
+		                                <span class="input-group-addon">Rp.</span>
+										<input class="form-control" type="text" style="text-align: right;" id="hrg_sewa" minlength="1" readonly="readonly" maxlength='20' name="hrg_sewa" data-type="text"/>
+		                            </div>
 								</div>
 							</div>
                     		<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Warna Barang</label>
 								<div class="col-md-15 col-sm-3">
-									<?php echo form_dropdown('warna',$option_warna,isset($default['warna']) ? $default['warna'] : '','class="default-select2 form-control" id="warna" data-size="10" data-live-search="true" data-parsley-group="wizard-step-2" data-parsley-required="true" data-style="btn-white"');?>
+									<?php echo form_dropdown('warna',$option_warna,isset($default['warna']) ? $default['warna'] : '','class="default-select2 form-control" id="warna" data-size="10" data-live-search="true" data-style="btn-white"');?>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Jumlah Barang</label>
 								<div class="col-md-2 col-sm-2">
-									<input class="form-control" type="number" id="qty" minlength="1" maxlength='20' name="qty" data-type="number" data-parsley-required="true" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+									<input class="form-control" type="number" id="qty" minlength="1" maxlength='20' name="qty" data-type="number"/>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3"></label>
 								<div class="col-md-4 col-sm-4">
-									<button type="button" id="tambahstok" class="btn btn-primary btn-xs m-r-5" title="Tambah Stok Barang"><i class="fa fa-plus"></i></button>
+									<button type="button" id="tambahbooking" class="btn btn-primary btn-xs m-r-5" title="Tambah Booking Barang"><i class="fa fa-plus"></i></button>
 								</div>
 							</div>
 							<div class="form-group">
@@ -231,17 +377,114 @@
 									<div class="widgetcontent bordered shadowed nomargin">
 										<div class ="table-responsive" style="text-align: center;" >
 											<?php 
-											echo "<table width=\"50%\" text-align=\"center\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" id='tbladdstok'>\n"; 
+											echo "<table width=\"70%\" text-align=\"center\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" id='tbladdbarang'>\n"; 
 											echo "  <tr>\n"; 
 											echo "    <th>Nama Barang</th>\n"; 
 											echo "    <th>Warna</th>\n";
+											echo "    <th>Harga Sewa</th>\n";
 											echo "    <th>QTY</th>\n";
+											echo "    <th>Total</th>\n";
 											echo "    <th>Action</th>\n";
 											echo "  </tr>\n"; 
 											echo "</table>";
 											?>
 										</div>
 									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Total</label>
+								<div class="col-md-3 col-sm-3">
+									<div class="input-group">
+		                                <span class="input-group-addon">Rp.</span>
+										<input class="form-control" type="text" style="text-align: right;" id="subtotal" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+		                            </div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Diskon Momen</label>
+								<div class="col-md-2 col-sm-2">
+									<div class="input-group">
+		                                <input class="form-control" type="text" style="text-align: right;" id="disc" minlength="1" readonly="readonly" maxlength='20' name="disc" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+		                                <span class="input-group-addon">%</span>
+		                            </div>
+								</div>
+							</div>
+							<div id="ket_disc">
+								<div class="form-group">
+									<div class="col-md-8 col-sm-8">
+	                            		<span style="color:red;" id="ket_diskon"></span>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Tanggal Sewa</label>
+								<div class="col-md-2 col-sm-2">
+									<div class="input-group date" id="tglmulai" data-date-format="dd-mm-yyyy">
+			                            <input type="text" class="form-control" name="tglsewa" id="tglsewa" data-parsley-minlength="10" data-parsley-maxlength="10" minlength="10" maxlength="10" data-parsley-required="true"/>
+			                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+			                        </div>
+			                    </div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Tanggal Selesai</label>
+								<div class="col-md-2 col-sm-2">
+									<div class="input-group date" id="tglselesai" data-date-format="dd-mm-yyyy">
+			                            <input type="text" class="form-control" id="tglselesaisewa" name="tglselesai" data-parsley-minlength="10" data-parsley-maxlength="10" minlength="10" maxlength="10" data-parsley-required="true"/>
+			                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+			                        </div>
+			                    </div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Lama Pinjam</label>
+								<div class="col-md-2 col-sm-2">
+									<div class="input-group">
+		                                <input class="form-control" type="text" style="text-align: right;" id="lama_pinjam" minlength="1" readonly="readonly" maxlength='20' name="lama_pinjam" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+		                                <span class="input-group-addon">Hari</span>
+		                            </div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Diskon Lama Pinjam</label>
+								<div class="col-md-2 col-sm-2">
+									<div class="input-group">
+		                                <input class="form-control" type="text" style="text-align: right;" id="disc_lama_pinjam" minlength="1" readonly="readonly" maxlength='20' name="disc_lama_pinjam" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+		                                <span class="input-group-addon">%</span>
+		                            </div>
+								</div>
+							</div>
+							<div id="ket_disc_lama">
+								<div class="form-group">
+									<div class="col-md-8 col-sm-8">
+	                            		<span style="color:red;" id="ket_diskon_lama"></span>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Subtotal</label>
+								<div class="col-md-3 col-sm-3">
+									<div class="input-group">
+		                                <span class="input-group-addon">Rp.</span>
+										<input class="form-control" type="text" style="text-align: right;" id="subtotal_" minlength="1" readonly="readonly" maxlength='20' name="subtotal_" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+		                            </div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Bayar</label>
+								<div class="col-md-3 col-sm-3">
+									<div class="input-group">
+		                                <span class="input-group-addon">Rp.</span>
+										<input class="form-control" type="text" style="text-align: right;" id="bayar" name="bayar"/>
+		                            </div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Sisa Pembayaran</label>
+								<div class="col-md-3 col-sm-3">
+									<div class="input-group">
+		                                <span class="input-group-addon">Rp.</span>
+										<input class="form-control" type="text" style="text-align: right;" readonly="readonly" id="sisa" name="sisa"/>
+		                            </div>
 								</div>
 							</div>
                     	</div>

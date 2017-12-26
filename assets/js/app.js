@@ -7,7 +7,7 @@ jQuery(document).ready(function() {
         var kode  = jQuery("#kode").val();
         var warna = jQuery("#warna option:selected").text();
         if (warna != "" && stok != "") {
-            jQuery('#tbladdstok > tbody:first').append("<tr id ='" + no + "''><td><input style='width:80px' class='form-control' type='text' readonly='readonly' value='" + kode + "' name='kodena[]' /><td><input style='width:180px' class='form-control' type='text' readonly='readonly' value='" + warna + "' name='warnana[]' /></td><td><input style='width:80px' readonly='readonly' class='form-control' type='text' value='" + stok + "' name='stokna[]'  /></td><td><input type='file' name='fotona[]' id='fotona' class='form-control' style='width:100px'/></td><td><button id='delRow' style=\"text-align:center\" class=\"btn btn-primary btn-xs m-r-5\" onclick=\"delrow('" + no + "');return false;\"><i class=\"fa fa-remove\"></i></button></td></tr>");
+            jQuery('#tbladdstok > tbody:first').append("<tr id ='" + no + "''><td><input style='width:80px' class='form-control' type='text' readonly='readonly' value='" + kode + "' name='kodena[]' /><td><input style='width:180px' class='form-control' type='text' readonly='readonly' value='" + warna + "' name='warnana[]' /></td><td><input style='width:80px' readonly='readonly' class='form-control' type='text' value='" + stok + "' name='stokna[]'  /></td><td><input type='file' name='fotona[]' id='fotona' class='form-control' style='width:100px'/></td><td><button id='delRow' style=\"text-align:center\" class=\"btn btn-primary btn-xs m-r-5\" onclick=\"delrow('" + no + "');return false;\"><i class=\"fa fa-remove\"></i></button></td></tr><br/>");
             jQuery("#tombol").show("slow");
             jQuery("#stok").val('');
             $.gritter.add({title:"Informasi !",text: " Silahkan Tambahkan Foto Barang !<br/> maxsize : 1mb <br/> Type File : jpg"});return false;
@@ -19,8 +19,76 @@ jQuery(document).ready(function() {
             return false;
         }
     });
+    jQuery("#tambahbooking").click(function() {
+        var no          = jQuery("#tbladdbarang tr").length;
+        var nama_barang = jQuery("#nama_barang").val();
+        var qty         = jQuery("#qty").val();
+        var harga       = jQuery("#hrg_sewa").val();
+        var harga_mask  = jQuery("#hrg_sewa").unmask();
+        var warna       = jQuery("#warna option:selected").text();
+        if (warna != "Pilih Warna Barang" && qty != "") {
+            var total = parseInt(harga_mask) * parseInt(qty);
+            jQuery('#tbladdbarang > tbody:first').append("<tr id ='" + no + "''><td><input style='width:200px' class='form-control' type='text' readonly='readonly' value='" + nama_barang + "' name='nama_barangna[]' /><td><input style='width:160px' class='form-control' type='text' readonly='readonly' value='" + warna + "' name='warnana[]' /></td><td><input style='width:100px' class='form-control' type='text' readonly='readonly' value='" + harga + "' name='hargana[]' /></td><td><input style='width:80px' readonly='readonly' class='form-control' type='text' value='" + qty + "' name='qtyna[]'  /></td><td><input style='width:80px' class='form-control' type='text' readonly='readonly' id='totalna' value='" + total + "' name='totalna[]' /><td><td><button id='delRowBooking' style=\"text-align:left\" class=\"btn btn-primary btn-xs m-r-5\" onclick=\"delrowb('" + no + "','" + total + "');return false;\"><i class=\"fa fa-remove\"></i></button></td></tr>");
+            jQuery("#tombol").show("slow");
+            jQuery("#qty").val('');
+            jQuery("#kode_barang").val('');
+            jQuery("#nama_barang").val('');
+            jQuery("#hrg_sewa").val('');
+            jQuery("#warna").select2("val","");
+            document.getElementById('kode_barang').focus();
+            var jumlah = 0;
+            var sub = jQuery('#subtotal').unmask();
+            for(i=0; i < no; i++){
+                jumlah = parseInt(total);
+            }
+            if(sub!=""){
+                jQuery('#subtotal').val(parseInt(jumlah)+parseInt(sub));
+            }else{
+                jQuery('#subtotal').val(parseInt(jumlah));
+            }
+            jQuery('#subtotal').priceFormat({
+                prefix: '',
+                centsSeparator: ',',
+                thousandsSeparator: '.'
+            });
+            if(subtotal!=""){
+                jQuery.post($BASE_URL+"booking/cekDiskon",
+                function(data){
+                    var dt = data.split("|");
+                    jQuery("#disc").val(dt[0]);
+                    jQuery("#nama_diskon").val(dt[1]);
+                    var nama_diskon = jQuery("#nama_diskon").val();
+                    var tot_diskon  = jQuery("#disc").val();
+                    if(tot_diskon=='NotOk'){
+                        jQuery("#disc").val('');
+                        document.getElementById("ket_diskon").innerHTML = "<b>Tidak Ada Diskon Moment</b>";
+                    }else{
+                        document.getElementById("ket_diskon").innerHTML = "<b>" + nama_diskon + "</b>";
+                    }
+                    jQuery("#ket_disc").show('slow');
+                    return false;
+                });
+            }
+        } else {
+            $.gritter.add({
+                title: "Informasi !",
+                text: " Data Tidak Boleh Kosong !"
+            });
+            return false;
+        }
+    });
 })
-function delrow(id) {
+function delrowx(id) {
+    jQuery("#" + id).remove();
+}
+function delrowb(id,total) {
+    var sub = jQuery('#subtotal').unmask();
+    jQuery('#subtotal').val(parseInt(sub)-parseInt(total));
+    jQuery('#subtotal').priceFormat({
+        prefix: '',
+        centsSeparator: ',',
+        thousandsSeparator: '.'
+    });
     jQuery("#" + id).remove();
 }
 function save(link) {
