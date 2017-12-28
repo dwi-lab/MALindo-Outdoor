@@ -33,9 +33,23 @@
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
 	    });
+	    jQuery('#b_cash').priceFormat({
+	        prefix: '',
+	        centsSeparator: ',',
+	        thousandsSeparator: '.'
+	    });
+	    jQuery('#sisa_bayar_p').priceFormat({
+	        prefix: '',
+	        centsSeparator: ',',
+	        thousandsSeparator: '.'
+	    });
         $('#tglmulai').datepicker();
     	$('#tglselesai').datepicker();
         jQuery("#informasi").hide('');
+        jQuery("#pelunasan").hide('');
+    	jQuery("#ket_poin").hide('');
+        jQuery("#bayar_cash").hide('');
+        jQuery("#bayar_poin").hide('');
         jQuery("#tombol").hide('');
         jQuery("#ket_disc").hide('');
         jQuery("#ket_disc_lama").hide('');
@@ -54,7 +68,6 @@
                             add(data.message); 
                         }else{
                             $.gritter.add({title:"Informasi !",text: "Data yang anda cari tidak ditemukan"});
-						    jQuery("#tombol").hide('');
 						    jQuery("#informasi").hide('');
         					jQuery("#status").hide('');
         					jQuery("#informasi_barang").hide('');
@@ -92,7 +105,7 @@
 					document.getElementById("status").innerHTML ="<div class=\"alert alert-danger fade in\"><i class=\"fa fa-remove fa-2x pull-left\"></i><p>"+ui.item.status_pinjam+"</p></div>	"
 				}
                 $.gritter.add({title:"Informasi Member !",text: "Nama Member : " + ui.item.nama + "<br/> No HP : " + ui.item.no_handphone + "<br/> No Identitas : " + ui.item.no_identitas,image:'<?php echo base_url();?>assets/foto/member/'+foto});
-                jQuery("#tombol").show("slow");
+                // jQuery("#tombol").show("slow");
 			    jQuery("#informasi").show('slow');
 				jQuery("#status").show('slow');
 				$("#status_pinjam").text(ui.item.status_pinjam);
@@ -174,6 +187,97 @@
 	            },500);
                 jQuery.unblockUI();
 	        }
+	    });
+	    jQuery("#b_cash").change(function(){
+			var total  = jQuery("#subtotal_").unmask();
+			var bayar  = jQuery("#b_cash").unmask();
+			if(bayar > total){
+				jQuery("#sisa_bayar").val(parseInt(bayar) - parseInt(total));
+			}else{
+				jQuery("#sisa_bayar").val(parseInt(total) - parseInt(bayar));
+			}
+			jQuery('#sisa_bayar').priceFormat({
+		        prefix: '',
+		        centsSeparator: ',',
+		        thousandsSeparator: '.'
+		    });
+        	jQuery("#tombol").show('');
+	    });
+	    jQuery("#jns_bayar").change(function(){
+			var jns = jQuery("#jns_bayar").val();
+			if(jns==2){
+				var nama = jQuery('#nama').val();
+				var pch  = nama.split(" | ");
+				var kode = pch[1];
+				jQuery.post($BASE_URL+"booking/cekPoint/"+kode,
+	            function(data){
+					var dt        = data;
+					jQuery("#tot_poin").val(dt);
+					var tot = jQuery("#tot_poin").val();
+	                if(tot=='NotOk'){
+	                	jQuery("#bayar_poin").hide('slow');
+						jQuery("#bayar_cash").hide('slow');
+	                    document.getElementById("ket_point").innerHTML = "<b>Member bersangkutan belum mempunyai Poin</b>";
+	                }else{
+	                	jQuery("#bayar_poin").show('slow');
+						jQuery("#bayar_cash").hide('slow');
+        				jQuery("#tombol").hide('');
+	                    document.getElementById("ket_point").innerHTML = "<b> Total Poin Member bersangkutan " + dt + "</b>";
+		                document.getElementById('b_point').focus();
+	                }
+	            	jQuery("#ket_poin").show('slow');
+                    return false;
+	            });
+			}else if(jns==1){
+        		jQuery("#pelunasan").hide('');
+				jQuery("#ket_poin").hide('slow');
+				jQuery("#bayar_poin").hide('slow');
+				jQuery("#bayar_cash").show('slow');
+                document.getElementById('b_cash').focus();
+        		jQuery("#tombol").hide('');
+			}else{
+        		jQuery("#tombol").hide('');
+				jQuery("#bayar_poin").hide('slow');
+				jQuery("#bayar_cash").hide('slow');
+	            $.gritter.add({title:"Informasi Pembayaran !",text: "Silahkan Pilih Jenis Pembayaran"});
+			}
+	    });
+	    jQuery("#b_point").change(function(){
+			var tot_poin = jQuery("#tot_poin").val();
+			var b        = jQuery("#b_point").val();
+			if(b > tot_poin){
+	            $.gritter.add({title:"Informasi Pembayaran !",text: "Pembayaran Poin Melebihi Total Poin Member"});
+	            jQuery("#b_point").val('');
+                document.getElementById('b_point').focus();
+        		jQuery("#tombol").hide('');
+			}else if(b <= tot_poin){
+				var nama = jQuery('#nama').val();
+				var pch  = nama.split(" | ");
+				var kode = pch[1];
+				jQuery.post($BASE_URL+"booking/bayarPoin/"+kode+"/"+b,
+	            function(data){
+					var dt        = data;
+					jQuery("#tot_poin_b").val(dt);
+					var tot_bayar = jQuery("#subtotal_").unmask();
+					var tukar     = dt;
+					if(tot_bayar > tukar){
+	            		$.gritter.add({title:"Informasi Pembayaran !",text: "Pembayaran Dengan Poin Masih Kurang, Sisa Pembayaran Bisa Dengan Uang !"});
+        				jQuery("#pelunasan").show('');
+						jQuery("#sisa_bayar_p").val(parseInt(tot_bayar) - parseInt(tukar));
+					}else{
+						$.gritter.add({title:"Informasi Pembayaran !",text: "Pembayaran Dengan Poin Melebihi Total Pembayaran, Poin Tidak Bisa Diuangkan !"});
+        				jQuery("#pelunasan").hide('');
+						jQuery("#sisa_bayar_p").val(parseInt(tukar) - parseInt(tot_bayar));
+					}
+        			jQuery("#tombol").show('');
+	            });
+			}
+			jQuery('#sisa_bayar_p').priceFormat({
+		        prefix: '',
+		        centsSeparator: ',',
+		        thousandsSeparator: '.'
+		    });
+            return false;
 	    });
 	    jQuery("#tglselesai").change(function(){
 			var mulai   = jQuery("#tglsewa").val();
@@ -288,6 +392,8 @@
 					?>
 					<div class="form-group">
 	                    <input class="form-control" type="hidden" id="status_warna" name="status_warna" />
+	                    <input class="form-control" type="hidden" id="tot_poin" name="tot_poin" />
+	                    <input class="form-control" type="hidden" id="tot_poin_b" name="tot_poin_b" />
 	                    <input class="form-control" type="hidden" id="nama_diskon" name="nama_diskon" />
 	                    <input class="form-control" type="hidden" id="tot_diskon" name="tot_diskon" />
 	                    <input class="form-control" type="hidden" id="foto" name="foto" />
@@ -462,7 +568,7 @@
 							</div>
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Subtotal</label>
-								<div class="col-md-3 col-sm-3">
+								<div class="col-md-3 col-sm-3"> 
 									<div class="input-group">
 		                                <span class="input-group-addon">Rp.</span>
 										<input class="form-control" type="text" style="text-align: right;" id="subtotal_" minlength="1" readonly="readonly" maxlength='20' name="subtotal_" data-parsley-minlength="1" data-parsley-maxlength="20"/>
@@ -470,21 +576,70 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="control-label col-md-3 col-sm-3">Bayar</label>
-								<div class="col-md-3 col-sm-3">
-									<div class="input-group">
-		                                <span class="input-group-addon">Rp.</span>
-										<input class="form-control" type="text" style="text-align: right;" id="bayar" name="bayar"/>
-		                            </div>
+								<label class="control-label col-md-3 col-sm-3">Jenis Bayar</label>
+								<div class="col-md-15 col-sm-3">
+									<select name="jns_bayar" class="default-select2 form-control" id="jns_bayar" data-size="10" data-live-search="true" data-style="btn-white">
+									<option value="" selected="selected">Pilih Jenis Bayar</option>
+									<option value="1">Cash</option>
+									<option value="2">Poin</option>
+									</select>
 								</div>
 							</div>
-							<div class="form-group">
-								<label class="control-label col-md-3 col-sm-3">Sisa Pembayaran</label>
-								<div class="col-md-3 col-sm-3">
-									<div class="input-group">
-		                                <span class="input-group-addon">Rp.</span>
-										<input class="form-control" type="text" style="text-align: right;" readonly="readonly" id="sisa" name="sisa"/>
-		                            </div>
+							<div id="bayar_cash">
+								<div class="form-group">
+									<label class="control-label col-md-3 col-sm-3">Bayar Cash</label>
+									<div class="col-md-3 col-sm-3">
+										<div class="input-group">
+			                                <span class="input-group-addon">Rp.</span>
+											<input class="form-control" type="text" style="text-align: right;" id="b_cash" name="b_cash"/>
+			                            </div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="control-label col-md-3 col-sm-3">Sisa Pembayaran / Kembalian</label>
+									<div class="col-md-3 col-sm-3">
+										<div class="input-group">
+			                                <span class="input-group-addon">Rp.</span>
+											<input class="form-control" readonly="readonly" type="text" style="text-align: right;" id="sisa_bayar" name="sisa_bayar"/>
+			                            </div>
+									</div>
+								</div>
+							</div>
+							<div id="bayar_poin">
+								<div class="form-group">
+									<label class="control-label col-md-3 col-sm-3">Bayar Poin</label>
+									<div class="col-md-2 col-sm-2">
+										<div class="input-group">
+											<input class="form-control" type="number" id="b_point" minlength="1" maxlength='20' name="b_point" data-type="number"/>
+			                            </div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="control-label col-md-3 col-sm-3">Sisa Pembayaran / Kembalian</label>
+									<div class="col-md-3 col-sm-3">
+										<div class="input-group">
+			                                <span class="input-group-addon">Rp.</span>
+											<input class="form-control" readonly="readonly" type="text" style="text-align: right;" id="sisa_bayar_p" name="sisa_bayar_p"/>
+			                            </div>
+									</div>
+								</div>
+							</div>
+							<div id="pelunasan">
+								<div class="form-group">
+									<label class="control-label col-md-3 col-sm-3">Bayar Sisa</label>
+									<div class="col-md-3 col-sm-3">
+										<div class="input-group">
+			                                <span class="input-group-addon">Rp.</span>
+											<input class="form-control" type="text" style="text-align: right;" id="b_sisa" name="b_sisa"/>
+			                            </div>
+									</div>
+								</div>
+							</div>
+							<div id="ket_poin">
+								<div class="form-group">
+									<div class="col-md-8 col-sm-8">
+	                            		<span style="color:red;" id="ket_point"></span>
+									</div>
 								</div>
 							</div>
                     	</div>

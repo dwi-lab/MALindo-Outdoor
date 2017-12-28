@@ -76,6 +76,21 @@ class Booking extends CI_Controller {
 			redirect("_404","refresh");
 		}
 	}
+	public function cekPoint($id){
+		if($this->input->is_ajax_request()){
+			$no_identitas = $this->service->anti($id);
+			$cekpoin      = $this->db->query("SELECT * FROM tbl_histori_poin WHERE kode_member = '$id'")->result();
+			if(count($cekpoin)>0){
+				foreach ($cekpoin as $key) {
+					echo $key->jml_poin;
+				}
+			}else{
+				echo "NotOk";
+			}
+		}else{
+	    	redirect('_404','refresh');
+	    }
+	}
 	public function cekLama($mulai,$selesai){
 		if($mulai !="" && $selesai != ""){
 			$mulai   = $this->service->anti(date("Y-m-d",strtotime($mulai)));
@@ -84,17 +99,40 @@ class Booking extends CI_Controller {
 			$endx    = new DateTime($selesai);
 			$lama    = $endx->diff($startx);
 			$lama    = $lama->format("%d")+0;
-			$cklama  = $this->db->get_where('tbl_disc',array('durasi'=>$lama));
-			if(count($cklama->result())>0){
-				$row = $cklama->row();
-				$lamana = $row->durasi;
-				$diskon = $row->disc;
-				echo $lamana . "|" . $diskon;
+			if($lama >= '8'){
+				echo $lama . "|" . "50";
+			}else{
+				$cklama  = $this->db->get_where('tbl_disc',array('durasi'=>$lama));
+				if(count($cklama->result())>0){
+					$row = $cklama->row();
+					$lamana = $row->durasi;
+					$diskon = $row->disc;
+					echo $lama . "|" . $diskon;
+				}else{
+					echo "NotOk";
+				}
+			}
+		}else{
+			echo "NotOk";
+		}
+	}
+	public function bayarPoin($kode,$poin){
+		if($this->input->is_ajax_request()){
+			$ckpoint   = $this->db->get_where('tbl_histori_poin',array('kode_member'=>$kode));
+			$key       = $ckpoint->row();
+			$jml       = $key->jml_poin;
+			$cksetpoin = $this->db->get_where('tbl_set_poin',array('id'=>'1'));
+			$row       = $cksetpoin->row();
+			$nominal   = $row->nominal;
+			if($jml >= $poin){
+				$total = 0;
+				$total = $nominal * $poin;
+				echo $total;
 			}else{
 				echo "NotOk";
 			}
 		}else{
-			echo "NotOk";
+			redirect('_404','refresh');
 		}
 	}
 	public function add(){
