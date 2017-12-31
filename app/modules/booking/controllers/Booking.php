@@ -2,6 +2,7 @@
 class Booking extends CI_Controller {
 	public function __construct(){
 		parent::__construct();
+        $this->load->library('email');
 		date_default_timezone_set('Asia/Jakarta');
 		$this->load->model('booking_model');
 		$this->load->library(array('PHPExcel/IOFactory'));
@@ -652,5 +653,36 @@ class Booking extends CI_Controller {
 		}else{
 			redirect('_404','refresh');
 		}
+	}
+	public function kirim_email($kode_booking){
+		$ci                    = get_instance();
+		$ci->load->library('email');
+		$config['protocol']  = "smtp";
+        $config['smtp_host'] = "ssl://smtp.googlemail.com";
+        $config['smtp_port'] = "465";
+        $config['smtp_user'] = "asnponorogo@gmail.com";
+        $config['smtp_pass'] = "Bismillah789";
+        $config['charset']   = "ISO-2022-ID";
+        $config['mailtype']  = "html";
+        $config['newline']   = "\r\n";
+		// $config['wordwrap'] = TRUE;
+		$email                 = "opchaky.it@gmail.com";
+		$subject               = "Faktur Pemesanan - MALindo Outdoor";
+		$from_email            = "asnponorogo@gmail.com";
+		$ci->email->initialize($config);
+		$ci->email->from($from_email, 'MALindo Outdoor - [Faktur Pemesanan]');
+		$list                  = array($email);
+		$ci->email->to($list);
+		$ci->email->subject($subject);
+		$body                  = $this->load->view('email',TRUE);
+        $ci->email->message($body);
+        if($this->email->send()){
+            $data['response'] = 'true';
+        }else{
+            $data['response'] = 'false';
+        }
+        if('IS_AJAX'){
+            echo json_encode($data);
+        }
 	}
 }

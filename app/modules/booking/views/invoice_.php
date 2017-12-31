@@ -1,8 +1,20 @@
+<script type="text/javascript">
+function kirim_email($kode_booking) {
+    jQuery.post($BASE_URL+"booking/kirim_email/"+$kode_booking,
+    function(data){
+        if(data.response=="TRUE"){
+            alert("Luhur");
+        }else{
+            alert("handap");
+        }
+    });
+}
+</script>
+<link href="<?php echo base_url();?>assets/css/invoice-print.min.css" rel="stylesheet" />
 <div class="invoice">
     <div class="invoice-company">
         <span class="pull-right hidden-print">
-        <a href="javascript:;" class="btn btn-sm btn-success m-b-10"><i class="fa fa-download m-r-5"></i> Export as PDF</a>
-        <a href="javascript:;" onclick="window.print()" class="btn btn-sm btn-success m-b-10"><i class="fa fa-print m-r-5"></i> Print</a>
+        <a href="javascript:;" onclick="window.print();kirim_email('<?php echo $kode_booking;?>');" class="btn btn-sm btn-success m-b-10"><i class="fa fa-print m-r-5"></i> Print</a>
         </span>
         <b>MALindo Outdoor</b>
     </div>
@@ -13,7 +25,7 @@
                 <strong>MALindo Outdoor.</strong><br />
                 JL. DR. Moch. Hatta No. 168 Kel. Sukamanah <br />
                 Kec. Cipedes Kota Tasikmalaya<br />
-                Tlp : 085-220-296-494<br />
+                Tlp : 0813-2014-7000<br />
                 e-mail : malindooutdoor@gmail.com
             </address>
         </div>
@@ -28,11 +40,11 @@
             </address>
         </div>
         <div class="invoice-date">
-            <small>Invoice Booking</small>
+            <small>Faktur Pesanan</small>
             <div class="date m-t-5"><?php echo $tgl_booking;?></div>
             <div class="invoice-detail">
                 #<?php echo $kode_booking;?><br />
-                <b>Booking</b><br/>
+                <b>Pesanan</b><br/>
                 <small><font color="red"><?php echo $tgl_mulai;?> s/d <?php echo $tgl_selesai;?></font></small><br/>
                 <b>Jenis Bayar : <font color="red"><?php echo $jns_bayar;?></font></b>
             </div>
@@ -43,7 +55,7 @@
             <table class="table table-invoice">
                 <thead>
                     <tr>
-                        <th>Booking Deskripsi</th>
+                        <th>Rincian Pesanan</th>
                         <th>Harga Sewa</th>
                         <th>Lama Pinjam</th>
                         <th>Total</th>
@@ -58,7 +70,8 @@
                             <tr>
                                 <td>
                                     <?php echo $row->nama_barang;?><br />
-                                    <small>Tipe Barang <?php echo $row->tipe;?> Merk Barang : <?php echo $row->merk;?> Warna Barang : <?php echo $row->warna;?> </small>
+                                    <small>Warna Barang : <?php echo $row->warna;?> </small>
+                                    <!-- <small>Tipe Barang <?php echo $row->tipe;?> Merk Barang : <?php echo $row->merk;?> Warna Barang : <?php echo $row->warna;?> </small> -->
                                 </td>
                                 <td><?php echo number_format($row->hrg_sewa);?></td>
                                 <td><?php echo number_format($row->lama) . " hari";?></td>
@@ -82,7 +95,7 @@
                         <i class="fa fa-minus"></i>
                     </div>
                     <div class="sub-price">
-                        <small>Disc Pinjam(<?php echo number_format($diskon_pinjam);?> %)</small>
+                        <small>Diskon Tetap (<?php echo number_format($diskon_pinjam);?> %)</small>
                         <?php echo number_format($tot_diskon_pinjam);?>
                         <small><font color="red"><?php echo $nama_diskon_pinjam;?></font></small>
                     </div>
@@ -90,7 +103,7 @@
                         <i class="fa fa-minus"></i>
                     </div>
                     <div class="sub-price">
-                        <small>Disc Momen(<?php echo number_format($diskon_momen);?> %)</small>
+                        <small>Diskon Khusus (<?php echo number_format($diskon_momen);?> %)</small>
                         <?php echo number_format($tot_diskon_momen);?>
                         <small><font color="red"><?php echo $nama_diskon_momen;?></font></small>
                     </div>
@@ -114,18 +127,18 @@
         $syarat = $this->db->get_where('tbl_syarat',array('status'=>'1'))->result();
         if(count($syarat)>0){
             foreach ($syarat as $xx) {
-                    echo " * " . $xx->ket;
+                echo " * " . $xx->ket;
             }
         }
         ?>
     </div>
     <div class="invoice-footer text-muted">
         <p class="text-center m-b-5">
-            HATURNUHUN PARANTOS SUMPING
+            Terimakasih Atas Kepercayaan Yang Telah Diberikan
         </p>
         <p class="text-center">
             <span class="m-r-10"><i class="fa fa-globe"></i> malindooutdoor.com</span>
-            <span class="m-r-10"><i class="fa fa-phone"></i> T:085-220-296-494</span>
+            <span class="m-r-10"><i class="fa fa-phone"></i> T:0813-2014-7000</span>
             <span class="m-r-10"><i class="fa fa-envelope"></i> malindooutdoor@gmail.com</span>
         </p>
     </div>

@@ -58,13 +58,25 @@
         $this->load->view('dashboard/menu_samping');
         ?>
         <div id="content" class="content">
-            <h1 class="page-header"><?php echo $halaman;?> <small><?php echo $judul;?></small></h1>
+            <?php
+            if($page=="booking"){
+                ?>
+                    <h1 class="page-header hidden-print">Invoice <small><?php echo $judul;?></small></h1>
+                <?php
+            }else{
+                ?>
+                    <h1 class="page-header"><?php echo $halaman;?> <small><?php echo $judul;?></small></h1>
+                <?php
+            }
+            ?>
             <?php
             $this->load->view($content);
             ?>
         </div>
         <?php 
-        $this->load->view('dashboard/footer');
+        if($page!="booking"){
+            $this->load->view('dashboard/footer');
+        }
         ?>
         <a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade" data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
     </div>
