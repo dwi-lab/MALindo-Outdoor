@@ -107,7 +107,7 @@ class Booking extends CI_Controller {
 					$row = $cklama->row();
 					$lamana = $row->durasi;
 					$diskon = $row->disc;
-					echo $lama . "|" . $diskon;
+					echo $lama . "|" . $diskon . "|" . $row->id;
 				}else{
 					echo "NotOk";
 				}
@@ -328,7 +328,7 @@ class Booking extends CI_Controller {
 			$diskon = $this->db->query("SELECT * FROM tbl_disc_momen WHERE tgl_mulai <= '$now' AND tgl_selesai >= '$now'")->result();
 			if(count($diskon)>0){
 				foreach ($diskon as $key) {
-					echo $key->diskon . "|" . "Diskon Momen : " . $key->nama_diskon . " dari tanggal " . date("d-m-Y",strtotime($key->tgl_mulai)) . " s/d " . date("d-m-Y",strtotime($key->tgl_selesai));
+					echo $key->diskon . "|" . "Diskon Momen : " . $key->nama_diskon . " dari tanggal " . date("d-m-Y",strtotime($key->tgl_mulai)) . " s/d " . date("d-m-Y",strtotime($key->tgl_selesai)) . "|" . $key->id;
 				}
 			}else{
 				echo "NotOk";				
@@ -364,19 +364,252 @@ class Booking extends CI_Controller {
 	    }
 	}
 	public function proses_add(){
-		$kode_booking  = $this->input->post('kode_booking');
+		$kode_booking  = $this->input->post('kode');
 		$info_member   = $this->input->post('nama');
 		$pch           = explode("|", $info_member);
-		$kode_member   = $pch[1];
-		$nama_barangna = $this->input->post('nama_barangna');
-		for ($i=0; $i < $nama_barangna ; $i++) { 
-			$ckkodebarang = $this->db->get_where('tbl_barang',array('nama_barang'=>$nama_barangna[$i]));
-			$row          = $ckkodebarang->row();
-			$kode_barang  = $row->kode;
-			$warna        = $this->input->post('warnana');
-			$ckwarna      = $this->db->get_where('view_barang_detil',array('warna'=>$warna[$i],'kode'=>$kode_barang));
-			$rowWarna     = $ckwarna->row();
-			$kode_warna   = $rowWarna->id_warna;
+		$kode_member   = str_replace(" ", "", $pch[1]);
+		$jns           = $this->input->post('jns_bayar');
+		$now           = date("Y-m-d H:i:s");
+		$mulai         = $this->service->anti(date("Y-m-d",strtotime($this->input->post('tglsewa'))));
+		$selesai       = $this->service->anti(date("Y-m-d",strtotime($this->input->post('tglselesai'))));
+		$total_bayar   = str_replace(".", "", $this->input->post('subtotal_'));
+		$lama          = $this->input->post('lama_pinjam');
+		$id_disc_lama  = $this->input->post('id_disc_lama');
+		$id_disc_momen = $this->input->post('id_disc_momen');
+		$subtotal      = str_replace(".", "", $this->input->post('subtotal'));
+		if($jns==1){
+/*Cash*/
+			$dibayar       = str_replace(".", "", $this->input->post('b_cash'));
+			$sisa          = $total_bayar - $dibayar;
+			if($dibayar    >= $total_bayar){
+				$sesa          = "0";
+			}else{
+				$sesa          = $total_bayar - $dibayar;
+			}
+			if($id_disc_lama !="" && $id_disc_momen !=""){
+				$simpanbooking = array(
+					'kode_booking'         =>$kode_booking,
+					'kode_member'          =>$kode_member,
+					'tgl_booking'          =>date('Y-m-d H:i:s'),
+					'tgl_perencanaan_sewa' =>$mulai,
+					'tgl_selesai'          =>$selesai,
+					'lama'                 =>$lama,
+					'subtotal'             =>$subtotal,
+					'disc_pinjam'          =>$id_disc_lama,
+					'disc_momen'           =>$id_disc_momen,
+					'total_bayar'          =>$total_bayar,
+					'poin_bayar'           =>NULL,
+					'dibayar'              =>$dibayar,
+					'sisa_bayar'           =>$sesa,
+					'jns_bayar'            =>'1',
+					'status_booking'       =>'1');
+			}else if($id_disc_lama !="" && $id_disc_momen ==""){
+				$simpanbooking = array(
+					'kode_booking'         =>$kode_booking,
+					'kode_member'          =>$kode_member,
+					'tgl_booking'          =>date('Y-m-d H:i:s'),
+					'tgl_perencanaan_sewa' =>$mulai,
+					'tgl_selesai'          =>$selesai,
+					'lama'                 =>$lama,
+					'subtotal'             =>$subtotal,
+					'disc_pinjam'          =>$id_disc_lama,
+					'disc_momen'           =>NULL,
+					'total_bayar'          =>$total_bayar,
+					'poin_bayar'           =>NULL,
+					'dibayar'              =>$dibayar,
+					'sisa_bayar'           =>$sesa,
+					'jns_bayar'            =>'1',
+					'status_booking'       =>'1');
+			}else if($id_disc_lama =="" && $id_disc_momen !=""){
+				$simpanbooking = array(
+					'kode_booking'         =>$kode_booking,
+					'kode_member'          =>$kode_member,
+					'tgl_booking'          =>date('Y-m-d H:i:s'),
+					'tgl_perencanaan_sewa' =>$mulai,
+					'tgl_selesai'          =>$selesai,
+					'lama'                 =>$lama,
+					'subtotal'             =>$subtotal,
+					'disc_pinjam'          =>NULL,
+					'disc_momen'           =>$id_disc_momen,
+					'total_bayar'          =>$total_bayar,
+					'poin_bayar'           =>NULL,
+					'dibayar'              =>$dibayar,
+					'sisa_bayar'           =>$sesa,
+					'jns_bayar'            =>'1',
+					'status_booking'       =>'1');
+			}else{
+				$simpanbooking = array(
+					'kode_booking'         =>$kode_booking,
+					'kode_member'          =>$kode_member,
+					'tgl_booking'          =>date('Y-m-d H:i:s'),
+					'tgl_perencanaan_sewa' =>$mulai,
+					'tgl_selesai'          =>$selesai,
+					'lama'                 =>$lama,
+					'subtotal'             =>$subtotal,
+					'disc_pinjam'          =>NULL,
+					'disc_momen'           =>NULL,
+					'total_bayar'          =>$total_bayar,
+					'poin_bayar'           =>NULL,
+					'dibayar'              =>$dibayar,
+					'sisa_bayar'           =>$sesa,
+					'jns_bayar'            =>'1',
+					'status_booking'       =>'1');
+			}
+			$this->db->insert('tbl_booking',$simpanbooking);
+		}else{
+/*Poin*/		
+			$total_bayar = str_replace(".", "", $this->input->post('sisa_bayar_p'));
+			$b_point     = $this->input->post('b_point');
+			$dibayar     = str_replace(".", "", $this->input->post('b_sisa'));
+			$sisa        = $total_bayar - $dibayar;
+			if($dibayar >= $total_bayar){
+				$sesa = "0";
+			}else{
+				$sesa = $total_bayar - $dibayar;
+			}
+			if($id_disc_lama !="" && $id_disc_momen !=""){
+				$simpanbooking = array(
+					'kode_booking'         =>$kode_booking,
+					'kode_member'          =>$kode_member,
+					'tgl_booking'          =>date('Y-m-d H:i:s'),
+					'tgl_perencanaan_sewa' =>$mulai,
+					'tgl_selesai'          =>$selesai,
+					'lama'                 =>$lama,
+					'subtotal'             =>$subtotal,
+					'disc_pinjam'          =>$id_disc_lama,
+					'disc_momen'           =>$id_disc_momen,
+					'total_bayar'          =>$total_bayar,
+					'poin_bayar'           =>$b_point,
+					'dibayar'              =>$dibayar,
+					'sisa_bayar'           =>$sesa,
+					'jns_bayar'            =>'2',
+					'status_booking'       =>'1');
+			}else if($id_disc_lama !="" && $id_disc_momen ==""){
+				$simpanbooking = array(
+					'kode_booking'         =>$kode_booking,
+					'kode_member'          =>$kode_member,
+					'tgl_booking'          =>date('Y-m-d H:i:s'),
+					'tgl_perencanaan_sewa' =>$mulai,
+					'tgl_selesai'          =>$selesai,
+					'lama'                 =>$lama,
+					'subtotal'             =>$subtotal,
+					'disc_pinjam'          =>$id_disc_lama,
+					'disc_momen'           =>NULL,
+					'total_bayar'          =>$total_bayar,
+					'poin_bayar'           =>$b_point,
+					'dibayar'              =>$dibayar,
+					'sisa_bayar'           =>$sesa,
+					'jns_bayar'            =>'2',
+					'status_booking'       =>'1');
+			}else if($id_disc_lama =="" && $id_disc_momen !=""){
+				$simpanbooking = array(
+					'kode_booking'         =>$kode_booking,
+					'kode_member'          =>$kode_member,
+					'tgl_booking'          =>date('Y-m-d H:i:s'),
+					'tgl_perencanaan_sewa' =>$mulai,
+					'tgl_selesai'          =>$selesai,
+					'lama'                 =>$lama,
+					'subtotal'             =>$subtotal,
+					'disc_pinjam'          =>NULL,
+					'disc_momen'           =>$id_disc_momen,
+					'total_bayar'          =>$total_bayar,
+					'poin_bayar'           =>$b_point,
+					'dibayar'              =>$dibayar,
+					'sisa_bayar'           =>$sesa,
+					'jns_bayar'            =>'2',
+					'status_booking'       =>'1');
+			}else{
+				$simpanbooking = array(
+					'kode_booking'         =>$kode_booking,
+					'kode_member'          =>$kode_member,
+					'tgl_booking'          =>date('Y-m-d H:i:s'),
+					'tgl_perencanaan_sewa' =>$mulai,
+					'tgl_selesai'          =>$selesai,
+					'lama'                 =>$lama,
+					'subtotal'             =>$subtotal,
+					'disc_pinjam'          =>NULL,
+					'disc_momen'           =>NULL,
+					'total_bayar'          =>$total_bayar,
+					'poin_bayar'           =>$b_point,
+					'dibayar'              =>$dibayar,
+					'sisa_bayar'           =>$sesa,
+					'jns_bayar'            =>'2',
+					'status_booking'       =>'1');
+			}
+			$this->db->insert('tbl_booking',$simpanbooking);
+		}
+		$ckpointmember      = $this->db->get_where('tbl_histori_poin',array('kode_member'=>$kode_member));
+		$rowPoin            = $ckpointmember->row();
+		$jml_poin           = $rowPoin->jml_poin;
+		$hitungpoin         = $jml_poin - $b_point;
+		$update_pointmember = array('jml_poin'=>$hitungpoin);
+		$this->db->where('kode_member',$kode_member);
+		$this->db->update('tbl_histori_poin',$update_pointmember);
+		$nama_barangna      = $this->input->post('nama_barangna');
+		$x                  = count($nama_barangna);
+		for ($i=0; $i < $x ; $i++) { 
+			$ckkodebarang = $this->db->get_where('tbl_barang',array('nama_barang'=>$nama_barangna[$i]))->result();
+			foreach ($ckkodebarang as $row) {
+				$kode_barang  = $row->kode;
+				$warna        = $this->input->post('warnana');
+				$ckwarna      = $this->db->get_where('view_barang_detil',array('warna'=>$warna[$i],'kode'=>$kode_barang));
+				$rowWarna     = $ckwarna->row();
+				$kode_warna   = $rowWarna->id_warna;
+				$simpandetil = array(
+					'kode_booking' =>$kode_booking,
+					'kode_barang'  =>$kode_barang,
+					'kode_warna'   =>$kode_warna,
+					'qty'          =>$this->input->post('qtyna')[$i],
+					'status'       =>'1');
+				$this->db->insert('tbl_booking_detil',$simpandetil);
+				$cekstok = $this->db->get_where('tbl_barang_stok',array('kode_barang'=>$kode_barang,'id_warna'=>$kode_warna))->result();
+				foreach ($cekstok as $key) {
+					$stok_awal = $key->stok;
+					$kurang    = $stok_awal - $this->input->post('qtyna')[$i];
+					$update_stok = array('stok'=>$kurang);
+					$this->db->where('kode_barang',$kode_barang);
+					$this->db->where('id_warna',$kode_warna);
+					$this->db->update('tbl_barang_stok',$update_stok);
+				}
+			}
+		}
+		redirect('booking/invoice/' . $kode_booking,'refresh');
+	}
+	public function invoice($kode_booking){
+		$kode                = $this->service->anti($kode_booking);
+		$isi['kode_booking'] = $kode;
+		$ckbooking           = $this->db->get_where('tbl_booking',array('kode_booking'=>$kode));
+		if(count($ckbooking->result())>0){
+			$row                = $ckbooking->row();
+			$kode_member        = $row->kode_member;
+			$jns_bayar          = $row->jns_bayar;
+			if($jns_bayar==2){
+				$isi['jns_bayar'] = "Poin";
+			}else{
+				$isi['jns_bayar'] = "Cash";
+			}
+			$isi['tgl_booking'] = date("d-m-Y H:i:s",strtotime($row->tgl_booking));
+			$ckmember           = $this->db->get_where('view_member',array('kode_member'=>$kode_member));
+			if(count($ckmember->result())>0){
+				$key                  = $ckmember->row();
+				$isi['nama_member']   = $key->nama;
+				$isi['email_member']  = $key->email;
+				$isi['alamat_member'] = $key->alamat;
+				$isi['tlp_member']    = $key->no_handphone;
+				$isi['alamat_detil']  = ucwords($key->kecamatan) . " , " . ucwords($key->kota);
+				$isi['kelas']         = "transaksi";
+				$isi['namamenu']      = "Booking";
+				$isi['page']          = "booking";
+				$isi['link']          = 'booking';
+				$isi['halaman']       = "Data Invoice";
+				$isi['judul']         = "Halaman Data Invoice";
+				$isi['content']       = "invoice_";
+				$this->load->view("dashboard/dashboard_view",$isi);
+			}else{
+				redirect('_404','refresh');
+			}
+		}else{
+			redirect('_404','refresh');
 		}
 	}
 }

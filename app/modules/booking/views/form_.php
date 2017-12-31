@@ -43,6 +43,11 @@
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
 	    });
+	    jQuery('#b_sisa').priceFormat({
+	        prefix: '',
+	        centsSeparator: ',',
+	        thousandsSeparator: '.'
+	    });
         $('#tglmulai').datepicker();
     	$('#tglselesai').datepicker();
         jQuery("#informasi").hide('');
@@ -211,7 +216,7 @@
 				var kode = pch[1];
 				jQuery.post($BASE_URL+"booking/cekPoint/"+kode,
 	            function(data){
-					var dt        = data;
+					var dt  = data;
 					jQuery("#tot_poin").val(dt);
 					var tot = jQuery("#tot_poin").val();
 	                if(tot=='NotOk'){
@@ -264,7 +269,7 @@
 	            		$.gritter.add({title:"Informasi Pembayaran !",text: "Pembayaran Dengan Poin Masih Kurang, Sisa Pembayaran Bisa Dengan Uang !"});
         				jQuery("#pelunasan").show('');
 						jQuery("#sisa_bayar_p").val(parseInt(tot_bayar) - parseInt(tukar));
-					}else{
+					}else if(tot_bayar <= tukar){
 						$.gritter.add({title:"Informasi Pembayaran !",text: "Pembayaran Dengan Poin Melebihi Total Pembayaran, Poin Tidak Bisa Diuangkan !"});
         				jQuery("#pelunasan").hide('');
 						jQuery("#sisa_bayar_p").val(parseInt(tukar) - parseInt(tot_bayar));
@@ -288,6 +293,7 @@
 					var dt        = data.split("|");
 					jQuery("#lama_pinjam").val(dt[0]);
 					jQuery("#disc_lama_pinjam").val(dt[1]);
+					jQuery("#id_disc_lama").val(dt[2]);
 					var lama      = jQuery("#lama_pinjam").val();
 					var disc_lama = jQuery("#disc_lama_pinjam").val();
 	                if(lama=='NotOk'){
@@ -393,6 +399,8 @@
 					<div class="form-group">
 	                    <input class="form-control" type="hidden" id="status_warna" name="status_warna" />
 	                    <input class="form-control" type="hidden" id="tot_poin" name="tot_poin" />
+	                    <input class="form-control" type="hidden" id="id_disc_lama" name="id_disc_lama" />
+	                    <input class="form-control" type="hidden" id="id_disc_momen" name="id_disc_momen" />
 	                    <input class="form-control" type="hidden" id="tot_poin_b" name="tot_poin_b" />
 	                    <input class="form-control" type="hidden" id="nama_diskon" name="nama_diskon" />
 	                    <input class="form-control" type="hidden" id="tot_diskon" name="tot_diskon" />

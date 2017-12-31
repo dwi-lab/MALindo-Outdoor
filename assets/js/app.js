@@ -57,6 +57,7 @@ jQuery(document).ready(function() {
                     var dt = data.split("|");
                     jQuery("#disc").val(dt[0]);
                     jQuery("#nama_diskon").val(dt[1]);
+                    jQuery("#id_disc_momen").val(dt[2]);
                     var nama_diskon = jQuery("#nama_diskon").val();
                     var tot_diskon  = jQuery("#disc").val();
                     if(tot_diskon=='NotOk'){

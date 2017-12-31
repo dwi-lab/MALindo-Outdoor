@@ -45,7 +45,7 @@ class Login extends CI_Controller {
 			$html         .='</div>';
 			$html         .='<div class="news-caption">';
 			$html         .='<h4 class="caption-title"><i class="fa fa-edit text-success"></i> MALindo Outdoor </h4>';
-			$html         .= "JL. DR. Moch. Hatta No. 168 Kel. Sukamanah Kec. Cipedes Kota Tasikmalaya <br/>" . "TELEPON : 085 220 296 494 <br/>" . "E-MAIL : dianfardiansyah28@gmail.com  WEBSITE : http://malindooutdoor.blogspot.co.id";
+			$html         .= "JL. DR. Moch. Hatta No. 168 Kel. Sukamanah Kec. Cipedes Kota Tasikmalaya <br/>" . "TELEPON : 085 220 296 494 <br/>" . "E-MAIL : malindooutdoor@gmail.com  WEBSITE : http://malindooutdoor.blogspot.co.id";
 			$data         =	array('html'=>$html);
 			echo json_encode($data);
 		}else{
