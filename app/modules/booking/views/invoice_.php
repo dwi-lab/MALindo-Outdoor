@@ -2,11 +2,7 @@
 function kirim_email($kode_booking) {
     jQuery.post($BASE_URL+"booking/kirim_email/"+$kode_booking,
     function(data){
-        if(data.response=="TRUE"){
-            alert("Luhur");
-        }else{
-            alert("handap");
-        }
+        alert(data);
     });
 }
 </script>
@@ -40,7 +36,7 @@ function kirim_email($kode_booking) {
             </address>
         </div>
         <div class="invoice-date">
-            <small>Faktur Pesanan</small>
+            <small>Nota Pesanan</small>
             <div class="date m-t-5"><?php echo $tgl_booking;?></div>
             <div class="invoice-detail">
                 #<?php echo $kode_booking;?><br />

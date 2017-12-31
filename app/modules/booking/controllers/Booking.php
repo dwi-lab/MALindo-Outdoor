@@ -2,7 +2,6 @@
 class Booking extends CI_Controller {
 	public function __construct(){
 		parent::__construct();
-        $this->load->library('email');
 		date_default_timezone_set('Asia/Jakarta');
 		$this->load->model('booking_model');
 		$this->load->library(array('PHPExcel/IOFactory'));
@@ -162,7 +161,7 @@ class Booking extends CI_Controller {
 		$query               = $this->db->query("SELECT MAX(kode_booking) as nona FROM tbl_booking WHERE RIGHT(kode_booking,4) = '$tahun'")->result();
 		if(count($query)>0){
 			foreach ($query as $zzz) {
-	 			$xx = substr($zzz->nona, 1, 3); 
+	 			$xx = substr($zzz->nona, 1, 3);
 	 		}
 	 		if($xx==''){
 	 			$newID = "001-BO-MAL-" . $tahun;
@@ -332,7 +331,7 @@ class Booking extends CI_Controller {
 					echo $key->diskon . "|" . "Diskon Momen : " . $key->nama_diskon . " dari tanggal " . date("d-m-Y",strtotime($key->tgl_mulai)) . " s/d " . date("d-m-Y",strtotime($key->tgl_selesai)) . "|" . $key->id;
 				}
 			}else{
-				echo "NotOk";				
+				echo "NotOk";
 			}
 		}else{
 	    	redirect('_404','refresh');
@@ -458,7 +457,7 @@ class Booking extends CI_Controller {
 			}
 			$this->db->insert('tbl_booking',$simpanbooking);
 		}else{
-/*Poin*/		
+/*Poin*/
 			$total_bayar = str_replace(".", "", $this->input->post('sisa_bayar_p'));
 			$b_point     = $this->input->post('b_point');
 			$dibayar     = str_replace(".", "", $this->input->post('b_sisa'));
@@ -548,7 +547,7 @@ class Booking extends CI_Controller {
 		$this->db->update('tbl_histori_poin',$update_pointmember);
 		$nama_barangna      = $this->input->post('nama_barangna');
 		$x                  = count($nama_barangna);
-		for ($i=0; $i < $x ; $i++) { 
+		for ($i=0; $i < $x ; $i++) {
 			$ckkodebarang = $this->db->get_where('tbl_barang',array('nama_barang'=>$nama_barangna[$i]))->result();
 			foreach ($ckkodebarang as $row) {
 				$kode_barang  = $row->kode;
@@ -655,34 +654,102 @@ class Booking extends CI_Controller {
 		}
 	}
 	public function kirim_email($kode_booking){
-		$ci                    = get_instance();
-		$ci->load->library('email');
-		$config['protocol']  = "smtp";
-        $config['smtp_host'] = "ssl://smtp.googlemail.com";
-        $config['smtp_port'] = "465";
-        $config['smtp_user'] = "asnponorogo@gmail.com";
-        $config['smtp_pass'] = "Bismillah789";
-        $config['charset']   = "ISO-2022-ID";
-        $config['mailtype']  = "html";
-        $config['newline']   = "\r\n";
-		// $config['wordwrap'] = TRUE;
-		$email                 = "opchaky.it@gmail.com";
-		$subject               = "Faktur Pemesanan - MALindo Outdoor";
-		$from_email            = "asnponorogo@gmail.com";
-		$ci->email->initialize($config);
-		$ci->email->from($from_email, 'MALindo Outdoor - [Faktur Pemesanan]');
-		$list                  = array($email);
-		$ci->email->to($list);
-		$ci->email->subject($subject);
-		$body                  = $this->load->view('email',TRUE);
-        $ci->email->message($body);
-        if($this->email->send()){
-            $data['response'] = 'true';
-        }else{
-            $data['response'] = 'false';
-        }
-        if('IS_AJAX'){
-            echo json_encode($data);
-        }
+		$kode                = $this->service->anti($kode_booking);
+		$isi['kode_booking'] = $kode;
+		$ckbooking           = $this->db->get_where('tbl_booking',array('kode_booking'=>$kode));
+		if(count($ckbooking->result())>0){
+			$row                = $ckbooking->row();
+			$kode_member        = $row->kode_member;
+			$jns_bayar          = $row->jns_bayar;
+			if($jns_bayar==2){
+				$ckhargapoin = $this->db->get('tbl_set_poin');
+				$xx = $ckhargapoin->row();
+				$isi['jns_bayar']   = "Poin";
+				$dibayar            = number_format($row->poin_bayar * $xx->nominal);
+				$isi['total_bayar'] = $row->poin_bayar * $xx->nominal + $row->dibayar;
+				if($row->dibayar!="" || $row->dibayar!=NULL){
+					$isi['status']      = number_format($row->poin_bayar) . " poin" . " + " . number_format($row->dibayar);
+				}else{
+					$isi['status']      = number_format($row->poin_bayar) . " poin";
+				}
+			}else{
+				$isi['total_bayar'] = $row->dibayar;
+				$isi['jns_bayar']   = "Cash";
+				$isi['status']      = "";
+			}
+			$diskon_momen = $row->disc_momen;
+			$cekDiskonmomen = $this->db->get_where('tbl_disc_momen',array('id'=>$diskon_momen));
+			if(count($cekDiskonmomen->result())>0){
+				$rowDisc_m = $cekDiskonmomen->row();
+				$disc_m                   = $rowDisc_m->diskon;
+				$isi['diskon_momen']      = $rowDisc_m->diskon;
+				$isi['nama_diskon_momen'] = $rowDisc_m->nama_diskon;
+			}else{
+				$disc_m                   = "0";
+				$isi['diskon_momen']      = "0";
+				$isi['nama_diskon_momen'] = "";
+			}
+			$diskonpinjam   = $row->disc_pinjam;
+			$ckdiskonpinjam = $this->db->get_where('tbl_disc',array('id'=>$diskonpinjam));
+			if(count($ckdiskonpinjam->result())>0){
+				$rowDisc_p                 = $ckdiskonpinjam->row();
+				$disc_p                    = $rowDisc_p->disc;
+				$isi['diskon_pinjam']      = $rowDisc_p->disc;
+				$isi['nama_diskon_pinjam'] = "Lama Pinjam " . number_format($rowDisc_p->durasi) . " hari";
+			}else{
+				$isi['diskon_pinjam']      = "0";
+				$disc_p                    = "0";
+				$isi['nama_diskon_pinjam'] = "";
+			}
+			$isi['sisa_bayar']        = $row->sisa_bayar;
+			$isi['subtotal']          = $row->subtotal;
+			$isi['tot_diskon_pinjam'] = $row->subtotal * $disc_p  / 100;
+			$isi['tot_diskon_momen']  = $row->subtotal * $disc_m  / 100;
+			$isi['tgl_mulai']         = date("d-m-Y",strtotime($row->tgl_perencanaan_sewa));
+			$isi['tgl_selesai']       = date("d-m-Y",strtotime($row->tgl_selesai));
+			$isi['tgl_booking']       = date("d-m-Y H:i:s",strtotime($row->tgl_booking));
+			$ckmember                 = $this->db->get_where('view_member',array('kode_member'=>$kode_member));
+			if(count($ckmember->result())>0){
+				$key                    = $ckmember->row();
+				$isi['nama_member']     = $key->nama;
+				$isi['email_member']    = $key->email;
+				$isi['alamat_member']   = $key->alamat;
+				$isi['tlp_member']      = $key->no_handphone;
+				$isi['alamat_detil']    = ucwords($key->kecamatan) . " , " . ucwords($key->kota);
+				$ci                     = get_instance();
+				$ci->load->library('email');
+				$config['protocol']     = "smtp";
+				$config['smtp_host']    = "ssl://smtp.googlemail.com";
+				$config['smtp_port']    = "465";
+				$config['smtp_timeout'] = "50";
+				$config['smtp_user']    = "asnponorogo@gmail.com";
+				$config['smtp_pass']    = "Bismillah789";
+				$config['charset']      = "ISO-2022-ID";
+				$config['mailtype']     = "html";
+				$config['newline']      = "\r\n";
+				$subject                = "Nota Pesanan";
+				$from_email             = "malindooutdoor@gmail.com";
+				$ci->email->initialize($config);
+				$ci->email->from($from_email, 'MALindo Outdoor - [Nota Pesanan]');
+				$email_member           = $key->email;
+				$list                   = array($email_member);
+				$ci->email->to($list);
+				$ci->email->subject($subject);
+				$body                   = $this->load->view('email',$isi,TRUE);
+		        $ci->email->message($body);
+		        if($this->email->send()){
+		        	$data['response'] = "true";
+		        }else{
+		        	$data['response'] = "false";
+		        }
+		        if('IS_AJAX'){
+		            echo json_encode($data);
+		        }
+			}else{
+				redirect('_404','refresh');
+			}
+		}else{
+			redirect('_404','refresh');
+		}
 	}
 }
