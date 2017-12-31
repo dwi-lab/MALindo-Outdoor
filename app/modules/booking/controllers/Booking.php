@@ -584,12 +584,53 @@ class Booking extends CI_Controller {
 			$kode_member        = $row->kode_member;
 			$jns_bayar          = $row->jns_bayar;
 			if($jns_bayar==2){
-				$isi['jns_bayar'] = "Poin";
+				$ckhargapoin = $this->db->get('tbl_set_poin');
+				$xx = $ckhargapoin->row();
+				$isi['jns_bayar']   = "Poin";
+				$dibayar            = number_format($row->poin_bayar * $xx->nominal);
+				$isi['total_bayar'] = $row->poin_bayar * $xx->nominal + $row->dibayar;
+				if($row->dibayar!="" || $row->dibayar!=NULL){
+					$isi['status']      = number_format($row->poin_bayar) . " poin" . " + " . number_format($row->dibayar);
+				}else{
+					$isi['status']      = number_format($row->poin_bayar) . " poin";
+				}
 			}else{
-				$isi['jns_bayar'] = "Cash";
+				$isi['total_bayar'] = $row->dibayar;
+				$isi['jns_bayar']   = "Cash";
+				$isi['status']      = "";
 			}
-			$isi['tgl_booking'] = date("d-m-Y H:i:s",strtotime($row->tgl_booking));
-			$ckmember           = $this->db->get_where('view_member',array('kode_member'=>$kode_member));
+			$diskon_momen = $row->disc_momen;
+			$cekDiskonmomen = $this->db->get_where('tbl_disc_momen',array('id'=>$diskon_momen));
+			if(count($cekDiskonmomen->result())>0){
+				$rowDisc_m = $cekDiskonmomen->row();
+				$disc_m                   = $rowDisc_m->diskon;
+				$isi['diskon_momen']      = $rowDisc_m->diskon;
+				$isi['nama_diskon_momen'] = $rowDisc_m->nama_diskon;
+			}else{
+				$disc_m                   = "0";
+				$isi['diskon_momen']      = "0";
+				$isi['nama_diskon_momen'] = "";
+			}
+			$diskonpinjam   = $row->disc_pinjam;
+			$ckdiskonpinjam = $this->db->get_where('tbl_disc',array('id'=>$diskonpinjam));
+			if(count($ckdiskonpinjam->result())>0){
+				$rowDisc_p                 = $ckdiskonpinjam->row();
+				$disc_p                    = $rowDisc_p->disc;
+				$isi['diskon_pinjam']      = $rowDisc_p->disc;
+				$isi['nama_diskon_pinjam'] = "Lama Pinjam " . number_format($rowDisc_p->durasi) . " hari";
+			}else{
+				$isi['diskon_pinjam']      = "0";
+				$disc_p                    = "0";
+				$isi['nama_diskon_pinjam'] = "";
+			}
+			$isi['sisa_bayar']        = $row->sisa_bayar;
+			$isi['subtotal']          = $row->subtotal;
+			$isi['tot_diskon_pinjam'] = $row->subtotal * $disc_p  / 100;
+			$isi['tot_diskon_momen']  = $row->subtotal * $disc_m  / 100;
+			$isi['tgl_mulai']         = date("d-m-Y",strtotime($row->tgl_perencanaan_sewa));
+			$isi['tgl_selesai']       = date("d-m-Y",strtotime($row->tgl_selesai));
+			$isi['tgl_booking']       = date("d-m-Y H:i:s",strtotime($row->tgl_booking));
+			$ckmember                 = $this->db->get_where('view_member',array('kode_member'=>$kode_member));
 			if(count($ckmember->result())>0){
 				$key                  = $ckmember->row();
 				$isi['nama_member']   = $key->nama;

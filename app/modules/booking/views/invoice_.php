@@ -33,6 +33,7 @@
             <div class="invoice-detail">
                 #<?php echo $kode_booking;?><br />
                 <b>Booking</b><br/>
+                <small><font color="red"><?php echo $tgl_mulai;?> s/d <?php echo $tgl_selesai;?></font></small><br/>
                 <b>Jenis Bayar : <font color="red"><?php echo $jns_bayar;?></font></b>
             </div>
         </div>
@@ -49,15 +50,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            Website design &amp; development<br />
-                            <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed id sagittis arcu.</small>
-                        </td>
-                        <td>$50.00</td>
-                        <td>50</td>
-                        <td>$2,500.00</td>
-                    </tr>
+                    <?php
+                    $detil = $this->db->query("SELECT * FROM tbl_booking a JOIN tbl_booking_detil b ON a.kode_booking = b.kode_booking JOIN view_barang_detil c ON b.kode_barang = c.kode WHERE a.kode_booking = '$kode_booking' GROUP BY b.kode_barang,b.kode_warna")->result();
+                    if(count($detil)>0){
+                        foreach ($detil as $row) {
+                            ?>
+                            <tr>
+                                <td>
+                                    <?php echo $row->nama_barang;?><br />
+                                    <small>Tipe Barang <?php echo $row->tipe;?> Merk Barang : <?php echo $row->merk;?> Warna Barang : <?php echo $row->warna;?> </small>
+                                </td>
+                                <td><?php echo number_format($row->hrg_sewa);?></td>
+                                <td><?php echo number_format($row->lama) . " hari";?></td>
+                                <td><?php echo number_format($row->hrg_sewa * $row->lama);?></td>
+                            </tr>
+                            <?php
+                        }
+                    }
+                    ?>
                 </tbody>
             </table>
         </div>
@@ -65,27 +75,49 @@
             <div class="invoice-price-left">
                 <div class="invoice-price-row">
                     <div class="sub-price">
-                        <small>SUBTOTAL</small>
-                        $4,500.00
+                        <small>Subtotal</small>
+                        <?php echo number_format($subtotal);?>
                     </div>
                     <div class="sub-price">
-                        <i class="fa fa-plus"></i>
+                        <i class="fa fa-minus"></i>
                     </div>
                     <div class="sub-price">
-                        <small>PAYPAL FEE (5.4%)</small>
-                        $108.00
+                        <small>Disc Pinjam(<?php echo number_format($diskon_pinjam);?> %)</small>
+                        <?php echo number_format($tot_diskon_pinjam);?>
+                        <small><font color="red"><?php echo $nama_diskon_pinjam;?></font></small>
+                    </div>
+                    <div class="sub-price">
+                        <i class="fa fa-minus"></i>
+                    </div>
+                    <div class="sub-price">
+                        <small>Disc Momen(<?php echo number_format($diskon_momen);?> %)</small>
+                        <?php echo number_format($tot_diskon_momen);?>
+                        <small><font color="red"><?php echo $nama_diskon_momen;?></font></small>
+                    </div>
+                    <div class="sub-price">
+                        <i class="fa fa-minus"></i>
+                    </div>
+                    <div class="sub-price">
+                        <small>Dibayar</small>
+                        <?php echo number_format($total_bayar);?>
+                        <small><font color="red"><?php echo $status;?></font></small>
                     </div>
                 </div>
             </div>
             <div class="invoice-price-right">
-                <small>TOTAL</small> $4508.00
+                <small>SISA PEMBAYARAN</small> <?php echo number_format($sisa_bayar);?>
             </div>
         </div>
     </div>
     <div class="invoice-note">
-        * Make all cheques payable to [Your Company Name]<br />
-        * Payment is due within 30 days<br />
-        * If you have any questions concerning this invoice, contact  [Name, Phone Number, Email]
+        <?php
+        $syarat = $this->db->get_where('tbl_syarat',array('status'=>'1'))->result();
+        if(count($syarat)>0){
+            foreach ($syarat as $xx) {
+                    echo " * " . $xx->ket;
+            }
+        }
+        ?>
     </div>
     <div class="invoice-footer text-muted">
         <p class="text-center m-b-5">
