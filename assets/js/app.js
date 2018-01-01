@@ -62,7 +62,7 @@ jQuery(document).ready(function() {
                     var tot_diskon  = jQuery("#disc").val();
                     if(tot_diskon=='NotOk'){
                         jQuery("#disc").val('');
-                        document.getElementById("ket_diskon").innerHTML = "<b>Tidak Ada Diskon Moment</b>";
+                        document.getElementById("ket_diskon").innerHTML = "<b>Tidak Ada Diskon Khusus</b>";
                     }else{
                         document.getElementById("ket_diskon").innerHTML = "<b>" + nama_diskon + "</b>";
                     }

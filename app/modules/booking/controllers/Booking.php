@@ -366,6 +366,7 @@ class Booking extends CI_Controller {
 	public function proses_add(){
 		$kode_booking  = $this->input->post('kode');
 		$info_member   = $this->input->post('nama');
+		$b_point       = "";
 		$pch           = explode("|", $info_member);
 		$kode_member   = str_replace(" ", "", $pch[1]);
 		$jns           = $this->input->post('jns_bayar');
@@ -376,7 +377,7 @@ class Booking extends CI_Controller {
 		$lama          = $this->input->post('lama_pinjam');
 		$id_disc_lama  = $this->input->post('id_disc_lama');
 		$id_disc_momen = $this->input->post('id_disc_momen');
-		$subtotal      = str_replace(".", "", $this->input->post('subtotal'));
+		$subtotal      = str_replace(".", "", $this->input->post('subtotal_x'));
 		if($jns==1){
 /*Cash*/
 			$dibayar       = str_replace(".", "", $this->input->post('b_cash'));
@@ -537,14 +538,15 @@ class Booking extends CI_Controller {
 					'status_booking'       =>'1');
 			}
 			$this->db->insert('tbl_booking',$simpanbooking);
+			$ckpointmember      = $this->db->get_where('tbl_histori_poin',array('kode_member'=>$kode_member));
+			$rowPoin            = $ckpointmember->row();
+			$jml_poin           = $rowPoin->jml_poin;
+			$hitungpoin         = $jml_poin - $b_point;
+			$update_pointmember = array('jml_poin'=>$hitungpoin);
+			$this->db->where('kode_member',$kode_member);
+			$this->db->update('tbl_histori_poin',$update_pointmember);
 		}
-		$ckpointmember      = $this->db->get_where('tbl_histori_poin',array('kode_member'=>$kode_member));
-		$rowPoin            = $ckpointmember->row();
-		$jml_poin           = $rowPoin->jml_poin;
-		$hitungpoin         = $jml_poin - $b_point;
-		$update_pointmember = array('jml_poin'=>$hitungpoin);
-		$this->db->where('kode_member',$kode_member);
-		$this->db->update('tbl_histori_poin',$update_pointmember);
+		
 		$nama_barangna      = $this->input->post('nama_barangna');
 		$x                  = count($nama_barangna);
 		for ($i=0; $i < $x ; $i++) {
@@ -738,9 +740,9 @@ class Booking extends CI_Controller {
 				$body                   = $this->load->view('email',$isi,TRUE);
 		        $ci->email->message($body);
 		        if($this->email->send()){
-		        	$data['response'] = "true";
+		        	$data['response'] = 'true';
 		        }else{
-		        	$data['response'] = "false";
+		        	$data['response'] = 'false';
 		        }
 		        if('IS_AJAX'){
 		            echo json_encode($data);

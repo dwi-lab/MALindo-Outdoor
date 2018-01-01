@@ -307,27 +307,32 @@
 					var diskon_momen = jQuery("#disc").val();
 					var diskon_lama  = jQuery("#disc_lama_pinjam").val();
 					var total        = jQuery("#subtotal").unmask();
+
+					var subtotal   = jQuery("#subtotal").unmask();
+					var h_subtotal = parseInt(subtotal) * parseInt(lama);
 					if(diskon_momen!="" && diskon_lama==""){
-						var h        = (parseInt(diskon_momen) / 100) * total;
-						var subtotal = parseInt(total) - parseInt(h);
+						var h        = parseInt(h_subtotal) * parseInt(diskon_momen) / 100;
+						var subtotal = parseInt(h_subtotal) - parseInt(h);
 					}else if(diskon_lama!="" && diskon_momen==""){
-						var h        = (parseInt(diskon_lama) / 100) * total;
-						var subtotal = parseInt(total) - parseInt(h);
+						var h        = parseInt(diskon_lama) / 100 * parseInt(h_subtotal);
+						var subtotal = parseInt(h_subtotal) - parseInt(h);
 					}else if(diskon_lama!="" && diskon_momen!=""){
-						var m        = (parseInt(diskon_momen) / 100) * total;
-						var subtotal_momen = parseInt(total) - parseInt(m);
-						var l        = (parseInt(diskon_lama) / 100) * total;
-						var subtotal_lama = parseInt(total) - parseInt(l);
-						var subtotal = parseInt(total) - ((parseInt(subtotal_momen) + parseInt(subtotal_lama)));
+						var m              = parseInt(h_subtotal) * (parseInt(diskon_momen) / 100);
+						var subtotal_momen = parseInt(h_subtotal) - parseInt(m);
+						var l              = parseInt(h_subtotal) * (parseInt(diskon_lama) / 100);
+						var subtotal_lama  = parseInt(h_subtotal) - parseInt(l);
+						var subtotal       = parseInt(h_subtotal) - ((parseInt(subtotal_momen) + parseInt(subtotal_lama)));
 					}else{
-						var subtotal = total;
+						var subtotal = parseInt(h_subtotal);
 					}
+					jQuery("#subtotal_x").val(parseInt(total) * parseInt(lama));
 					jQuery("#subtotal_").val(subtotal);
 					jQuery('#subtotal_').priceFormat({
 				        prefix: '',
 				        centsSeparator: ',',
 				        thousandsSeparator: '.'
 				    });
+					
                     return false;
 	            });
 			}else{
@@ -339,8 +344,8 @@
 			var qty   = jQuery("#qty").val();
 			var warna = jQuery("#warna_barang").val();
 			if(warna!=""){
-				if(qty!="" || qty > 0){
-					if(qty <= stok){
+				if(qty!="" || parseInt(qty)  > 0){
+					if(parseInt(qty)  <= parseInt(stok)){
 						$.gritter.add({title:"Informasi Barang !",text: "Silahkan Klik Tombol Tambah untuk menambah Barang."});
 			            return false;
 					}else{
@@ -398,6 +403,7 @@
 					?>
 					<div class="form-group">
 	                    <input class="form-control" type="hidden" id="status_warna" name="status_warna" />
+	                    <input class="form-control" type="hidden" id="subtotal_x" name="subtotal_x" />
 	                    <input class="form-control" type="hidden" id="tot_poin" name="tot_poin" />
 	                    <input class="form-control" type="hidden" id="id_disc_lama" name="id_disc_lama" />
 	                    <input class="form-control" type="hidden" id="id_disc_momen" name="id_disc_momen" />
@@ -516,22 +522,6 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="control-label col-md-3 col-sm-3">Diskon Momen</label>
-								<div class="col-md-2 col-sm-2">
-									<div class="input-group">
-		                                <input class="form-control" type="text" style="text-align: right;" id="disc" minlength="1" readonly="readonly" maxlength='20' name="disc" data-parsley-minlength="1" data-parsley-maxlength="20"/>
-		                                <span class="input-group-addon">%</span>
-		                            </div>
-								</div>
-							</div>
-							<div id="ket_disc">
-								<div class="form-group">
-									<div class="col-md-8 col-sm-8">
-	                            		<span style="color:red;" id="ket_diskon"></span>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Tanggal Sewa</label>
 								<div class="col-md-2 col-sm-2">
 									<div class="input-group date" id="tglmulai" data-date-format="dd-mm-yyyy">
@@ -559,7 +549,7 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="control-label col-md-3 col-sm-3">Diskon Lama Pinjam</label>
+								<label class="control-label col-md-3 col-sm-3">Diskon Tetap</label>
 								<div class="col-md-2 col-sm-2">
 									<div class="input-group">
 		                                <input class="form-control" type="text" style="text-align: right;" id="disc_lama_pinjam" minlength="1" readonly="readonly" maxlength='20' name="disc_lama_pinjam" data-parsley-minlength="1" data-parsley-maxlength="20"/>
@@ -574,6 +564,26 @@
 									</div>
 								</div>
 							</div>
+							
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Diskon Khusus</label>
+								<div class="col-md-2 col-sm-2">
+									<div class="input-group">
+		                                <input class="form-control" type="text" style="text-align: right;" id="disc" minlength="1" readonly="readonly" maxlength='20' name="disc" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+		                                <span class="input-group-addon">%</span>
+		                            </div>
+								</div>
+							</div>
+							<div id="ket_disc">
+								<div class="form-group">
+									<div class="col-md-8 col-sm-8">
+	                            		<span style="color:red;" id="ket_diskon"></span>
+									</div>
+								</div>
+							</div>
+							
+							
+							
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Subtotal</label>
 								<div class="col-md-3 col-sm-3"> 

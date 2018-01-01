@@ -2,7 +2,13 @@
 function kirim_email($kode_booking) {
     jQuery.post($BASE_URL+"booking/kirim_email/"+$kode_booking,
     function(data){
-        alert(data);
+        if(data.response!='true'){
+            $.gritter.add({title:"Informasi Invoice !",text: "Nota Pesanan Terkirim ke e-mail member !"});
+            return false;
+        }else{
+            $.gritter.add({title:"Informasi Invoice !",text: "Nota Pesanan Gagal Terkirim ke e-mail member !"});
+            return false;
+        }
     });
 }
 </script>
