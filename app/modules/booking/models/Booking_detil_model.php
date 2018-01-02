@@ -1,19 +1,16 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-class Booking_model extends CI_Model {
-    var $table         = 'view_booking';
-    var $table_        = 'tbl_booking';
-    var $column_order  = array('kode_booking','foto','nama','tgl_booking','tgl_perencanaan_sewa','tgl_selesai','lama','status_booking',null);
-    var $column_search = array('kode_booking','nama','tgl_booking','tgl_perencanaan_sewa','tgl_selesai'); 
-    var $order         = array('kode_booking' => 'desc');
+class Booking_detil_model extends CI_Model {
+    var $table         = 'view_booking_detil';
+    var $table_        = 'tbl_booking_detil';
+    var $column_order  = array(null,null,'kode_barang','nama_barang','warna','hrg_sewa','qty',null);
+    var $column_search = array('kode_barang','nama_barang','warna','qty','hrg_sewa'); 
+    var $order         = array('id' => 'desc');
     public function __construct(){
         parent::__construct();
         $this->load->database();
     }
     private function _get_datatables_query(){
-        if($this->input->post('jns_bayar')){
-            $this->db->where("jns_bayar=",$this->input->post('jns_bayar'));
-        }
         $this->db->from($this->table);
         $i = 0;
         foreach ($this->column_search as $item) {
@@ -54,7 +51,7 @@ class Booking_model extends CI_Model {
     }
     public function get_by_id($id){
         $this->db->from($this->table);
-        $this->db->where('kode_booking',$id);
+        $this->db->where('kode_barang',$id);
         $query = $this->db->get();
         return $query->row();
     }
@@ -62,8 +59,8 @@ class Booking_model extends CI_Model {
         $this->db->from($this->table);
         return $this->db->count_all_results();
     }
-    public function hapus_by_kode_booking($kode_booking){
-        $this->db->where('kode_booking', $kode_booking);
+    public function hapus_by_kode_barang($kode_barang){
+        $this->db->where('kode_barang', $kode_barang);
         $this->db->delete($this->table_);
     }
 }

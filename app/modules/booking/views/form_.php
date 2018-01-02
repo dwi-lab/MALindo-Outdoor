@@ -224,6 +224,7 @@
 						jQuery("#bayar_cash").hide('slow');
 	                    document.getElementById("ket_point").innerHTML = "<b>Member bersangkutan belum mempunyai Poin</b>";
 	                }else{
+        				jQuery("#pelunasan").show('');
 	                	jQuery("#bayar_poin").show('slow');
 						jQuery("#bayar_cash").hide('slow');
         				jQuery("#tombol").hide('');
@@ -234,14 +235,15 @@
                     return false;
 	            });
 			}else if(jns==1){
-        		jQuery("#pelunasan").hide('');
 				jQuery("#ket_poin").hide('slow');
 				jQuery("#bayar_poin").hide('slow');
 				jQuery("#bayar_cash").show('slow');
+        		jQuery("#pelunasan").hide('');
                 document.getElementById('b_cash').focus();
         		jQuery("#tombol").hide('');
 			}else{
         		jQuery("#tombol").hide('');
+        		jQuery("#pelunasan").hide('');
 				jQuery("#bayar_poin").hide('slow');
 				jQuery("#bayar_cash").hide('slow');
 	            $.gritter.add({title:"Informasi Pembayaran !",text: "Silahkan Pilih Jenis Pembayaran"});
@@ -265,7 +267,7 @@
 					jQuery("#tot_poin_b").val(dt);
 					var tot_bayar = jQuery("#subtotal_").unmask();
 					var tukar     = dt;
-					if(tot_bayar > tukar){
+					if(parseInt(tot_bayar) > parseInt(tukar)){
 	            		$.gritter.add({title:"Informasi Pembayaran !",text: "Pembayaran Dengan Poin Masih Kurang, Sisa Pembayaran Bisa Dengan Uang !"});
         				jQuery("#pelunasan").show('');
 						jQuery("#sisa_bayar_p").val(parseInt(tot_bayar) - parseInt(tukar));

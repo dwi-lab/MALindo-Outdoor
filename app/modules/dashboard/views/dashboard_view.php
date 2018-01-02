@@ -60,7 +60,7 @@
             <?php
             if($page=="booking"){
                 ?>
-                    <h1 class="page-header hidden-print">Invoice <small><?php echo $judul;?></small></h1>
+                    <h1 class="page-header hidden-print"><?php echo $halaman;?> <small><?php echo $judul;?></small></h1>
                 <?php
             }else{
                 ?>

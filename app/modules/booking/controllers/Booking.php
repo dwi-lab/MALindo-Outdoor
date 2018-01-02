@@ -4,6 +4,7 @@ class Booking extends CI_Controller {
 		parent::__construct();
 		date_default_timezone_set('Asia/Jakarta');
 		$this->load->model('booking_model');
+		$this->load->model('booking_detil_model');
 		$this->load->library(array('PHPExcel/IOFactory'));
 		$submenu = "Booking";
 		$menu    = "transaksi";
@@ -37,32 +38,31 @@ class Booking extends CI_Controller {
 			$no   = $_POST['start'];
 			foreach ($list as $rowx) {
 				$no++;
-				$row      = array();
-				$row[]    = $no . ".";
-				$row[]    = "<right>" . $rowx->kode . "</right>";
-				$row[]    = $rowx->nama_booking;
-				$row[]    = $rowx->tipe;
-				$row[]    = $rowx->merk;
-				$row[]    = $rowx->total_stok;
-				$row[]    = '<center><a class="btn btn-xs m-r-5 btn-primary" href="javascript:void(0)" title="Edit Data"
-				data-step         ="6"
-				data-intro        ="Digunakan untuk mengedit data."
-				data-hint         ="Digunakan untuk mengedit data."
-				data-hintPosition ="top-middle"
-				data-position     ="bottom-right-aligned"
-				onclick="edit_booking(\'Booking\',\'booking\',\'edit_data\','."'".$rowx->kode."'".')"><i class="icon-pencil"></i></a><a class="btn btn-xs m-r-5 btn-danger " href="javascript:void(0)" title="Hapus Data"
-				data-step         ="7"
-				data-intro        ="Digunakan untuk menghapus data."
-				data-hint         ="Digunakan untuk menghapus data."
-				data-hintPosition ="top-middle"
-				data-position     ="bottom-right-aligned"
-				onclick="hapus_data(\'Booking\',\'booking\',\'hapus_data\','."'".$rowx->kode."'".')"><i class="icon-remove icon-white"></i></a><a data-toggle="tooltip" class="btn btn-xs m-r-5 btn-warning" href="javascript:void(0)" title="Lihat Detil"
-				data-step         ="8"
-				data-intro        ="Digunakan untuk melihat detil booking."
-				data-hint         ="Digunakan untuk melihat detil booking."
-				data-hintPosition ="top-middle"
-				data-position     ="bottom-right-aligned"
-				onclick="detil_booking('."'".$rowx->kode."'".',\'booking\',\'booking\','."'".$rowx->kode."'".')"><i class="fa fa-search"></i></a></center>';
+				$row   = array();
+				$row[] = $no . ".";
+				$row[] = "<center><a class='fancybox' href='".base_url()."assets/foto/member/$rowx->foto' style='width:100px;text-align:center;height:102px;' data-fancybox-group='gallery' title='".$rowx->nama."'><img src='".base_url()."assets/foto/member/$rowx->foto' style='width:71px;' alt=''/></a></center>";
+				$row[] = "<right>" . $rowx->kode_booking . "</right>";
+				$row[] = $rowx->nama;
+				$row[] = date("d-m-Y",strtotime($rowx->tgl_booking));
+				$row[] = date("d-m-Y",strtotime($rowx->tgl_perencanaan_sewa));
+				$row[] = date("d-m-Y",strtotime($rowx->tgl_selesai));
+				$row[] = number_format($rowx->lama);
+				$row[] = $rowx->status_booking ? '<center><a href="javascript:void(0)"
+					data-step         ="4"
+					data-intro        ="Digunakan untuk mengaktifkan atau menonaktifkan data."
+					data-hint         ="Digunakan untuk mengaktifkan atau menonaktifkan data."
+					data-hintPosition ="top-middle"
+					data-position     ="bottom-right-aligned"
+					onclick="rbstatus(\'aktif\',\'Booking\',\'booking\','."'".$rowx->kode_booking."'".')" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-info" title="Sedang Dalam Proses">InProses</a>' : '<center><a href="javascript:void(0)" onclick="rbstatus(\'inaktif\',\'Booking\',\'booking\','."'".$rowx->kode_booking."'".')" data-toggle="tooltip" class="btn disable btn-xs m-r-5 btn-danger" title="Batal Booking">Batal Booking</a>';
+				$row[]  = '<center><div class="btn-group m-r-5 m-b-5">
+								<a href="javascript:;" data-toggle="dropdown" class="btn btn-xs m-r-5 btn-info dropdown-toggle">Action <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									<li><a href="javascript:;" onclick="detil_booking('."'".$rowx->kode_booking."'".',\'Booking\',\'booking\','."'".$rowx->kode_booking."'".')">Lihat Detil</a></li>
+									<li><a href="javascript:;">Lihat Nota</a></li>
+									<li class="divider"></li>
+									<li><a href="javascript:;">Hapus Booking</a></li>
+								</ul>
+							</div></center>';
 				$data[] = $row;
 			}
 			$output = array(
@@ -74,6 +74,163 @@ class Booking extends CI_Controller {
 			echo json_encode($output);
 		}else{
 			redirect("_404","refresh");
+		}
+	}
+	public function getDataDetil(){
+		if($this->input->is_ajax_request()){
+			$list = $this->booking_detil_model->get_datatables();
+			$data = array();
+			$no   = $_POST['start'];
+			foreach ($list as $rowx) {
+				$no++;
+				$row   = array();
+				$row[] = $no . ".";
+				$row[] = "<center><a class='fancybox' href='".base_url()."assets/foto/barang/$rowx->foto' style='width:100px;text-align:center;height:102px;' data-fancybox-group='gallery' title='".$rowx->nama_barang."'><img src='".base_url()."assets/foto/barang/$rowx->foto' style='width:71px;' alt=''/></a></center>";
+				$row[] = $rowx->kode_barang;
+				$row[] = $rowx->nama_barang;
+				$row[] = $rowx->warna;
+				$row[] = number_format($rowx->hrg_sewa);
+				$row[] = number_format($rowx->qty);
+				$row[]  = '<center><a class="btn btn-xs m-r-5 btn-primary" href="javascript:void(0)" title="Edit Data" 
+					onclick="edit_data(\'Data Booking Barang\',\'booking\',\'edit_data_barang\','."'".$rowx->id."'".')"><i class="icon-pencil"></i></a><a class="btn btn-xs m-r-5 btn-danger " href="javascript:void(0)" title="Hapus Data" 
+					onclick="hapus_data(\'Data Booking Barang\',\'booking\',\'hapus_data_barang\','."'".$rowx->id."'".')"><i class="icon-remove icon-white"></i></a></center>';
+				$data[] = $row;
+			}
+			$output = array(
+				"draw"            => $_POST['draw'],
+				"recordsTotal"    => $this->booking_detil_model->count_all(),
+				"recordsFiltered" => $this->booking_detil_model->count_filtered(),
+				"data"            => $data,
+				);
+			echo json_encode($output);
+		}else{
+			redirect("_404","refresh");
+		}
+	}
+	public function cekdata($kode=Null){
+		if($this->input->is_ajax_request()){
+			$ckdata = $this->db->get_where('view_booking',array('kode_booking'=>$this->service->anti($kode)))->result();
+			if(count($ckdata)>0){
+				$data['say'] = "ok";
+			}else{
+				$data['say'] = "NotOk";
+			}
+			if('IS_AJAX'){
+				echo json_encode($data);
+			}
+		}else{
+			redirect("_404","refresh");
+		}
+	}
+	public function detil_booking($kode){
+		$ckdata = $this->db->get_where('view_booking',array('kode_booking'=>$kode));
+		if(count($ckdata->result())>0){
+			$this->session->set_userdata('kode_booking',$kode);
+			$cksetpoin             = $this->db->get('tbl_set_poin');
+			$x                     = $cksetpoin->row();
+			$isi['harga_poin']     = $x->nominal;
+			$row                   = $ckdata->row();
+			$isi['foto_identitas'] = $row->foto_identitas;
+			$isi['foto']           = $row->foto;
+			$isi['kode_member']    = $row->kode_member;
+			$isi['no_identitas']   = $row->no_identitas;
+			$isi['nama']           = $row->nama;
+			$isi['almt']           = $row->alamat;
+			$isi['mail']           = $row->email;
+			$isi['jk']             = $row->jns_kel;
+			$isi['kerja']          = $row->kerja;
+			$isi['hp']             = $row->no_handphone;
+			$isi['tgllahir']       = $row->tgl_lahir;
+			$isi['tgldaftar']      = $row->tgl_daftar;
+			$isi['provinsi']       = $row->provinsi;
+			$isi['kota']           = $row->kota;
+			$isi['kecamatan']      = $row->kecamatan;
+			$isi['kelurahan']      = $row->kelurahan;
+			$isi['umur']           = $this->service->umur(date("d-m-Y",strtotime($row->tgl_lahir)));
+			$isi['kelas']          = "transaksi";
+			$isi['namamenu']       = "Booking";
+			$isi['page']           = "booking";
+			$isi['link']           = 'booking';
+			$isi['actionhapus']    = 'hapus';
+			$isi['actionedit']     = 'edit';
+			$isi['halaman']        = "Detil Data Booking";
+			$isi['judul']          = "Halaman Detil Data Booking";
+			$isi['content']        = "detil_booking";
+			$kode                  = $this->service->anti($kode);
+			$isi['kode_booking']   = $kode;
+			$ckbooking             = $this->db->get_where('tbl_booking',array('kode_booking'=>$kode));
+			if(count($ckbooking->result())>0){
+				$row                   = $ckbooking->row();
+				$isi['lama']           = $row->lama;
+				$isi['poin_bayar']     = $row->poin_bayar;
+				$isi['poin_bayar']     = $row->poin_bayar;
+				$isi['status_booking'] = $row->status_booking;
+				$kode_member           = $row->kode_member;
+				$jns_bayar             = $row->jns_bayar;
+				if($jns_bayar==2){
+					$ckhargapoin = $this->db->get('tbl_set_poin');
+					$xx = $ckhargapoin->row();
+					$isi['jns_bayar']   = "Poin";
+					$dibayar            = number_format($row->poin_bayar * $xx->nominal);
+					$isi['total_bayar'] = $row->poin_bayar * $xx->nominal + $row->dibayar;
+					if($row->dibayar!="" || $row->dibayar!=NULL){
+						$isi['status']      = number_format($row->poin_bayar) . " poin" . " + " . number_format($row->dibayar);
+					}else{
+						$isi['status']      = number_format($row->poin_bayar) . " poin";
+					}
+				}else{
+					$isi['total_bayar'] = $row->dibayar;
+					$isi['jns_bayar']   = "Cash";
+					$isi['status']      = "";
+				}
+				$diskon_momen = $row->disc_momen;
+				$cekDiskonmomen = $this->db->get_where('tbl_disc_momen',array('id'=>$diskon_momen));
+				if(count($cekDiskonmomen->result())>0){
+					$rowDisc_m = $cekDiskonmomen->row();
+					$disc_m                   = $rowDisc_m->diskon;
+					$isi['diskon_momen']      = $rowDisc_m->diskon;
+					$isi['nama_diskon_momen'] = $rowDisc_m->nama_diskon;
+				}else{
+					$disc_m                   = "0";
+					$isi['diskon_momen']      = "0";
+					$isi['nama_diskon_momen'] = "";
+				}
+				$diskonpinjam   = $row->disc_pinjam;
+				$ckdiskonpinjam = $this->db->get_where('tbl_disc',array('id'=>$diskonpinjam));
+				if(count($ckdiskonpinjam->result())>0){
+					$rowDisc_p                 = $ckdiskonpinjam->row();
+					$disc_p                    = $rowDisc_p->disc;
+					$isi['diskon_pinjam']      = $rowDisc_p->disc;
+					$isi['nama_diskon_pinjam'] = "Lama Pinjam " . number_format($rowDisc_p->durasi) . " hari";
+				}else{
+					$isi['diskon_pinjam']      = "0";
+					$disc_p                    = "0";
+					$isi['nama_diskon_pinjam'] = "";
+				}
+				$isi['sisa_bayar']        = $row->sisa_bayar;
+				$isi['subtotal']          = $row->subtotal;
+				$isi['tot_diskon_pinjam'] = $row->subtotal * $disc_p  / 100;
+				$isi['tot_diskon_momen']  = $row->subtotal * $disc_m  / 100;
+				$isi['tgl_mulai']         = date("d-m-Y",strtotime($row->tgl_perencanaan_sewa));
+				$isi['tgl_selesai']       = date("d-m-Y",strtotime($row->tgl_selesai));
+				$isi['tgl_booking']       = date("d-m-Y H:i:s",strtotime($row->tgl_booking));
+				$ckmember                 = $this->db->get_where('view_member',array('kode_member'=>$kode_member));
+				if(count($ckmember->result())>0){
+					$key                    = $ckmember->row();
+					$isi['nama_member']     = $key->nama;
+					$isi['email_member']    = $key->email;
+					$isi['alamat_member']   = $key->alamat;
+					$isi['tlp_member']      = $key->no_handphone;
+					$isi['alamat_detil']    = ucwords($key->kecamatan) . " , " . ucwords($key->kota);
+				}else{
+					redirect('_404','refresh');
+				}
+			}else{
+				redirect('_404','refresh');
+			}
+			$this->load->view("dashboard/dashboard_view",$isi);
+		}else{
+			redirect('_404','refresh');
 		}
 	}
 	public function cekPoint($id){
@@ -546,7 +703,6 @@ class Booking extends CI_Controller {
 			$this->db->where('kode_member',$kode_member);
 			$this->db->update('tbl_histori_poin',$update_pointmember);
 		}
-		
 		$nama_barangna      = $this->input->post('nama_barangna');
 		$x                  = count($nama_barangna);
 		for ($i=0; $i < $x ; $i++) {
