@@ -58,7 +58,7 @@ class Booking extends CI_Controller {
 								<a href="javascript:;" data-toggle="dropdown" class="btn btn-xs m-r-5 btn-info dropdown-toggle">Action <span class="caret"></span></a>
 								<ul class="dropdown-menu">
 									<li><a href="javascript:;" onclick="detil_booking('."'".$rowx->kode_booking."'".',\'Booking\',\'booking\','."'".$rowx->kode_booking."'".')">Lihat Detil</a></li>
-									<li><a href="javascript:;">Lihat Nota</a></li>
+									<li><a href="'.base_url().'booking/invoice/'.$rowx->kode_booking.'">Lihat Nota</a></li>
 									<li class="divider"></li>
 									<li><a href="javascript:;">Hapus Booking</a></li>
 								</ul>
