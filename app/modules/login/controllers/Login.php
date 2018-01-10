@@ -52,6 +52,14 @@ class Login extends CI_Controller {
 			redirect("_404",'refresh');
 		}
 	}
+	public function generate($user, $pass){
+		$user = addslashes($user);
+		$pass = addslashes($pass);
+		$pass = md5(crypt($pass,md5($user)));
+
+		echo "Usernamena : " . $user . "</br>" . "Passwordna : " . $pass;
+
+	}
 	public function getRight(){
 		if($this->input->is_ajax_request()){
 			$html      =	"";
@@ -86,4 +94,9 @@ class Login extends CI_Controller {
 			redirect("_404",'refresh');
 		}
 	}
+	public function tester(){
+		$currip = $_SERVER["REMOTE_ADDR"];
+		echo "string" . $currip;
+	}
+	
 }

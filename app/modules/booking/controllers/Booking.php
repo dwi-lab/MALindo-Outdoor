@@ -880,8 +880,8 @@ class Booking extends CI_Controller {
 				$config['smtp_host']    = "ssl://smtp.googlemail.com";
 				$config['smtp_port']    = "465";
 				$config['smtp_timeout'] = "50";
-				$config['smtp_user']    = "asnponorogo@gmail.com";
-				$config['smtp_pass']    = "Bismillah789";
+				$config['smtp_user']    = "malindooutdoor@gmail.com";
+				$config['smtp_pass']    = "081320147000x";
 				$config['charset']      = "ISO-2022-ID";
 				$config['mailtype']     = "html";
 				$config['newline']      = "\r\n";
