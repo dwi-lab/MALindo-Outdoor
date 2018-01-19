@@ -337,7 +337,7 @@ class Booking extends CI_Controller {
 		if($this->input->is_ajax_request()){
 			$keyword          = $this->service->anti($this->input->post('term'));
 			$data['response'] = 'false';
-			$cari_member      = $this->db->query("SELECT a.kode_member,a.nama,a.foto,a.no_handphone,a.no_identitas,a.alamat FROM view_member a WHERE a.kode_member LIKE '$keyword%' OR a.nama LIKE '$keyword%' OR a.no_identitas LIKE '$keyword%' OR a.no_handphone LIKE '$keyword%' ORDER BY a.nama ASC")->result();
+			$cari_member      = $this->db->query("SELECT a.kode_member,a.nama,a.foto,a.no_handphone,a.no_identitas,a.alamat FROM view_member a WHERE a.kode_member LIKE '%$keyword%' OR a.nama LIKE '%$keyword%' OR a.no_identitas LIKE '%$keyword%' OR a.no_handphone LIKE '%$keyword%' ORDER BY a.nama ASC")->result();
 			if( ! empty($cari_member) ){
 				$data['response']  = 'true';
 				$data['message']   = array();
@@ -498,7 +498,7 @@ class Booking extends CI_Controller {
 		if($this->input->is_ajax_request()){
 			$keyword          = $this->service->anti($this->input->post('term'));
 			$data['response'] = 'false';
-			$cari_member      = $this->db->query("SELECT a.kode,a.nama_barang,a.hrg_sewa FROM view_barang a WHERE kode LIKE '$keyword%' OR nama_barang LIKE '$keyword' ORDER BY a.nama_barang ASC")->result();
+			$cari_member      = $this->db->query("SELECT a.kode,a.nama_barang,a.hrg_sewa,a.poin FROM view_barang a WHERE kode LIKE '%$keyword%' OR nama_barang LIKE '%$keyword%' ORDER BY a.nama_barang ASC")->result();
 			if( ! empty($cari_member) ){
 				$data['response']  = 'true';
 				$data['message']   = array();
@@ -508,6 +508,7 @@ class Booking extends CI_Controller {
 						'value'         => $row->nama_barang . " | " . $row->kode,
 						'nama'          => $row->nama_barang,
 						'kode'          => $row->kode,
+						'poin'          => number_format($row->poin),
 						'harga'         => number_format($row->hrg_sewa));
 				}
 			}else{

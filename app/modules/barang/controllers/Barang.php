@@ -116,7 +116,7 @@ class Barang extends CI_Controller {
 				"recordsTotal"    => $this->barang_model->count_all(),
 				"recordsFiltered" => $this->barang_model->count_filtered(),
 				"data"            => $data,
-				);
+			);
 			echo json_encode($output);
 		}else{
 			redirect("_404","refresh");
@@ -172,16 +172,16 @@ class Barang extends CI_Controller {
 		$isi['content']      = "form_";
 		$isi['action']       = "proses_add";
 		$ahhhhhh             = $this->db->query("SELECT SUBSTR(MAX(kode),-6) as nona FROM tbl_barang")->result();
- 		foreach ($ahhhhhh as $zzz) {
- 			$xx = substr($zzz->nona, 3, 6);
- 		}
- 		if($xx==''){
- 			$newID = 'B-0001';
- 		}else{
+		foreach ($ahhhhhh as $zzz) {
+			$xx = substr($zzz->nona, 3, 6);
+		}
+		if($xx==''){
+			$newID = 'B-0001';
+		}else{
 			$noUrut = (int) substr($xx, 1, 4);
 			$noUrut++;
 			$newID  = "B-" . sprintf("%04s", $noUrut);
- 		}
+		}
 		$isi['default']['kode']  = $newID;
 		$isi['option_warna'][''] = "Pilih Warna Barang";
 		$cwarna                  = $this->db->get('tbl_warna')->result();
@@ -221,6 +221,7 @@ class Barang extends CI_Controller {
 		$this->form_validation->set_rules('hrgbeli', 'Harga Beli', 'htmlspecialchars|trim|required|min_length[1]');
 		$this->form_validation->set_rules('hrgsusut', 'Biaya Penyusutan', 'htmlspecialchars|trim|required|min_length[1]');
 		$this->form_validation->set_rules('hrgsewa', 'Harga Sewa', 'htmlspecialchars|trim|required|min_length[1]');
+		$this->form_validation->set_rules('poin', 'Harga Poin', 'htmlspecialchars|trim|required|min_length[1]');
 		$this->form_validation->set_message('is_unique', '%s sudah ada sebelumnya');
 		$this->form_validation->set_message('required', '%s tidak boleh kosong');
 		$this->form_validation->set_message('min_length', '%s minimal %s karakter');
@@ -233,12 +234,14 @@ class Barang extends CI_Controller {
 			$merk     = $this->service->anti($this->input->post('merk'));
 			$warna    = $this->service->anti($this->input->post('warna'));
 			$tgl      = $this->service->anti($this->input->post('tglbeli'));
+			$poin     = $this->service->anti($this->input->post('poin'));
 			$tgla     = $this->service->anti(date("Y-m-d",strtotime($tgl)));
 			$hrgbeli  = $this->service->anti(str_replace(".", "", $this->input->post('hrgbeli')));
 			$hrgsusut = $this->service->anti(str_replace(".", "", $this->input->post('hrgsusut')));
 			$hrgsewa  = $this->service->anti(str_replace(".", "", $this->input->post('hrgsewa')));
 			$simpan   = array(
 				'kode'             =>$kode,
+				'poin'             =>$poin,
 				'nama_barang'      =>$nama,
 				'hrg_sewa'         =>$hrgsewa,
 				'id_tipe'          =>$tipe,
@@ -252,23 +255,23 @@ class Barang extends CI_Controller {
 				$path   = "assets/foto/barang";
 				$files  = $_FILES['fotona'];
 				$config = array(
-		            'upload_path'   => $path,
-		            'allowed_types' =>'jpg',
-		            'overwrite'     => NULL,
-		        );
-		        $this->load->library('upload', $config);
+					'upload_path'   => $path,
+					'allowed_types' =>'jpg',
+					'overwrite'     => NULL,
+				);
+				$this->load->library('upload', $config);
 				$images   = array();
-		        foreach ($files['name'] as $key => $image) {
-	                $_FILES['multi_images[]']['name']     = $files['name'][$key];
-	                $_FILES['multi_images[]']['type']     = $files['type'][$key];
-	                $_FILES['multi_images[]']['tmp_name'] = $files['tmp_name'][$key];
-	                $_FILES['multi_images[]']['error']    = $files['error'][$key];
-	                $_FILES['multi_images[]']['size']     = $files['size'][$key];
+				foreach ($files['name'] as $key => $image) {
+					$_FILES['multi_images[]']['name']     = $files['name'][$key];
+					$_FILES['multi_images[]']['type']     = $files['type'][$key];
+					$_FILES['multi_images[]']['tmp_name'] = $files['tmp_name'][$key];
+					$_FILES['multi_images[]']['error']    = $files['error'][$key];
+					$_FILES['multi_images[]']['size']     = $files['size'][$key];
 					$fileName            = $image;
 					$images[]            = $fileName;
 					$config['file_name'] = $fileName;
-		            $this->upload->initialize($config);
-		            if ($this->upload->do_upload('multi_images[]')) {
+					$this->upload->initialize($config);
+					if ($this->upload->do_upload('multi_images[]')) {
 						$namafoto = str_replace(" ", "_", $files['name'][$key]);
 						$warnax   = $this->input->post('warnana')[$key];
 						$ckwarna  = $this->db->get_where('tbl_warna',array('warna'=>$warnax))->result();
@@ -286,9 +289,9 @@ class Barang extends CI_Controller {
 						$update_stok  = array('total_stok'=>$total_stokna);
 						$this->db->where('kode',$kode);
 						$this->db->update('tbl_barang',$update_stok);
-		            }
-		        }
-		    }
+					}
+				}
+			}
 			redirect('barang','refresh');
 		}else{
 			$this->add();
@@ -420,31 +423,31 @@ class Barang extends CI_Controller {
 			FROM view_barang_detil a WHERE a.id_merk = '$merk' AND a.id_tipe = '$tipe'");
 		$fields = $data->list_fields();
 		$col    = 0;
-        foreach ($fields as $field){
-            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, 1, $field);
-            $col++;
-        }
+		foreach ($fields as $field){
+			$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, 1, $field);
+			$col++;
+		}
         // Mengambil Data
-        $row = 2;
-        foreach($data->result() as $data){
-            $col = 0;
-            foreach ($fields as $field){
-                $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, $row, $data->$field);
-                $col++;
-            }
-            $row++;
-        }
-        $objPHPExcel->setActiveSheetIndex(0);
-        $objPHPExcel->getActiveSheet()->setTitle('Form Pengisian Stok Barang');
-        $objWriter = IOFactory::createWriter($objPHPExcel, 'Excel2007');
-        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-        header("Cache-Control: no-store, no-cache, must-revalidate");
-        header("Cache-Control: post-check=0, pre-check=0", false);
-        header("Pragma: no-cache");
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $nfile = "Form Pengisian Stok Barang.xlsx";
-        header('Content-Disposition: attachment;filename="' . $nfile . '"');
-        $objWriter->save("php://output");
+		$row = 2;
+		foreach($data->result() as $data){
+			$col = 0;
+			foreach ($fields as $field){
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, $row, $data->$field);
+				$col++;
+			}
+			$row++;
+		}
+		$objPHPExcel->setActiveSheetIndex(0);
+		$objPHPExcel->getActiveSheet()->setTitle('Form Pengisian Stok Barang');
+		$objWriter = IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		$nfile = "Form Pengisian Stok Barang.xlsx";
+		header('Content-Disposition: attachment;filename="' . $nfile . '"');
+		$objWriter->save("php://output");
 	}
 	public function download_format_stok_tipe($tipe=NULL){
 		$objPHPExcel = new PHPExcel();
@@ -459,31 +462,31 @@ class Barang extends CI_Controller {
 			FROM view_barang_detil a WHERE a.id_tipe = '$tipe'");
 		$fields = $data->list_fields();
 		$col    = 0;
-        foreach ($fields as $field){
-            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, 1, $field);
-            $col++;
-        }
+		foreach ($fields as $field){
+			$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, 1, $field);
+			$col++;
+		}
         // Mengambil Data
-        $row = 2;
-        foreach($data->result() as $data){
-            $col = 0;
-            foreach ($fields as $field){
-                $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, $row, $data->$field);
-                $col++;
-            }
-            $row++;
-        }
-        $objPHPExcel->setActiveSheetIndex(0);
-        $objPHPExcel->getActiveSheet()->setTitle('Form Pengisian Stok Barang');
-        $objWriter = IOFactory::createWriter($objPHPExcel, 'Excel2007');
-        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-        header("Cache-Control: no-store, no-cache, must-revalidate");
-        header("Cache-Control: post-check=0, pre-check=0", false);
-        header("Pragma: no-cache");
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $nfile = "Form Pengisian Stok Barang.xlsx";
-        header('Content-Disposition: attachment;filename="' . $nfile . '"');
-        $objWriter->save("php://output");
+		$row = 2;
+		foreach($data->result() as $data){
+			$col = 0;
+			foreach ($fields as $field){
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, $row, $data->$field);
+				$col++;
+			}
+			$row++;
+		}
+		$objPHPExcel->setActiveSheetIndex(0);
+		$objPHPExcel->getActiveSheet()->setTitle('Form Pengisian Stok Barang');
+		$objWriter = IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		$nfile = "Form Pengisian Stok Barang.xlsx";
+		header('Content-Disposition: attachment;filename="' . $nfile . '"');
+		$objWriter->save("php://output");
 	}
 	public function download_format_stok_merk($merk=NULL){
 		$objPHPExcel = new PHPExcel();
@@ -498,31 +501,31 @@ class Barang extends CI_Controller {
 			FROM view_barang_detil a WHERE a.id_merk = '$merk'");
 		$fields = $data->list_fields();
 		$col    = 0;
-        foreach ($fields as $field){
-            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, 1, $field);
-            $col++;
-        }
+		foreach ($fields as $field){
+			$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, 1, $field);
+			$col++;
+		}
         // Mengambil Data
-        $row = 2;
-        foreach($data->result() as $data){
-            $col = 0;
-            foreach ($fields as $field){
-                $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, $row, $data->$field);
-                $col++;
-            }
-            $row++;
-        }
-        $objPHPExcel->setActiveSheetIndex(0);
-        $objPHPExcel->getActiveSheet()->setTitle('Form Pengisian Stok Barang');
-        $objWriter = IOFactory::createWriter($objPHPExcel, 'Excel2007');
-        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-        header("Cache-Control: no-store, no-cache, must-revalidate");
-        header("Cache-Control: post-check=0, pre-check=0", false);
-        header("Pragma: no-cache");
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $nfile = "Form Pengisian Stok Barang.xlsx";
-        header('Content-Disposition: attachment;filename="' . $nfile . '"');
-        $objWriter->save("php://output");
+		$row = 2;
+		foreach($data->result() as $data){
+			$col = 0;
+			foreach ($fields as $field){
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, $row, $data->$field);
+				$col++;
+			}
+			$row++;
+		}
+		$objPHPExcel->setActiveSheetIndex(0);
+		$objPHPExcel->getActiveSheet()->setTitle('Form Pengisian Stok Barang');
+		$objWriter = IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		$nfile = "Form Pengisian Stok Barang.xlsx";
+		header('Content-Disposition: attachment;filename="' . $nfile . '"');
+		$objWriter->save("php://output");
 	}
 	public function download_format_stok_all(){
 		$objPHPExcel = new PHPExcel();
@@ -537,42 +540,43 @@ class Barang extends CI_Controller {
 			FROM view_barang_detil a ");
 		$fields = $data->list_fields();
 		$col    = 0;
-        foreach ($fields as $field){
-            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, 1, $field);
-            $col++;
-        }
+		foreach ($fields as $field){
+			$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, 1, $field);
+			$col++;
+		}
         // Mengambil Data
-        $row = 2;
-        foreach($data->result() as $data){
-            $col = 0;
-            foreach ($fields as $field){
-                $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, $row, $data->$field);
-                $col++;
-            }
-            $row++;
-        }
-        $objPHPExcel->setActiveSheetIndex(0);
-        $objPHPExcel->getActiveSheet()->setTitle('Form Pengisian Stok Barang');
-        $objWriter = IOFactory::createWriter($objPHPExcel, 'Excel2007');
-        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-        header("Cache-Control: no-store, no-cache, must-revalidate");
-        header("Cache-Control: post-check=0, pre-check=0", false);
-        header("Pragma: no-cache");
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $nfile = "Form Pengisian Stok Barang.xlsx";
-        header('Content-Disposition: attachment;filename="' . $nfile . '"');
-        $objWriter->save("php://output");
+		$row = 2;
+		foreach($data->result() as $data){
+			$col = 0;
+			foreach ($fields as $field){
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, $row, $data->$field);
+				$col++;
+			}
+			$row++;
+		}
+		$objPHPExcel->setActiveSheetIndex(0);
+		$objPHPExcel->getActiveSheet()->setTitle('Form Pengisian Stok Barang');
+		$objWriter = IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		$nfile = "Form Pengisian Stok Barang.xlsx";
+		header('Content-Disposition: attachment;filename="' . $nfile . '"');
+		$objWriter->save("php://output");
 	}
 	public function proses_edit(){
 		if($this->input->is_ajax_request()){
 			$data = array(
 				'id_tipe'          =>$this->input->post('tipeX'),
 				'id_merk'          =>$this->input->post('merkX'),
+				'poin'             =>$this->input->post('hrgpoin'),
 				'tgl_beli'         =>date("Y-m-d",strtotime($this->input->post('tgl_beli'))),
 				'hrg_beli'         =>str_replace(".", "", $this->input->post('hrgbeli')),
 				'biaya_penyusutan' =>str_replace(".", "", $this->input->post('hrgsusut')),
 				'hrg_sewa'         =>str_replace(".", "", $this->input->post('hrgsewa')),
-				'nama_barang'      => $this->service->anti(htmlspecialchars($this->input->post('nama'))));
+				'nama_barang'      =>$this->service->anti(htmlspecialchars($this->input->post('nama'))));
 			$this->barang_model->update(array('kode' => $this->service->anti($this->input->post('id'))), $data);
 			echo json_encode(array("status" => TRUE));
 		}else{
@@ -598,7 +602,7 @@ class Barang extends CI_Controller {
 				$this->hapus_foto($this->input->post('id'));
 				$upload       = $this->_do_upload();
 				$data['foto'] = $upload;
-	        }
+			}
 			$this->barang_detil_model->update(array('id' => $this->service->anti($this->input->post('id'))), $data);
 			$ckkode       = $this->db->get_where('tbl_barang_stok',array('id'=>$this->input->post('id')));
 			$rowKode      = $ckkode->row();
@@ -622,7 +626,7 @@ class Barang extends CI_Controller {
 			if(!empty($_FILES['foto']['name'])){
 				$upload       = $this->_do_upload();
 				$data['foto'] = $upload;
-	        }
+			}
 			$this->barang_detil_model->simpan($data);
 			$hitung_stok  = $this->db->query("SELECT SUM(stok) as total_stok FROM tbl_barang_stok WHERE kode_barang = '$kode_barang' GROUP BY kode_barang WITH ROLLUP");
 			$rowStok      = $hitung_stok->row();
@@ -644,9 +648,9 @@ class Barang extends CI_Controller {
 		$config['max_width']     = 2000;
 		$config['max_height']    = 2000;
 		$config['file_name']     = round(microtime(true) * 1000);
-        $this->upload->initialize($config);
-        $this->load->library('upload', $config);
-        if(!$this->upload->do_upload('foto')) {
+		$this->upload->initialize($config);
+		$this->load->library('upload', $config);
+		if(!$this->upload->do_upload('foto')) {
 			$data['inputerror'][]   = 'foto';
 			$data['error_string'][] = 'Upload error: '.$this->upload->display_errors('','');
 			$data['status']         = FALSE;
@@ -673,6 +677,7 @@ class Barang extends CI_Controller {
 			$isi['nama']        = $row->nama_barang;
 			$isi['tipe']        = $row->tipe;
 			$isi['merk']        = $row->merk;
+			$isi['poin']        = $row->poin;
 			$isi['tglbeli']     = $row->tgl_beli;
 			$isi['hrgbeli']     = $row->hrg_beli;
 			$isi['hrgsewa']     = $row->hrg_sewa;
@@ -724,7 +729,7 @@ class Barang extends CI_Controller {
 				"recordsTotal"    => $this->barang_detil_model->count_all(),
 				"recordsFiltered" => $this->barang_detil_model->count_filtered(),
 				"data"            => $data,
-				);
+			);
 			echo json_encode($output);
 		}else{
 			redirect("_404","refresh");
@@ -742,7 +747,8 @@ class Barang extends CI_Controller {
 			a.hrg_sewa as HARGA_SEWA,
 			a.biaya_penyusutan as BIAYA_SUSUT,
 			a.id_tipe as TIPE_BARANG,
-			a.id_merk as MERK_BARANG
+			a.id_merk as MERK_BARANG,
+			a.poin as POIN
 			FROM view_barang a");
 		$fields      = $data_barang->list_fields();
 		$col         = 0;
@@ -803,16 +809,16 @@ class Barang extends CI_Controller {
 						$rowMerk = $ckmerk->row();
 						$id_merk = $rowMerk->id;
 						$ahhhhhh             = $this->db->query("SELECT SUBSTR(MAX(kode),-6) as nona FROM tbl_barang")->result();
-				 		foreach ($ahhhhhh as $zzz) {
-				 			$xx = substr($zzz->nona, 3, 6);
-				 		}
-				 		if($xx==''){
-				 			$newID = 'B-0001';
-				 		}else{
+						foreach ($ahhhhhh as $zzz) {
+							$xx = substr($zzz->nona, 3, 6);
+						}
+						if($xx==''){
+							$newID = 'B-0001';
+						}else{
 							$noUrut = (int) substr($xx, 1, 4);
 							$noUrut++;
 							$newID  = "B-" . sprintf("%04s", $noUrut);
-				 		}
+						}
 						$simpan_barang = array(
 							'kode'             =>$newID,
 							'nama_barang'      =>$rowData[0][0],
@@ -821,7 +827,8 @@ class Barang extends CI_Controller {
 							'hrg_sewa'         =>$rowData[0][3],
 							'biaya_penyusutan' =>str_replace(".", "", $rowData[0][4]),
 							'id_tipe'          =>$id_tipe,
-							'id_merk'          =>$id_merk
+							'id_merk'          =>$id_merk,
+							'poin'             =>$rowData[0][7]
 						);
 						$this->db->insert('tbl_barang',$simpan_barang);
 						$ckwarna = $this->db->get('tbl_warna')->result();
@@ -835,12 +842,12 @@ class Barang extends CI_Controller {
 							$this->db->insert('tbl_barang_stok',$simpan_stok);
 						}
 						$this->session->set_flashdata('msg',
-						'<br/><div class=\"alert alert-warning fade in\">
-						<font color="red"><b>Import Data Barang Berhasil.</b></font></div>');
+							'<br/><div class=\"alert alert-warning fade in\">
+							<font color="red"><b>Import Data Barang Berhasil.</b></font></div>');
 					}else{
 						$this->session->set_flashdata('msg',
-						'<br/><div class=\"alert alert-warning fade in\">
-						<font color="red"><b>Pengisian Merk Barang tidak ditemukan di database, silahkan edit terlebih dahulu file import Data Barang .</b></font></div>');
+							'<br/><div class=\"alert alert-warning fade in\">
+							<font color="red"><b>Pengisian Merk Barang tidak ditemukan di database, silahkan edit terlebih dahulu file import Data Barang .</b></font></div>');
 					}
 				}else{
 					$this->session->set_flashdata('msg',
@@ -883,23 +890,23 @@ class Barang extends CI_Controller {
 					NULL,
 					TRUE,
 					FALSE);
-					$update_stok = array(
-						'stok'          =>$rowData[0][5]
-					);
-					$ckwarna = $this->db->get_where('tbl_warna',array('warna'=>$rowData[0][4]))->result();
-					foreach ($ckwarna as $keyWarna) {
-						$idWarna     = $keyWarna->id;
-						$kode_barang = $rowData[0][0];
-						$this->db->where('kode_barang',$kode_barang);
-						$this->db->where('id_warna',$idWarna);
-						$this->db->update('tbl_barang_stok',$update_stok);
-						$hitung_stok = $this->db->query("SELECT SUM(stok) as total_stok FROM tbl_barang_stok WHERE kode_barang = '$kode_barang' GROUP BY kode_barang WITH ROLLUP");
-						$rowStok = $hitung_stok->row();
-						$total_stokna = $rowStok->total_stok;
-						$update_stok = array('total_stok'=>$total_stokna);
-						$this->db->where('kode',$kode_barang);
-						$this->db->update('tbl_barang',$update_stok);
-					}
+				$update_stok = array(
+					'stok'          =>$rowData[0][5]
+				);
+				$ckwarna = $this->db->get_where('tbl_warna',array('warna'=>$rowData[0][4]))->result();
+				foreach ($ckwarna as $keyWarna) {
+					$idWarna     = $keyWarna->id;
+					$kode_barang = $rowData[0][0];
+					$this->db->where('kode_barang',$kode_barang);
+					$this->db->where('id_warna',$idWarna);
+					$this->db->update('tbl_barang_stok',$update_stok);
+					$hitung_stok = $this->db->query("SELECT SUM(stok) as total_stok FROM tbl_barang_stok WHERE kode_barang = '$kode_barang' GROUP BY kode_barang WITH ROLLUP");
+					$rowStok = $hitung_stok->row();
+					$total_stokna = $rowStok->total_stok;
+					$update_stok = array('total_stok'=>$total_stokna);
+					$this->db->where('kode',$kode_barang);
+					$this->db->update('tbl_barang',$update_stok);
+				}
 			}
 			redirect($_SERVER['HTTP_REFERER']);
 		}

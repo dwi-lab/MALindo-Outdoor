@@ -32,6 +32,11 @@
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
 	    });   
+	    jQuery('#hrgpoin').priceFormat({
+	        prefix: '',
+	        centsSeparator: ',',
+	        thousandsSeparator: '.'
+	    });   
 	    jQuery('#stok').priceFormat({
 	        prefix: '',
 	        centsSeparator: ',',
@@ -180,7 +185,12 @@
                             <input class="form-control" maxlength="15" style="text-align:right" type="text" id="hrgsewa" minlength="1" name="hrgsewa" />
 						</div>
 					</div>
-					
+					<div class="form-group">
+						<label class="control-label col-md-3 col-sm-3">Harga Poin * :</label>
+                            <div class="col-md-3">
+                            <input class="form-control" maxlength="15" style="text-align:right" type="text" id="hrgpoin" minlength="1" name="hrgpoin" />
+						</div>
+					</div>
 				</form>					
 			</div>
 			<div class="modal-footer">

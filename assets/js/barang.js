@@ -79,6 +79,7 @@ function edit_barang(page,link,action,id){
         dataType: "JSON",
         success: function(data){
             $('[name="nama"]').val(data.nama_barang);
+            $('[name="hrgpoin"]').val(data.poin);
             $('[name="hrgbeli"]').val(data.hrg_beli);
             $('[name="hrgsusut"]').val(data.biaya_penyusutan);
             $('[name="hrgsewa"]').val(data.hrg_sewa);

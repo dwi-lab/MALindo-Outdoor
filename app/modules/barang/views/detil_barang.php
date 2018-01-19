@@ -55,6 +55,10 @@
                                 <td>Rp. <?php echo number_format($hrgbeli) ;?></td>
                             </tr>
                             <tr class="highlight">
+                                <td class="field">Harga Poin</td>
+                                <td><?php echo number_format($poin) ;?></td>
+                            </tr>
+                            <tr class="highlight">
                                 <td class="field">Biaya Penyusutan</td>
                                 <td>Rp. <?php echo number_format($hrgsusut) ;?></td>
                             </tr>

@@ -24,27 +24,33 @@ jQuery(document).ready(function() {
         var nama_barang = jQuery("#nama_barang").val();
         var qty         = jQuery("#qty").val();
         var harga       = jQuery("#hrg_sewa").val();
+        var harga_poin  = jQuery("#hrg_poin").val();
         var harga_mask  = jQuery("#hrg_sewa").unmask();
         var warna       = jQuery("#warna option:selected").text();
-        if (warna != "Pilih Warna Barang" && qty != "") {
-            var total = parseInt(harga_mask) * parseInt(qty);
-            jQuery('#tbladdbarang > tbody:first').append("<tr id ='" + no + "''><td><input style='width:200px' class='form-control' type='text' readonly='readonly' value='" + nama_barang + "' name='nama_barangna[]' /><td><input style='width:160px' class='form-control' type='text' readonly='readonly' value='" + warna + "' name='warnana[]' /></td><td><input style='width:100px' class='form-control' type='text' readonly='readonly' value='" + harga + "' name='hargana[]' /></td><td><input style='width:80px' readonly='readonly' class='form-control' type='text' value='" + qty + "' name='qtyna[]'  /></td><td><input style='width:80px' class='form-control' type='text' readonly='readonly' id='totalna' value='" + total + "' name='totalna[]' /><td><td><button id='delRowBooking' style=\"text-align:left\" class=\"btn btn-primary btn-xs m-r-5\" onclick=\"delrowb('" + no + "','" + total + "');return false;\"><i class=\"fa fa-remove\"></i></button></td></tr>");
-            // jQuery("#tombol").show("slow");
+        if (warna       != "Pilih Warna Barang" && qty != "") {
+            var total    = parseInt(harga_mask) * parseInt(qty);
+            var tot_poin = parseInt(harga_poin) * parseInt(qty);
+            jQuery('#tbladdbarang > tbody:first').append("<tr id ='" + no + "''><td><input style='width:200px' class='form-control' type='text' readonly='readonly' value='" + nama_barang + "' name='nama_barangna[]' /><td><input style='width:160px' class='form-control' type='text' readonly='readonly' value='" + warna + "' name='warnana[]' /></td><td><input style='width:100px' class='form-control' type='text' readonly='readonly' value='" + harga + "' name='hargana[]' /></td><td><input style='width:50px' class='form-control' type='text' readonly='readonly' value='" + harga_poin + "' name='harga_poina[]' /></td><td><input style='width:80px' readonly='readonly' class='form-control' type='text' value='" + qty + "' name='qtyna[]'  /></td><td><input style='width:80px' class='form-control' type='text' readonly='readonly' id='totalna' value='" + total + "' name='totalna[]' /><td><td><button id='delRowBooking' style=\"text-align:left\" class=\"btn btn-primary btn-xs m-r-5\" onclick=\"delrowb('" + no + "','" + total + "');return false;\"><i class=\"fa fa-remove\"></i></button></td></tr>");
             jQuery("#qty").val('');
             jQuery("#kode_barang").val('');
             jQuery("#nama_barang").val('');
             jQuery("#hrg_sewa").val('');
             jQuery("#warna").select2("val","");
             document.getElementById('kode_barang').focus();
-            var jumlah = 0;
-            var sub = jQuery('#subtotal').unmask();
+            var jumlah  = 0;
+            var jumlahP = 0;
+            var sub     = jQuery('#subtotal').unmask();
+            var t_poin  = jQuery('#subpoin').unmask();
             for(i=0; i < no; i++){
-                jumlah = parseInt(total);
+                jumlah  = parseInt(total);
+                jumlahP = parseInt(tot_poin);
             }
             if(sub!=""){
                 jQuery('#subtotal').val(parseInt(jumlah)+parseInt(sub));
+                jQuery('#subpoin').val(parseInt(jumlahP)+parseInt(t_poin));
             }else{
                 jQuery('#subtotal').val(parseInt(jumlah));
+                jQuery('#subpoin').val(parseInt(jumlahP));
             }
             jQuery('#subtotal').priceFormat({
                 prefix: '',

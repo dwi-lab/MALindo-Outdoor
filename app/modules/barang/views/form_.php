@@ -18,22 +18,22 @@
         $(".datepicker").datepicker({
             todayHighlight: !0
         });
-        jQuery('#hrgbeli').priceFormat({
+        jQuery('
 	        prefix: '',
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
 	    });
-	    jQuery('#hrgsusut').priceFormat({
+	    jQuery('
 	        prefix: '',
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
 	    });
-	    jQuery('#hrgsewa').priceFormat({
+	    jQuery('
 	        prefix: '',
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
 	    });   
-	    jQuery('#stok').priceFormat({
+	    jQuery('
 	        prefix: '',
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
@@ -98,7 +98,6 @@
                             <span style="color:red;"><?php echo form_error('nama');?></span>
 						</div>
 					</div>
-
 					<div
 					data-step         ="7"
 					data-intro        ="Masukan Tanggal Beli Barang. Format Tanggal dd-mm-yyyy."
@@ -152,6 +151,19 @@
 						<div class="col-md-2 col-sm-2">
 							<input class="form-control" maxlength="15" style="text-align:right" type="text" id="hrgsewa" minlength="1" name="hrgsewa" value="<?php echo set_value('hrgsewa',isset($default['hrgsewa']) ? $default['hrgsewa'] : ''); ?>" data-type="hrgsewa" data-parsley-required="true" data-parsley-minlength="1" data-parsley-minlength="15"/>
                             <span style="color:red;"><?php echo form_error('hrgsewa');?></span>
+						</div>
+					</div>
+					<div
+					data-step         ="10"
+					data-intro        ="Masukan Poin Harga Sewa permalam. "
+					data-hint         ="Masukan Poin Harga Sewa permalam. "
+					data-hintPosition ="top-middle"
+					data-position     ="bottom-right-aligned"
+					class="form-group">
+						<label class="control-label col-md-3 col-sm-3">Harga Poin</label>
+						<div class="col-md-1 col-sm-1">
+							<input class="form-control" maxlength="3" style="text-align:right" type="text" id="poin" minlength="1" name="poin" value="<?php echo set_value('poin',isset($default['poin']) ? $default['poin'] : ''); ?>" data-type="poin" data-parsley-required="true" data-parsley-minlength="1" data-parsley-minlength="3"/>
+                            <span style="color:red;"><?php echo form_error('poin');?></span>
 						</div>
 					</div>
 					<div

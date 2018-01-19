@@ -144,6 +144,7 @@
                 jQuery('#kode_barang').val(ui.item.kode);
                 jQuery('#nama_barang').val(ui.item.nama);
                 jQuery('#hrg_sewa').val(ui.item.harga);
+                jQuery('#hrg_poin').val(ui.item.poin);
 				jQuery("#informasi_barang_detil").show('slow');
             	document.getElementById('warna').focus();
                 return false;
@@ -307,11 +308,10 @@
 			        jQuery("#ket_disc_lama").show('slow');
 			        /*Hitung Subtotal*/
 					var diskon_momen = jQuery("#disc").val();
-					var diskon_lama  = jQuery("#disc_lama_pinjam").val();
-					var total        = jQuery("#subtotal").unmask();
-
-					var subtotal   = jQuery("#subtotal").unmask();
-					var h_subtotal = parseInt(subtotal) * parseInt(lama);
+					var diskon_lama = jQuery("#disc_lama_pinjam").val();
+					var total       = jQuery("#subtotal").unmask();
+					var subtotal    = jQuery("#subtotal").unmask();
+					var h_subtotal  = parseInt(subtotal) * parseInt(lama);
 					if(diskon_momen!="" && diskon_lama==""){
 						var h        = parseInt(h_subtotal) * parseInt(diskon_momen) / 100;
 						var subtotal = parseInt(h_subtotal) - parseInt(h);
@@ -454,9 +454,9 @@
                     </div>
                     <div id="informasi_barang">
                     	<div class="form-group">
-							<label class="control-label col-md-3 col-sm-3">Kode Barang</label>
-							<div class="col-md-2 col-sm-2">
-								<input class="form-control" type="text" id="kode_barang" minlength="1" maxlength='20' name="kode_barang" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+							<label class="control-label col-md-3 col-sm-3">Informasi Barang</label>
+							<div class="col-md-8">
+								<input class="form-control" type="text" id="kode_barang" minlength="1" placeholder="Masukan Informasi Barang (Kode Barang,Nama Barang)" maxlength='20' name="kode_barang" data-parsley-minlength="1" data-parsley-maxlength="50"/>
 							</div>
 						</div>
                     	<div id="informasi_barang_detil">
@@ -467,11 +467,22 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="control-label col-md-3 col-sm-3">Harga Sewa</label>
+								<label class="control-label col-md-3 col-sm-3">Harga Sewa<br/>
+								<small><font color="red">* permalam</font></small></label>
 								<div class="col-md-2 col-sm-2">
 									<div class="input-group">
 		                                <span class="input-group-addon">Rp.</span>
 										<input class="form-control" type="text" style="text-align: right;" id="hrg_sewa" minlength="1" readonly="readonly" maxlength='20' name="hrg_sewa" data-type="text"/>
+		                            </div>
+									
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Harga Poin<br/>
+								<small><font color="red">* permalam</font></small></label>
+								<div class="col-md-1 col-sm-1">
+									<div class="input-group">
+										<input class="form-control" type="text" id="hrg_poin" style="text-align: right;" id="hrg_poin" minlength="1" readonly="readonly" maxlength='20' name="hrg_poin" data-type="text"/>
 		                            </div>
 								</div>
 							</div>
@@ -499,11 +510,12 @@
 									<div class="widgetcontent bordered shadowed nomargin">
 										<div class ="table-responsive" style="text-align: center;" >
 											<?php 
-											echo "<table width=\"70%\" text-align=\"center\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" id='tbladdbarang'>\n"; 
+											echo "<table width=\"80%\" text-align=\"center\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" id='tbladdbarang'>\n"; 
 											echo "  <tr>\n"; 
 											echo "    <th>Nama Barang</th>\n"; 
 											echo "    <th>Warna</th>\n";
 											echo "    <th>Harga Sewa</th>\n";
+											echo "    <th>Harga Poin</th>\n";
 											echo "    <th>QTY</th>\n";
 											echo "    <th>Total</th>\n";
 											echo "    <th>Action</th>\n";
@@ -514,15 +526,16 @@
 									</div>
 								</div>
 							</div>
-							<div class="form-group">
+							<!-- <div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Total</label>
 								<div class="col-md-3 col-sm-3">
 									<div class="input-group">
-		                                <span class="input-group-addon">Rp.</span>
-										<input class="form-control" type="text" style="text-align: right;" id="subtotal" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
-		                            </div>
+		                                <span class="input-group-addon">Rp.</span> -->
+										<input class="form-control" type="hidden" style="text-align: right;" id="subtotal" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+										<input class="form-control" type="hidden" style="text-align: right;" id="subpoin" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+		                            <!-- </div>
 								</div>
-							</div>
+							</div> -->
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Tanggal Sewa</label>
 								<div class="col-md-2 col-sm-2">
