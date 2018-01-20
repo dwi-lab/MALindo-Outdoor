@@ -210,8 +210,10 @@
         	jQuery("#tombol").show('');
 	    });
 	    jQuery("#jns_bayar").change(function(){
-			var jns = jQuery("#jns_bayar").val();
+			var jns           = jQuery("#jns_bayar").val();
+			var subtotal_poin = jQuery("#subtotal_poin").val();
 			if(jns==2){
+	            $.gritter.add({title:"Informasi Pembayaran !",text: "Jika Pembayaran dengan Poin untuk Diskon Tetap dan Diskon Khusus tidak Berlaku !"});
 				var nama = jQuery('#nama').val();
 				var pch  = nama.split(" | ");
 				var kode = pch[1];
@@ -229,8 +231,14 @@
 	                	jQuery("#bayar_poin").show('slow');
 						jQuery("#bayar_cash").hide('slow');
         				jQuery("#tombol").hide('');
-	                    document.getElementById("ket_point").innerHTML = "<b> Total Poin Member bersangkutan " + dt + "</b>";
-		                document.getElementById('b_point').focus();
+        				if(parseInt(dt) >= parseInt(subtotal_poin)){
+	        				document.getElementById("ket_point").innerHTML = "<b> Total Poin Member bersangkutan " + dt + "</b>";
+			                document.getElementById('b_point').focus();	
+        				}else{
+        					var kurang = parseInt(subtotal_poin) - parseInt(dt);
+	            			document.getElementById("ket_point").innerHTML = "<b>Pembayaran dengan Poin Kurang " + kurang + " Poin, Total Poin Member bersangkutan " + dt + "</b>";
+			                document.getElementById('b_point').focus();	
+        				}
 	                }
 	            	jQuery("#ket_poin").show('slow');
                     return false;
@@ -253,12 +261,12 @@
 	    jQuery("#b_point").change(function(){
 			var tot_poin = jQuery("#tot_poin").val();
 			var b        = jQuery("#b_point").val();
-			if(b > tot_poin){
+			if(parseInt(b) > parseInt(tot_poin)){
 	            $.gritter.add({title:"Informasi Pembayaran !",text: "Pembayaran Poin Melebihi Total Poin Member"});
 	            jQuery("#b_point").val('');
                 document.getElementById('b_point').focus();
         		jQuery("#tombol").hide('');
-			}else if(b <= tot_poin){
+			}else if(parseInt(b) <= parseInt(tot_poin)){
 				var nama = jQuery('#nama').val();
 				var pch  = nama.split(" | ");
 				var kode = pch[1];
@@ -298,6 +306,8 @@
 					jQuery("#disc_lama_pinjam").val(dt[1]);
 					jQuery("#id_disc_lama").val(dt[2]);
 					var lama      = jQuery("#lama_pinjam").val();
+					var subpoin   = jQuery("#subpoin").val();
+					jQuery("#subtotal_poin").val(parseInt(lama) * parseInt(subpoin));
 					var disc_lama = jQuery("#disc_lama_pinjam").val();
 	                if(lama=='NotOk'){
 						jQuery("#disc_lama_pinjam").val('');
@@ -334,7 +344,6 @@
 				        centsSeparator: ',',
 				        thousandsSeparator: '.'
 				    });
-					
                     return false;
 	            });
 			}else{
@@ -474,7 +483,6 @@
 		                                <span class="input-group-addon">Rp.</span>
 										<input class="form-control" type="text" style="text-align: right;" id="hrg_sewa" minlength="1" readonly="readonly" maxlength='20' name="hrg_sewa" data-type="text"/>
 		                            </div>
-									
 								</div>
 							</div>
 							<div class="form-group">
@@ -531,8 +539,8 @@
 								<div class="col-md-3 col-sm-3">
 									<div class="input-group">
 		                                <span class="input-group-addon">Rp.</span> -->
-										<input class="form-control" type="hidden" style="text-align: right;" id="subtotal" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
-										<input class="form-control" type="hidden" style="text-align: right;" id="subpoin" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+										<input class="form-control" type="text" style="text-align: right;" id="subtotal" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+										<input class="form-control" type="text" style="text-align: right;" id="subpoin" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
 		                            <!-- </div>
 								</div>
 							</div> -->
@@ -579,7 +587,6 @@
 									</div>
 								</div>
 							</div>
-							
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Diskon Khusus</label>
 								<div class="col-md-2 col-sm-2">
@@ -596,15 +603,20 @@
 									</div>
 								</div>
 							</div>
-							
-							
-							
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Subtotal</label>
 								<div class="col-md-3 col-sm-3"> 
 									<div class="input-group">
 		                                <span class="input-group-addon">Rp.</span>
 										<input class="form-control" type="text" style="text-align: right;" id="subtotal_" minlength="1" readonly="readonly" maxlength='20' name="subtotal_" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+		                            </div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Subtotal Poin</label>
+								<div class="col-md-1 col-sm-1"> 
+									<div class="input-group">
+										<input class="form-control" type="text" style="text-align: right;" id="subtotal_poin" minlength="1" readonly="readonly" maxlength='20' name="subtotal_poin" data-parsley-minlength="1" data-parsley-maxlength="20"/>
 		                            </div>
 								</div>
 							</div>
