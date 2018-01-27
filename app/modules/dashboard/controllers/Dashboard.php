@@ -44,32 +44,28 @@ class Dashboard extends CI_Controller {
 		redirect("login","refresh");
 	}
 	public function kirim_email(){
-		$ci                     = get_instance();
-		$ci->load->library('email');
-		$config['protocol']     = "smtp";
-		$config['smtp_host']    = "ssl://smtp.googlemail.com";
-		$config['smtp_port']    = "465";
-		$config['smtp_timeout'] = "50";
-		$cksetemail             = $this->db->get('tbl_email');
-		$x                      = $cksetemail->row();
-		$config['smtp_user']    = $x->email;
-		$config['smtp_pass']    = $x->password;
-		$config['charset']      = "ISO-2022-ID";
-		$config['mailtype']     = "html";
-		$config['newline']      = "\r\n";
-		$config['crlf']         = "\r\n";
-		$subject                = $this->input->post('judul');
-		$from_email             = $x->email;
-		$ci->email->initialize($config);
-		$ci->email->from($from_email, 'MALindo Outdoor - ['.$this->input->post('judul').']');
-		$email_member     = $this->input->post('email');
-		$isi['deskripsi'] = $this->input->post('deskripsi');
-		$list             = array($email_member);
-		$ci->email->to($list);
-		$ci->email->subject($subject);
-		$body                   = $this->load->view('email',$isi,TRUE);
-        $ci->email->message($body);
-        if($this->email->send()){
+		$cksetemail = $this->db->get('tbl_email');
+		$x          = $cksetemail->row();
+		$smtp_user  = $x->email;
+		$smtp_pass  = $x->password;
+		$config     = Array(
+			'protocol'  => 'smtp',
+			'smtp_host' => 'ssl://smtp.googlemail.com',
+			'smtp_port' => 465,
+			'smtp_user' => $smtp_user, 
+			'smtp_pass' => $smtp_pass,
+			'mailtype'  => 'html',
+			'charset'   => 'iso-8859-1',
+			'wordwrap'  => TRUE
+		);
+		$message = $this->input->post('deskripsi');
+		$this->load->library('email', $config);
+		$this->email->set_newline("\r\n");
+		$this->email->from($smtp_user, 'MALindo Outdoor - ['.$this->input->post('judul').']');
+		$this->email->to('opchaky.it@gmail.com');
+		$this->email->subject($this->input->post('judul'));
+		$this->email->message($message);
+		if($this->email->send()){
 			echo json_encode(array("status" => TRUE));
         }else{
 			echo json_encode(array("status" => FALSE));
