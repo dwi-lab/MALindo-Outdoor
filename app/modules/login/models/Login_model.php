@@ -9,9 +9,10 @@ class Login_model extends CI_Model {
 			$rows  = $ceklogin->row();
 			if($rows->level=='0'){
 				$newdata = array(
-					'level'     =>$rows->level,
-					'login'     =>TRUE,
-					'kode'      =>$rows->kode);
+					'level' =>$rows->level,
+					'login' =>TRUE,
+					'sett_' =>$rows->setting_harga,
+					'kode'  =>$rows->kode);
 			}else{
 				$cekmenu = $this->db->get_where('tbl_usermenu',array('kode'=>$rows->kode))->result();	
 				if(!empty($cekmenu)){
@@ -24,11 +25,12 @@ class Login_model extends CI_Model {
 					$hax = "";
 				}
 				$newdata = array(
-					'level'     =>$rows->level,
-					'login'     =>TRUE,
-					'priv'      =>$hak,
-					'privx'     =>$hax,
-					'kode'      =>$rows->kode);
+					'level' =>$rows->level,
+					'login' =>TRUE,
+					'priv'  =>$hak,
+					'sett_' =>$rows->setting_harga,
+					'privx' =>$hax,
+					'kode'  =>$rows->kode);
 			}
 			$this->session->set_userdata($newdata);
 			return true;

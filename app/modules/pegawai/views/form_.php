@@ -116,8 +116,20 @@
 				            <input type="file" id="foto" name="foto" />  
 						</div>
 					</div>
+					<div 
+					data-step         ="9" 
+					data-intro        ="Setting Potongan Harga ?" 
+					data-hint         ="Setting Potongan Harga ?" 
+					data-hintPosition ="top-middle" 
+					data-position     ="bottom-right-aligned"
+					class="form-group">
+						<label class="control-label col-md-3 col-sm-3">Sett Potongan Harga</label>
+						<div class="col-md-2 col-sm-2">
+							<input class="submenu" name="set_pot" id="set_pot" <?php if($set_pot=='1'){echo 'checked="checked"';}else{ echo ''; } ;?> data-parsley-multiple="submenu" type="checkbox">
+						</div>
+					</div>
 					<div
-					data-step         ="9"
+					data-step         ="10"
 					data-intro        ="Jika Tidak Memliki File Foto Pegawai Silahkan Lakukan Pengambilan Foto Pegawai"
 					data-hintPosition ="top-middle"
 					data-position     ="bottom-right-aligned"
@@ -152,7 +164,7 @@
 						</div>
 					</div>
 					<div 
-					data-step         ="10" 
+					data-step         ="11" 
 					data-intro        ="Pilih Hak Akses Pegawai." 
 					data-hintPosition ="top-middle" 
 					data-position     ="bottom-right-aligned"

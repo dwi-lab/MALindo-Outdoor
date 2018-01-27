@@ -93,7 +93,7 @@
 					<br/>
 					<?php echo form_dropdown('tipe',$option_tipe,isset($default['tipe']) ? $default['tipe'] : '','class="default-select2 form-control" style="width:15%" id="tipe" name="tipe" data-live-search="true" data-style="btn-white"');?>
 					<?php echo form_dropdown('merk',$option_merk,isset($default['merk']) ? $default['merk'] : '','class="default-select2 form-control" style="width:15%" id="merk" name="merk" data-live-search="true" data-style="btn-white"');?>
-					<?php echo form_dropdown('warna',$option_warna,isset($default['warna']) ? $default['warna'] : '','class="default-select2 form-control" style="width:15%" id="warna" name="warna" data-live-search="true" data-style="btn-white"');?>
+					<!-- <?php echo form_dropdown('warna',$option_warna,isset($default['warna']) ? $default['warna'] : '','class="default-select2 form-control" style="width:15%" id="warna" name="warna" data-live-search="true" data-style="btn-white"');?> -->
 				</div>
 			</div> 
 			<div class="panel-body"> 

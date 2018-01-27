@@ -140,6 +140,129 @@ function save(link) {
         }
     });
 }
+function save_booking(link) {
+    $('#btnSave').text('Proses...');
+    $('#btnSave').attr('disabled', true);
+    var url;
+    if (save_method == 'add') {
+        url = $BASE_URL + link + "/proses_add_barang";
+    } else {
+        url = $BASE_URL + link + "/proses_edit";
+    }
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: $('#form').serialize(),
+        dataType: "JSON",
+        success: function(data) {
+            if (data.status) {
+                window.location.reload();
+            } else {
+                for (var i = 0; i < data.inputerror.length; i++) {
+                    $('[name ="' + data.inputerror[i] + '"]').parent().parent().addClass('has-error');
+                    $('[name ="' + data.inputerror[i] + '"]').next().text(data.error_string[i]);
+                    $('.select').select2({
+                        minimumResultsForSearch: Infinity,
+                        width: '250px'
+                    });
+                }
+            }
+            $('#btnSave').text('Simpan');
+            $('#btnSave').attr('disabled', false);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $.gritter.add({
+                title: "Informasi !",
+                text: "Error adding / update data."
+            });
+            $('#btnSave').text('Simpan');
+            $('#btnSave').attr('disabled', false);
+            return false;
+        }
+    });
+}
+function save_bookingx(link) {
+    $('#btnSaveAdd').text('Proses...');
+    $('#btnSaveAdd').attr('disabled', true);
+    var url;
+    if (save_method == 'add') {
+        url = $BASE_URL + link + "/proses_add_barang";
+    } else {
+        url = $BASE_URL + link + "/proses_edit_booking";
+    }
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: $('#form_add').serialize(),
+        dataType: "JSON",
+        success: function(data) {
+            if (data.status) {
+                window.location.reload();
+            } else {
+                for (var i = 0; i < data.inputerror.length; i++) {
+                    $('[name ="' + data.inputerror[i] + '"]').parent().parent().addClass('has-error');
+                    $('[name ="' + data.inputerror[i] + '"]').next().text(data.error_string[i]);
+                    $('.select').select2({
+                        minimumResultsForSearch: Infinity,
+                        width: '250px'
+                    });
+                }
+            }
+            $('#btnSaveAdd').text('Simpan');
+            $('#btnSaveAdd').attr('disabled', false);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $.gritter.add({
+                title: "Informasi !",
+                text: "Error adding / update data."
+            });
+            $('#btnSaveAdd').text('Simpan');
+            $('#btnSaveAdd').attr('disabled', false);
+            return false;
+        }
+    });
+}
+function save_bookingxx(link) {
+    $('#btnSaveAdd').text('Proses...');
+    $('#btnSaveAdd').attr('disabled', true);
+    var url;
+    if (save_method == 'add') {
+        url = $BASE_URL + link + "/proses_add_barang";
+    } else {
+        url = $BASE_URL + link + "/proses_edit_booking";
+    }
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: $('#form_edit').serialize(),
+        dataType: "JSON",
+        success: function(data) {
+            if (data.status) {
+                window.location.reload();
+            } else {
+                for (var i = 0; i < data.inputerror.length; i++) {
+                    $('[name ="' + data.inputerror[i] + '"]').parent().parent().addClass('has-error');
+                    $('[name ="' + data.inputerror[i] + '"]').next().text(data.error_string[i]);
+                    $('.select').select2({
+                        minimumResultsForSearch: Infinity,
+                        width: '250px'
+                    });
+                }
+            }
+            $('#btnSaveAdd').text('Simpan');
+            $('#btnSaveAdd').attr('disabled', false);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $.gritter.add({
+                title: "Informasi !",
+                text: "Error adding / update data."
+            });
+            $('#btnSaveAdd').text('Simpan');
+            $('#btnSaveAdd').attr('disabled', false);
+            return false;
+        }
+    });
+}
 function save_detil(page,link,formid){
     $('#btnSave').text('proses menyimpan data...'); 
     $('#btnSave').attr('disabled',true);
@@ -220,6 +343,49 @@ function hapus_data(page, link, action, id) {
                             title: "Informasi !",
                             text: " Data berhasil di hapus."
                         });
+                        return false;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        $.gritter.add({
+                            title: "Informasi !",
+                            text: " Error deleting data."
+                        });
+                        jQuery.unblockUI();
+                        return false;
+                    }
+                });
+            }, 100);
+        }
+    });
+}
+function hapus_data_barang(page, link, action, id) {
+    bootbox.confirm("Yakin Akan Menghapus " + page + " Berikut ?", function(result) {
+        if (result) {
+            setTimeout(function() {
+                jQuery.blockUI({
+                    css: {
+                        border: 'none',
+                        padding: '15px',
+                        backgroundColor: '#000',
+                        '-webkit-border-radius': '10px',
+                        '-moz-border-radius': '10px',
+                        opacity: 2,
+                        color: '#fff'
+                    },
+                    message: 'Mohon menunggu ... '
+                });
+                $.ajax({
+                    url: $BASE_URL + link + "/" + action + "/" + id,
+                    type: "POST",
+                    dataType: "JSON",
+                    success: function(data) {
+                        $('#modal_form').modal('hide');
+                        jQuery.unblockUI();
+                        $.gritter.add({
+                            title: "Informasi !",
+                            text: " Data berhasil di hapus."
+                        });
+                        window.location.reload();
                         return false;
                     },
                     error: function(jqXHR, textStatus, errorThrown) {

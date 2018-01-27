@@ -59,4 +59,42 @@ class Member_model extends CI_Model {
         $this->db->where('kode_member', $kode_member);
         $this->db->delete($this->table_);
     }
+    public function getOrderPerbulan($kode){
+        $result = $this->db->query("SELECT YEAR(tgl_booking) as year, MONTH(tgl_booking) as month, COUNT(id) as num FROM tbl_booking WHERE kode_member = '$kode' GROUP BY YEAR(tgl_booking), MONTH(tgl_booking) ASC");
+        $result = $result->result_array();
+        $orders = array();
+        $years  = array();
+        foreach ($result as $res) {
+            if (!isset($orders[$res['year']])) {
+                for ($i = 1; $i <= 12; $i++) {
+                    $orders[$res['year']][$i] = 0;
+                }
+            }
+            $years[]                             = $res['year'];
+            $orders[$res['year']][$res['month']] = $res['num'];
+        }
+        return array(
+            'years'  => array_unique($years),
+            'orders' => $orders
+        );
+    }
+    public function getSewaPerbulan($kode){
+        $result = $this->db->query("SELECT YEAR(tgl_transaksi) as year, MONTH(tgl_transaksi) as month, COUNT(id) as num FROM tbl_trans WHERE kode_member = '$kode' GROUP BY YEAR(tgl_transaksi), MONTH(tgl_transaksi) ASC");
+        $result = $result->result_array();
+        $orders = array();
+        $years  = array();
+        foreach ($result as $res) {
+            if (!isset($orders[$res['year']])) {
+                for ($i = 1; $i <= 12; $i++) {
+                    $orders[$res['year']][$i] = 0;
+                }
+            }
+            $years[]                             = $res['year'];
+            $orders[$res['year']][$res['month']] = $res['num'];
+        }
+        return array(
+            'years'  => array_unique($years),
+            'orders' => $orders
+        );
+    }
 }

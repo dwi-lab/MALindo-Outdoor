@@ -48,6 +48,11 @@
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
 	    });
+	    jQuery('#potongan').priceFormat({
+	        prefix: '',
+	        centsSeparator: ',',
+	        thousandsSeparator: '.'
+	    });
         $('#tglmulai').datepicker();
     	$('#tglselesai').datepicker();
         jQuery("#informasi").hide('');
@@ -58,9 +63,11 @@
         jQuery("#tombol").hide('');
         jQuery("#ket_disc").hide('');
         jQuery("#ket_disc_lama").hide('');
+        jQuery("#ket_ultah").hide('');
         jQuery("#informasi_barang").hide('');
         jQuery("#informasi_barang_detil").hide('');
         jQuery("#status").hide('');
+
         jQuery("#nama").autocomplete({
             source: function(req,add){
                 jQuery.ajax({
@@ -114,7 +121,15 @@
 			    jQuery("#informasi").show('slow');
 				jQuery("#status").show('slow');
 				$("#status_pinjam").text(ui.item.status_pinjam);
-                return false;
+				jQuery.post($BASE_URL+"booking/cekUltah/"+ui.item.kode,
+	            function(data){
+					if(data=='NotOk'){
+				        jQuery("#ket_ultah").hide('slow');					
+	                }else{
+				        jQuery("#ket_ultah").show('slow');
+	                    document.getElementById("ket_ulangtahun").innerHTML = "<b> Member Bersangkutan Ulang Tahun Hari Ini, Tanggal Lahir : "+ data +" </b>";
+	                }
+	            });
             }
         })
         jQuery("#kode_barang").autocomplete({
@@ -194,20 +209,57 @@
                 jQuery.unblockUI();
 	        }
 	    });
+	    jQuery("#potongan").change(function(){
+			var potongan  = jQuery("#potongan").unmask();
+			var subtotal_ = jQuery("#subtotal_").unmask();
+	        if(potongan!=""){
+	            var tot_x = parseInt(subtotal_) - parseInt(potongan);
+	            jQuery("#subtotal_").val(tot_x);
+	            jQuery('#subtotal_').priceFormat({
+			        prefix: '',
+			        centsSeparator: ',',
+			        thousandsSeparator: '.'
+			    });
+			    var s = jQuery("#subtotal_").val();
+	            jQuery.post($BASE_URL+"booking/cekMinbayar/"+s,
+	            function(data){
+					var dt        = data.split("|");
+					var min_bayar = dt[1];
+					jQuery("#min_bayar").val(min_bayar);
+	            	$.gritter.add({title:"Informasi !",text: "Minimal Pembayaran " + dt[0] + " %"});
+					
+                    return false;
+	            });
+	        }
+	    });
 	    jQuery("#b_cash").change(function(){
-			var total  = jQuery("#subtotal_").unmask();
-			var bayar  = jQuery("#b_cash").unmask();
-			if(bayar > total){
-				jQuery("#sisa_bayar").val(parseInt(bayar) - parseInt(total));
+			var total     = jQuery("#subtotal_").unmask();
+			var bayar     = jQuery("#b_cash").unmask();
+			var min_bayar = jQuery("#min_bayar").unmask();
+			if(parseInt(bayar) < parseInt(min_bayar)){
+				var s = jQuery("#subtotal_").val();
+	            jQuery.post($BASE_URL+"booking/cekMinbayar/"+s,
+	            function(data){
+					var dt        = data.split("|");
+	            	$.gritter.add({title:"Informasi !",text: "Minimal Pembayaran " + dt[0] + " % dari Total <br/> Sebesar : Rp. " + dt[1]});
+                    return false;
+	            });
+	        	jQuery("#tombol").hide('');
+				return false;
 			}else{
-				jQuery("#sisa_bayar").val(parseInt(total) - parseInt(bayar));
+				if(parseInt(bayar) > parseInt(total)){
+					jQuery("#sisa_bayar").val(parseInt(bayar) - parseInt(total));
+				}else{
+					jQuery("#sisa_bayar").val(parseInt(total) - parseInt(bayar));
+				}
+				jQuery('#sisa_bayar').priceFormat({
+			        prefix: '',
+			        centsSeparator: ',',
+			        thousandsSeparator: '.'
+			    });
+	        	jQuery("#tombol").show('');
+				return false;
 			}
-			jQuery('#sisa_bayar').priceFormat({
-		        prefix: '',
-		        centsSeparator: ',',
-		        thousandsSeparator: '.'
-		    });
-        	jQuery("#tombol").show('');
 	    });
 	    jQuery("#jns_bayar").change(function(){
 			var jns           = jQuery("#jns_bayar").val();
@@ -244,6 +296,16 @@
                     return false;
 	            });
 			}else if(jns==1){
+				var s = jQuery("#subtotal_").val();
+	            jQuery.post($BASE_URL+"booking/cekMinbayar/"+s,
+	            function(data){
+					var dt        = data.split("|");
+					var min_bayar = dt[1];
+					jQuery("#min_bayar").val(min_bayar);
+	            	$.gritter.add({title:"Informasi !",text: "Minimal Pembayaran " + dt[0] + " %"});
+					
+                    return false;
+	            });
 				jQuery("#ket_poin").hide('slow');
 				jQuery("#bayar_poin").hide('slow');
 				jQuery("#bayar_cash").show('slow');
@@ -259,7 +321,7 @@
 			}
 	    });
 	    jQuery("#b_point").change(function(){
-			var tot_poin = jQuery("#tot_poin").val();
+			/*var tot_poin = jQuery("#tot_poin").val();
 			var b        = jQuery("#b_point").val();
 			if(parseInt(b) > parseInt(tot_poin)){
 	            $.gritter.add({title:"Informasi Pembayaran !",text: "Pembayaran Poin Melebihi Total Poin Member"});
@@ -293,7 +355,20 @@
 		        centsSeparator: ',',
 		        thousandsSeparator: '.'
 		    });
-            return false;
+            return false;*/
+			var subtotal_poin = jQuery("#subtotal_poin").val();
+			var b             = jQuery("#b_point").val();
+			if(parseInt(b) >= parseInt(subtotal_poin)){
+				$.gritter.add({title:"Informasi Pembayaran !",text: "Pembayaran Dengan Poin Melebihi Total Pembayaran, Poin Tidak Bisa Diuangkan !"});
+				jQuery("#pelunasan").hide('');
+    			jQuery("#tombol").show('');
+				// jQuery("#sisa_bayar_p").val(parseInt(tukar) - parseInt(tot_bayar));
+			}else{
+				jQuery("#pelunasan").hide('');
+				$.gritter.add({title:"Informasi Pembayaran !",text: "Pembayaran Dengan Poin Masih Kurang !"});
+				// jQuery("#pelunasan").show('');
+				// jQuery("#sisa_bayar_p").val(parseInt(tot_bayar) - parseInt(tukar));
+			}
 	    });
 	    jQuery("#tglselesai").change(function(){
 			var mulai   = jQuery("#tglsewa").val();
@@ -318,10 +393,10 @@
 			        jQuery("#ket_disc_lama").show('slow');
 			        /*Hitung Subtotal*/
 					var diskon_momen = jQuery("#disc").val();
-					var diskon_lama = jQuery("#disc_lama_pinjam").val();
-					var total       = jQuery("#subtotal").unmask();
-					var subtotal    = jQuery("#subtotal").unmask();
-					var h_subtotal  = parseInt(subtotal) * parseInt(lama);
+					var diskon_lama  = jQuery("#disc_lama_pinjam").val();
+					var total        = jQuery("#subtotal").unmask();
+					var subtotal     = jQuery("#subtotal").unmask();
+					var h_subtotal   = parseInt(subtotal) * parseInt(lama);
 					if(diskon_momen!="" && diskon_lama==""){
 						var h        = parseInt(h_subtotal) * parseInt(diskon_momen) / 100;
 						var subtotal = parseInt(h_subtotal) - parseInt(h);
@@ -382,11 +457,6 @@
     <div class="col-md-12">
 		<div class="panel panel-inverse" data-sortable-id="form-validation-2">
 		    <div class="panel-heading">
-		        <div class="panel-heading-btn">
-		            <a href="javascript:void(0);" class="btn btn-info btn-xs m-r-5" title="Bantuan" onclick="javascript:introJs().start();">
-						<i class="fa fa-question"></i>
-					</a>
-		        </div>
 		        <h4 class="panel-title"><?php echo $halaman;?></h4>
 		    </div>
 		    <div class="panel-body panel-form">
@@ -415,6 +485,7 @@
 					<div class="form-group">
 	                    <input class="form-control" type="hidden" id="status_warna" name="status_warna" />
 	                    <input class="form-control" type="hidden" id="subtotal_x" name="subtotal_x" />
+	                    <input class="form-control" type="hidden" id="min_bayar" name="min_bayar" />
 	                    <input class="form-control" type="hidden" id="tot_poin" name="tot_poin" />
 	                    <input class="form-control" type="hidden" id="id_disc_lama" name="id_disc_lama" />
 	                    <input class="form-control" type="hidden" id="id_disc_momen" name="id_disc_momen" />
@@ -438,6 +509,13 @@
                             <span class="help-block"></span>
                         </div>
                     </div>
+                    <div id="ket_ultah">
+						<div class="form-group">
+							<div class="col-md-8 col-sm-8">
+                        		<span style="color:red;" id="ket_ulangtahun"></span>
+							</div>
+						</div>
+					</div>
                     <div id="informasi">
                     	<div class="form-group">
 	                        <label class="control-label col-md-3 col-sm-3">No Handphone</label>
@@ -539,8 +617,8 @@
 								<div class="col-md-3 col-sm-3">
 									<div class="input-group">
 		                                <span class="input-group-addon">Rp.</span> -->
-										<input class="form-control" type="text" style="text-align: right;" id="subtotal" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
-										<input class="form-control" type="text" style="text-align: right;" id="subpoin" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+										<input class="form-control" type="hidden" style="text-align: right;" id="subtotal" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+										<input class="form-control" type="hidden" style="text-align: right;" id="subpoin" minlength="1" readonly="readonly" maxlength='20' name="subtotal" data-parsley-minlength="1" data-parsley-maxlength="20"/>
 		                            <!-- </div>
 								</div>
 							</div> -->
@@ -620,6 +698,21 @@
 		                            </div>
 								</div>
 							</div>
+							<?php
+							if($this->session->userdata('sett_')=='1'){
+								?>
+								<div class="form-group">
+									<label class="control-label col-md-3 col-sm-3">Potongan Lainnnya</label>
+									<div class="col-md-3 col-sm-3">
+										<div class="input-group">
+			                                <span class="input-group-addon">Rp.</span>
+											<input class="form-control" type="text" style="text-align: right;" id="potongan" name="potongan"/>
+			                            </div>
+									</div>
+								</div>
+								<?php
+							}
+							?>
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Jenis Bayar</label>
 								<div class="col-md-15 col-sm-3">

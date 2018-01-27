@@ -72,4 +72,23 @@ class Barang_model extends CI_Model {
         $this->db->where('kode', $kode);
         $this->db->delete($this->table_);
     }
+    public function getBarangPerbulan($kode){
+        $result = $this->db->query("SELECT YEAR(tgl_transaksi) as year, MONTH(tgl_transaksi) as month, SUM(lama) as num FROM tbl_trans GROUP BY YEAR(tgl_transaksi), MONTH(tgl_transaksi) ASC");
+        $result = $result->result_array();
+        $orders = array();
+        $years  = array();
+        foreach ($result as $res) {
+            if (!isset($orders[$res['year']])) {
+                for ($i = 1; $i <= 12; $i++) {
+                    $orders[$res['year']][$i] = 0;
+                }
+            }
+            $years[]                             = $res['year'];
+            $orders[$res['year']][$res['month']] = $res['num'];
+        }
+        return array(
+            'years'  => array_unique($years),
+            'orders' => $orders
+        );
+    }
 }

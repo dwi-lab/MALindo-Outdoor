@@ -132,7 +132,7 @@ class Barang extends CI_Controller {
 	}
 	public function import(){
 		$isi['option_tipe'][''] = "Pilih Tipe Barang";
-		$cktipe = $this->db->get('tbl_tipe')->result();
+		$cktipe                 = $this->db->get('tbl_tipe')->result();
 		if(count($cktipe)>0){
 			foreach ($cktipe as $row) {
 				$isi['option_tipe'][$row->id] = $row->tipe;
@@ -141,7 +141,7 @@ class Barang extends CI_Controller {
 			$isi['option_tipe'][''] = "Data Tipe Barang Belum Tersedia";
 		}
 		$isi['option_merk'][''] = "Pilih Data Merk";
-		$ckmerk = $this->db->get('tbl_merk')->result();
+		$ckmerk                 = $this->db->get('tbl_merk')->result();
 		if(count($ckmerk)>0){
 			foreach ($ckmerk as $roww) {
 				$isi['option_merk'][$roww->id] = $roww->merk;
@@ -193,7 +193,7 @@ class Barang extends CI_Controller {
 			$isi['option_warna'][''] = "Data Warna Belum Tersedia";
 		}
 		$isi['option_tipe'][''] = "Pilih Tipe Barang";
-		$cktipe = $this->db->get('tbl_tipe')->result();
+		$cktipe                 = $this->db->get('tbl_tipe')->result();
 		if(count($cktipe)>0){
 			foreach ($cktipe as $row) {
 				$isi['option_tipe'][$row->id] = $row->tipe;
@@ -202,7 +202,7 @@ class Barang extends CI_Controller {
 			$isi['option_tipe'][''] = "Data Tipe Barang Belum Tersedia";
 		}
 		$isi['option_merk'][''] = "Pilih Data Merk";
-		$ckmerk = $this->db->get('tbl_merk')->result();
+		$ckmerk                 = $this->db->get('tbl_merk')->result();
 		if(count($ckmerk)>0){
 			foreach ($ckmerk as $roww) {
 				$isi['option_merk'][$roww->id] = $roww->merk;
@@ -672,6 +672,7 @@ class Barang extends CI_Controller {
 			}else{
 				$isi['option_warna'][''] = "Data Warna Belum Tersedia";
 			}
+			$isi['pinjamBulan'] = $this->barang_model->getBarangPerbulan($kode);
 			$row                = $ckdata->row();
 			$isi['kode']        = $kode;
 			$isi['nama']        = $row->nama_barang;

@@ -13,7 +13,7 @@ class Minifyhtml {
     /**
      * Responsible for sending final output to browser
      */
-    /*function output(){
+    function output(){
           ini_set("pcre.recursion_limit", "16777");
           $CI =& get_instance();
           $buffer = $CI->output->get_output();
@@ -48,26 +48,7 @@ class Minifyhtml {
 
           $CI->output->set_output($new_buffer);
           $CI->output->_display();
-    }*/
-     public function output(){
-        $CI =& get_instance();
-       $buffer = $CI->output->get_output();
-       
-       $search = array(
-          '/\>[^\S ]+/s', 
-          '/[^\S ]+\</s', 
-           '/(\s)+/s', // shorten multiple whitespace sequences
-        '#(?://)?<!\[CDATA\[(.*?)(?://)?\]\]>#s' //leave CDATA alone
-        );
-       $replace = array(
-           '>',
-           '<',
-           '\\1',
-        "//&lt;![CDATA[\n".'\1'."\n//]]>"
-        );
-       $buffer = preg_replace($search, $replace, $buffer);
-       $CI->output->set_output($buffer);
-       $CI->output->_display();
+     
     }
 }
 ?>

@@ -93,6 +93,31 @@ function edit_barang(page,link,action,id){
             $('#modal_form').modal('show');
             $('.modal-title').text('Edit Data Barang');
             $('[name="kode"]').attr('disabled',false);
+            jQuery('#hrgbeli').priceFormat({
+                prefix: '',
+                centsSeparator: ',',
+                thousandsSeparator: '.'
+            });
+            jQuery('#hrgsusut').priceFormat({
+                prefix: '',
+                centsSeparator: ',',
+                thousandsSeparator: '.'
+            });
+            jQuery('#hrgsewa').priceFormat({
+                prefix: '',
+                centsSeparator: ',',
+                thousandsSeparator: '.'
+            });   
+            jQuery('#hrgpoin').priceFormat({
+                prefix: '',
+                centsSeparator: ',',
+                thousandsSeparator: '.'
+            });   
+            jQuery('#stok').priceFormat({
+                prefix: '',
+                centsSeparator: ',',
+                thousandsSeparator: '.'
+            });               
         },
         error: function (jqXHR, textStatus, errorThrown){
             alert('Error get data from ajax');

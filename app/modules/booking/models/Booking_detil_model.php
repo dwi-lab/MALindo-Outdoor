@@ -2,7 +2,9 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Booking_detil_model extends CI_Model {
     var $table         = 'view_booking_detil';
+    var $tablex        = 'view_booking';
     var $table_        = 'tbl_booking_detil';
+    var $table__       = 'tbl_booking';
     var $column_order  = array(null,null,'kode_barang','nama_barang','warna','hrg_sewa','qty',null);
     var $column_search = array('kode_barang','nama_barang','warna','qty','hrg_sewa'); 
     var $order         = array('id' => 'desc');
@@ -11,6 +13,7 @@ class Booking_detil_model extends CI_Model {
         $this->load->database();
     }
     private function _get_datatables_query(){
+        $this->db->where('kode_booking',$this->session->userdata('kode_booking'));
         $this->db->from($this->table);
         $i = 0;
         foreach ($this->column_search as $item) {
@@ -51,7 +54,13 @@ class Booking_detil_model extends CI_Model {
     }
     public function get_by_id($id){
         $this->db->from($this->table);
-        $this->db->where('kode_barang',$id);
+        $this->db->where('id',$id);
+        $query = $this->db->get();
+        return $query->row();
+    }
+    public function get_by_kode_booking($id){
+        $this->db->from($this->tablex);
+        $this->db->where('kode_booking',$id);
         $query = $this->db->get();
         return $query->row();
     }
@@ -62,5 +71,17 @@ class Booking_detil_model extends CI_Model {
     public function hapus_by_kode_barang($kode_barang){
         $this->db->where('kode_barang', $kode_barang);
         $this->db->delete($this->table_);
+    }
+    public function hapus_by_kode_booking($kode_booking){
+        $this->db->where('kode_booking', $kode_booking);
+        $this->db->delete($this->table__);
+    }
+    public function hapus_by_id($id){
+        $this->db->where('id', $id);
+        $this->db->delete($this->table_);
+    }
+    public function tambah_data_booking($data){
+        $this->db->insert($this->table_, $data);
+        return $this->db->insert_id();
     }
 }

@@ -11,6 +11,7 @@ $(function() {
             "type": "POST",
             "data": function ( data ) {
                 data.jns_bayar = $('#jns_bayar').val();
+                data.status    = $('#status').val();
             }
         },
         "columnDefs": [{ 
@@ -33,6 +34,9 @@ $(function() {
         table.ajax.reload(null,false); 
     });
     jQuery("#jns_bayar").change(function(){
+        table.ajax.reload(null,false); 
+    });
+    jQuery("#status").change(function(){
         table.ajax.reload(null,false); 
     });
     $('.select').select2({
@@ -62,6 +66,7 @@ function reload_table(){
     });
     setTimeout(function () {
         jQuery('[name ="jns_bayar"]').select2("val", "");
+        jQuery('[name ="status"]').select2("val", "");
         jQuery("#filter_pencarian").hide("slow");
         table.ajax.reload(null,false);
         jQuery.unblockUI();

@@ -45,13 +45,12 @@ class Pegawai extends CI_Controller {
 				$row[] = $rowx->nama;
 				$row[] = $rowx->email;
 				$row[] = $rowx->no_handphone;
-				$row[]  = '<center><a class="btn btn-xs m-r-5 btn-primary" href="javascript:void(0)" title="Edit Data"
+				$row[] = '<center><a class="btn btn-xs m-r-5 btn-primary" href="'.base_url().'pegawai/edit/'.$rowx->kode.'" title="Edit Data"
 				data-step         ="5"
 				data-intro        ="Digunakan untuk mengedit data."
 				data-hint         ="Digunakan untuk mengedit data."
 				data-hintPosition ="top-middle"
-				data-position     ="bottom-right-aligned"
-				onclick="edit_pegawai('."'".$rowx->kode."'".',\'Data Pegawai\',\'pegawai\')"><i class="icon-pencil"></i></a><a class="btn btn-xs m-r-5 btn-danger " href="javascript:void(0)" title="Hapus Data"
+				data-position     ="bottom-right-aligned"><i class="icon-pencil"></i></a><a class="btn btn-xs m-r-5 btn-danger " href="javascript:void(0)" title="Hapus Data"
 				data-step         ="6"
 				data-intro        ="Digunakan untuk menghapus data."
 				data-hint         ="Digunakan untuk menghapus data."
@@ -73,6 +72,7 @@ class Pegawai extends CI_Controller {
 	}
 	public function add(){
 		$isi['cek']          = "add";
+		$isi['set_pot']      = "";
 		$isi['kelas']        = "master";
 		$isi['namamenu']     = "Data Pegawai";
 		$isi['page']         = "pegawai";
@@ -98,7 +98,6 @@ class Pegawai extends CI_Controller {
 		$this->load->view("dashboard/dashboard_view",$isi);
 	}
 	public function proses_foto($kode){
-		// $this->hapusfoto($kode);
 		$filename  = 'assets/foto/pegawai/' . $kode . '.jpg';
 		$input_con = file_get_contents('php://input');
 		$result    = file_put_contents($filename,$input_con);
@@ -140,15 +139,17 @@ class Pegawai extends CI_Controller {
 				if ($this->upload->do_upload('foto')){
 					$gbr  = $this->upload->data();
 					$simpan       = array(
-						'kode'         =>$kode,
-						'nama'         =>$nama,
-						'username'     =>$kode,
-						'password'     =>md5($kode),
-						'login'        =>'1',
-						'level'        =>'1',
-						'no_handphone' =>$hp,
-						'email'        =>$mail,
-						'foto'         =>$gbr['file_name']);
+						'kode'          =>$kode,
+						'nama'          =>$nama,
+						'username'      =>$kode,
+						'password'      =>md5($kode),
+						'login'         =>'1',
+						'level'         =>'1',
+						'setting_harga' =>$this->input->post('set_pot'),
+						'no_handphone'  =>$hp,
+						'email'         =>$mail,
+						'foto'          =>$gbr['file_name']
+					);
 				}else{
 					?>
 					<script type="text/javascript">
@@ -159,15 +160,17 @@ class Pegawai extends CI_Controller {
 				}
 			}else{
 				$simpan       = array(
-					'kode'         =>$kode,
-					'nama'         =>$nama,
-					'no_handphone' =>$hp,
-					'email'        =>$mail,
-					'username'     =>$kode,
-					'password'     =>md5($kode),
-					'login'        =>'1',
-					'level'        =>'1',
-					'foto'         =>$kode . ".jpg");
+					'kode'          =>$kode,
+					'nama'          =>$nama,
+					'no_handphone'  =>$hp,
+					'email'         =>$mail,
+					'username'      =>$kode,
+					'password'      =>md5($kode),
+					'login'         =>'1',
+					'level'         =>'1',
+					'setting_harga' =>$this->input->post('set_pot'),
+					'foto'          =>$kode . ".jpg"
+				);
 			}
 			$this->db->insert('tbl_username',$simpan);
 			$out   ="";
@@ -227,6 +230,7 @@ class Pegawai extends CI_Controller {
 		}
 	}
 	public function edit($kode){
+		$this->session->set_userdata('kodex',$kode);
 		$ckdata = $this->db->get_where('tbl_username',array('kode'=>$kode));
 		if(count($ckdata->result())>0){
 			$umenu = $this->db->get_where('tbl_usermenu',array('kode'=>$kode))->result();
@@ -246,6 +250,7 @@ class Pegawai extends CI_Controller {
 			$isi['default']['hp']   = $row->no_handphone;
 			$isi['foto']            = $row->foto;
 			$isi['cek']             = "edit";
+			$isi['set_pot']         = $row->setting_harga;
 			$isi['kelas']           = "master";
 			$isi['namamenu']        = "Data Pegawai";
 			$isi['page']            = "pegawai";
@@ -283,6 +288,12 @@ class Pegawai extends CI_Controller {
 			$nama_murni = $pisah[0];
 			$ubah       = $acak.$nama_murni;
 			$nama_fl    = $acak.$nm;
+			$set        = $this->input->post('set_pot');
+			if($set=='on'){
+				$setx = '1';
+			}else{
+				$setx = '0';
+			}
 			$tmpName    = $this->service->anti(str_replace(" ", "_", $_FILES['foto']['name']));
 			$nmfile     = "file_".time();
 			if($tmpName!=''){
@@ -298,11 +309,13 @@ class Pegawai extends CI_Controller {
 					$gbr    = $this->upload->data();
 					$this->hapusfoto($kode);
 					$simpan = array(
-						'kode'         =>$kode,
-						'nama'         =>$nama,
-						'no_handphone' =>$hp,
-						'email'        =>$mail,
-						'foto'         =>$gbr['file_name']);
+						'kode'          =>$kode,
+						'nama'          =>$nama,
+						'no_handphone'  =>$hp,
+						'email'         =>$mail,
+						'setting_harga' =>$setx,
+						'foto'          =>$gbr['file_name']
+					);
 				}else{
 					?>
 					<script type="text/javascript">
@@ -313,11 +326,13 @@ class Pegawai extends CI_Controller {
 				}
 			}else{
 				$simpan       = array(
-					'kode'         =>$kode,
-					'nama'         =>$nama,
-					'no_handphone' =>$hp,
-					'email'        =>$mail,
-					'foto'         =>$kode . ".jpg");
+					'kode'          =>$kode,
+					'nama'          =>$nama,
+					'no_handphone'  =>$hp,
+					'email'         =>$mail,
+					'setting_harga' =>$setx
+					// 'foto'          =>$kode . ".jpg"
+				);
 			}
 			$this->db->where('kode',$kode);
 			$this->db->update('tbl_username',$simpan);
@@ -347,7 +362,7 @@ class Pegawai extends CI_Controller {
 	        }
 			redirect('pegawai','refresh');
 		}else{
-			$this->edit($this->input->post('kode'));
+			$this->add();
 		}
 	}
 	public function detil_pegawai($kode){

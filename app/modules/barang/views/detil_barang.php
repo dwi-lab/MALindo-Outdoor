@@ -1,12 +1,58 @@
 <link href="<?php echo base_url();?>assets/plugins/bootstrap-datepicker/css/datepicker.css" rel="stylesheet" />
 <link href="<?php echo base_url();?>assets/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet" />
-<script type="text/javascript" src="<?php echo base_url();?>assets/highcharts/highcharts.js"></script>
-<script type="text/javascript" src="<?php echo base_url();?>assets/highcharts/themes/skies.js"></script>
 <script src="<?php echo base_url();?>assets/plugins/DataTables/js/jquery.dataTables.js"></script>
 <script src="<?php echo base_url();?>assets/plugins/DataTables/js/dataTables.responsive.js"></script>
 <script src="<?php echo base_url();?>assets/js/table-manage-responsive.demo.min.js"></script>
 <script src="<?php echo base_url();?>assets/js/apps.min.js"></script>
 <script src="<?php echo base_url();?>assets/js/detil_barang.js"></script>
+<script src="<?= base_url('assets/highcharts/highcharts.js') ?>"></script>
+<script src="<?= base_url('assets/highcharts/data.js') ?>"></script>
+<script src="<?= base_url('assets/highcharts/drilldown.js') ?>"></script>
+<script type="text/javascript">
+$(function () {
+    Highcharts.chart('pinjam-bulan', {
+    title: {
+    text: 'Grafik Peminjaman Perbulan',
+            x: - 20
+    },
+            subtitle: {
+            text: 'Grafik Peminjaman Barang Pertiap Bulan',
+                    x: - 20
+            },
+            xAxis: {
+            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+                    'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']
+            },
+            yAxis: {
+            title: {
+            text: 'Hari'
+            },
+                    plotLines: [{
+                    value: 0,
+                            width: 1,
+                            color: '#808080'
+                    }]
+            },
+            tooltip: {
+            valueSuffix: ' Lama (hari)'
+            },
+            legend: {
+            layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle',
+                    borderWidth: 0
+            },
+            series: [
+<?php foreach ($pinjamBulan['years'] as $year) { ?>
+                {
+                name: '<?= $year ?>',
+                        data: [<?= implode(',', $pinjamBulan['orders'][$year]) ?>]
+                },
+<?php } ?>
+            ]
+    });
+});
+</script>
 <div class="profile-container">
     <div class="panel-heading">
         <div class="panel-heading-btn">
@@ -131,56 +177,17 @@
             </div>
         </div> 
     </div>
-    <div class="col-md-12">
-        <div class="panel panel-inverse">
+    <div class="col-lg-12">
+        <div class="panel panel-inverse" data-sortable-id="index-5">
             <div class="panel-heading">
-                <h4 class="panel-title">Grafik Peminjaman</h4>
-            </div>
-            <div class="panel-body p-0">
-                <div
-                data-step         ="3"
-                data-intro        ="Grafik Peminjaman Barang."
-                data-hint         ="Grafik Peminjaman Barang."
-                data-hintPosition ="top-middle"
-                data-position     ="bottom-right-aligned"
-                class="vertical-box">
-                    <div id="chart-pinjam" class="vertical-box-column p-20 calendar"></div>
+                <div class="panel-heading-btn">
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                 </div>
+                <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Grafik Peminjaman Barang - Perbulan</h3>
             </div>
-        </div>
-    </div>
-    <div class="col-md-12">
-        <div class="panel panel-inverse">
-            <div class="panel-heading">
-                <h4 class="panel-title">History Peminjaman</h4>
-            </div>
-            <div class="panel-body p-0">
-                <div
-                data-step         ="4"
-                data-intro        ="History Peminjaman Barang."
-                data-hint         ="History Peminjaman Barang."
-                data-hintPosition ="top-middle"
-                data-position     ="bottom-right-aligned"
-                class="vertical-box">
-                    <div id="calendar" class="vertical-box-column p-20 calendar"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-12">
-        <div class="panel panel-inverse">
-            <div class="panel-heading">
-                <h4 class="panel-title">History Pengembalian</h4>
-            </div>
-            <div class="panel-body p-0">
-                <div
-                data-step         ="5"
-                data-intro        ="History Pengembalian Barang."
-                data-hint         ="History Pengembalian Barang."
-                data-hintPosition ="top-middle"
-                data-position     ="bottom-right-aligned"
-                class="vertical-box">
-                    <div id="calendar" class="vertical-box-column p-20 calendar"></div>
+            <div class="panel-body">
+                <div id="pinjam-bulan" style="min-width: 310px; height: 400px; margin: 0 auto;">
+
                 </div>
             </div>
         </div>

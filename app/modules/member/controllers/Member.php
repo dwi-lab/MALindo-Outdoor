@@ -331,7 +331,7 @@ class Member extends CI_Controller {
 	public function edit($kode){
 		$ckdata = $this->db->get_where('view_member',array('kode_member'=>$kode));
 		if(count($ckdata->result())>0){
-			$this->session->userdata('kode_member',$kode);
+			$this->session->set_userdata('kode_member',$kode);
 			$row                                   = $ckdata->row();
 			$isi['default']['kode']                = $row->kode_member;
 			$isi['default']['nama']                = $row->nama;
@@ -459,7 +459,7 @@ class Member extends CI_Controller {
 					?>
 					<script type="text/javascript">
 						alert("Foto Identitas Tidak Boleh Kosong, Pastikan Type File jpg dan ukuran file maksimal 1mb");
-						window.location.href="<?php echo base_url();?>member/add";
+						window.location.href="<?php echo base_url();?>member/edit/<?php echo $this->session->userdata('kode_member');?>";
 					</script>
 					<?php
 				}
@@ -492,6 +492,8 @@ class Member extends CI_Controller {
 		$ckdata = $this->db->get_where('view_member',array('kode_member'=>$kode));
 		if(count($ckdata->result())>0){
 			$row                   = $ckdata->row();
+			$isi['orderBulan']     = $this->member_model->getOrderPerbulan($kode);
+			$isi['sewaBulan']      = $this->member_model->getSewaPerbulan($kode);
 			$isi['foto_identitas'] = $row->foto_identitas;
 			$isi['foto']           = $row->foto;
 			$isi['kode_member']    = $kode;
@@ -509,6 +511,13 @@ class Member extends CI_Controller {
 			$isi['kecamatan']      = $row->kecamatan;
 			$isi['kelurahan']      = $row->kelurahan;
 			$isi['umur']           = $this->service->umur(date("d-m-Y",strtotime($row->tgl_lahir)));
+			$ckpoin = $this->db->get_where('tbl_histori_poin',array('kode_member'=>$kode));
+			if(count($ckpoin->result())>0){
+				$x = $ckpoin->row();
+				$isi['poin'] = $x->jml_poin;
+			}else{
+				$isi['poin'] = "0";
+			}
 			$isi['kelas']          = "master";
 			$isi['namamenu']       = "Data Member";
 			$isi['page']           = "member";

@@ -2,12 +2,10 @@
 function kirim_email($kode_booking) {
     jQuery.post($BASE_URL+"booking/kirim_email/"+$kode_booking,
     function(data){
-        if(data.response!='true'){
+        if(data.response=='true'){
             $.gritter.add({title:"Informasi Invoice !",text: "Nota Pesanan Terkirim ke e-mail member !"});
-            return false;
         }else{
             $.gritter.add({title:"Informasi Invoice !",text: "Nota Pesanan Gagal Terkirim ke e-mail member !"});
-            return false;
         }
     });
 }
@@ -17,6 +15,7 @@ function kirim_email($kode_booking) {
     <div class="invoice-company">
         <span class="pull-right hidden-print">
         <a href="javascript:;" onclick="window.print();kirim_email('<?php echo $kode_booking;?>');" class="btn btn-sm btn-success m-b-10"><i class="fa fa-print m-r-5"></i> Print</a>
+        <a href="javascript:;" onclick="kirim_email('<?php echo $kode_booking;?>');" class="btn btn-sm btn-primary m-b-10"><i class="fa fa-envelope m-r-5"></i> Kirim E-mail</a>
         </span>
         <b>MALindo Outdoor</b>
     </div>
@@ -28,7 +27,8 @@ function kirim_email($kode_booking) {
                 JL. DR. Moch. Hatta No. 168 Kel. Sukamanah <br />
                 Kec. Cipedes Kota Tasikmalaya<br />
                 Tlp : 0813-2014-7000<br />
-                e-mail : malindooutdoor@gmail.com
+                e-mail : malindooutdoor@gmail.com<br />
+                user : <?php echo "<b>".$kasir."</b>";?>
             </address>
         </div>
         <div class="invoice-to">
@@ -55,35 +55,79 @@ function kirim_email($kode_booking) {
     <div class="invoice-content">
         <div class="table-responsive">
             <table class="table table-invoice">
-                <thead>
-                    <tr>
-                        <th>Rincian Pesanan</th>
-                        <th>Harga Sewa</th>
-                        <th>Lama Pinjam</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $detil = $this->db->query("SELECT * FROM tbl_booking a JOIN tbl_booking_detil b ON a.kode_booking = b.kode_booking JOIN view_barang_detil c ON b.kode_barang = c.kode WHERE a.kode_booking = '$kode_booking' GROUP BY b.kode_barang,b.kode_warna")->result();
-                    if(count($detil)>0){
-                        foreach ($detil as $row) {
-                            ?>
-                            <tr>
-                                <td>
-                                    <?php echo $row->nama_barang;?><br />
-                                    <small>Warna Barang : <?php echo $row->warna;?> </small>
-                                    <!-- <small>Tipe Barang <?php echo $row->tipe;?> Merk Barang : <?php echo $row->merk;?> Warna Barang : <?php echo $row->warna;?> </small> -->
-                                </td>
-                                <td><?php echo number_format($row->hrg_sewa);?></td>
-                                <td><?php echo number_format($row->lama) . " hari";?></td>
-                                <td><?php echo number_format($row->hrg_sewa * $row->lama);?></td>
-                            </tr>
-                            <?php
-                        }
-                    }
+                <?php
+                if($jnsx_bayar=='2'){
                     ?>
-                </tbody>
+                    <thead>
+                        <tr>
+                            <th>Rincian Pesanan</th>
+                            <th>Harga Sewa</th>
+                            <th>Harga Poin</th>
+                            <th>Lama Pinjam</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $detil = $this->db->query("SELECT * FROM tbl_booking a JOIN tbl_booking_detil b ON a.kode_booking = b.kode_booking JOIN view_barang_detil c ON b.kode_barang = c.kode WHERE a.kode_booking = '$kode_booking' GROUP BY b.kode_barang,b.kode_warna")->result();
+                        if(count($detil)>0){
+                            foreach ($detil as $row) {
+                                $ckpoin = $this->db->get_where('tbl_barang',array('kode'=>$row->kode_barang));
+                                $xx     = $ckpoin->row();
+                                ?>
+                                <tr>
+                                    <td>
+                                        <?php echo $row->nama_barang;?><br />
+                                        <small>Warna Barang : <?php echo $row->warna;?> </small>
+                                        <!-- <small>Tipe Barang <?php echo $row->tipe;?> Merk Barang : <?php echo $row->merk;?> Warna Barang : <?php echo $row->warna;?> </small> -->
+                                    </td>
+                                    <td><?php echo number_format($row->hrg_sewa);?></td>
+                                    <td><?php echo number_format($xx->poin);?></td>
+                                    <td><?php echo number_format($row->lama) . " hari";?></td>
+                                    <td><?php echo number_format($row->hrg_sewa * $row->lama);?></td>
+                                </tr>
+                                <?php
+                            }
+                        }
+                        ?>
+                    </tbody>
+                    <?php
+                }else{
+                    ?>
+                    <thead>
+                        <tr>
+                            <th>Rincian Pesanan</th>
+                            <th>Harga Sewa</th>
+                            <th>Qty</th>
+                            <th>Lama Pinjam</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $detil = $this->db->query("SELECT * FROM tbl_booking a JOIN tbl_booking_detil b ON a.kode_booking = b.kode_booking JOIN view_barang_detil c ON b.kode_barang = c.kode WHERE a.kode_booking = '$kode_booking' GROUP BY b.kode_barang,b.kode_warna")->result();
+                        if(count($detil)>0){
+                            foreach ($detil as $row) {
+                                ?>
+                                <tr>
+                                    <td>
+                                        <?php echo $row->nama_barang;?><br />
+                                        <small>Warna Barang : <?php echo $row->warna;?> </small>
+                                        <!-- <small>Tipe Barang <?php echo $row->tipe;?> Merk Barang : <?php echo $row->merk;?> Warna Barang : <?php echo $row->warna;?> </small> -->
+                                    </td>
+                                    <td><?php echo number_format($row->hrg_sewa);?></td>
+                                    <td><?php echo number_format($row->qty);?></td>
+                                    <td><?php echo number_format($row->lama) . " hari";?></td>
+                                    <td><?php echo number_format($row->hrg_sewa * $row->lama);?></td>
+                                </tr>
+                                <?php
+                            }
+                        }
+                        ?>
+                    </tbody>
+                    <?php
+                }
+                ?>
             </table>
         </div>
         <div class="invoice-price">
@@ -91,13 +135,20 @@ function kirim_email($kode_booking) {
                 <div class="invoice-price-row">
                     <div class="sub-price">
                         <small>Subtotal</small>
-                        <?php echo number_format($subtotal);?>
+                        <?php echo number_format($subtotal);?><br/>
+                        <?php
+                        if($potongan!=""){
+                            ?>
+                                <small><font color="red"><?php echo "Potongan : Rp. " . number_format($potongan);?></font></small>
+                            <?php
+                        }
+                        ?>
                     </div>
                     <div class="sub-price">
                         <i class="fa fa-minus"></i>
                     </div>
                     <div class="sub-price">
-                        <small>Diskon Tetap (<?php echo number_format($diskon_pinjam);?> %)</small>
+                        <small>Dis Tetap (<?php echo number_format($diskon_pinjam);?> %)</small>
                         <?php echo number_format($tot_diskon_pinjam);?>
                         <small><font color="red"><?php echo $nama_diskon_pinjam;?></font></small>
                     </div>
@@ -105,7 +156,7 @@ function kirim_email($kode_booking) {
                         <i class="fa fa-minus"></i>
                     </div>
                     <div class="sub-price">
-                        <small>Diskon Khusus (<?php echo number_format($diskon_momen);?> %)</small>
+                        <small>Dis Khusus (<?php echo number_format($diskon_momen);?> %)</small>
                         <?php echo number_format($tot_diskon_momen);?>
                         <small><font color="red"><?php echo $nama_diskon_momen;?></font></small>
                     </div>
@@ -115,13 +166,31 @@ function kirim_email($kode_booking) {
                     <div class="sub-price">
                         <small>Dibayar</small>
                         <?php echo number_format($total_bayar);?>
-                        <small><font color="red"><?php echo $status;?></font></small>
+                        <?php
+                        if($jnsx_bayar!='2'){
+                            ?>
+                            <small><font color="red"><?php echo $status;?></font></small>
+                            <?php
+                        }
+                        ?>
                     </div>
                 </div>
             </div>
-            <div class="invoice-price-right">
-                <small>SISA PEMBAYARAN</small> <?php echo number_format($sisa_bayar);?>
-            </div>
+            <?php
+            if($jnsx_bayar=='2'){
+                ?>
+                <div class="invoice-price-right">
+                    <small>SISA POIN</small> <?php echo number_format($sisa_poin);?>
+                </div>
+                <?php
+            }else{
+                ?>
+                <div class="invoice-price-right">
+                    <small>SISA PEMBAYARAN</small> <?php echo number_format($sisa_bayar);?>
+                </div>
+                <?php
+            }
+            ?>
         </div>
     </div>
     <div class="invoice-note">
@@ -129,7 +198,7 @@ function kirim_email($kode_booking) {
         $syarat = $this->db->get_where('tbl_syarat',array('status'=>'1'))->result();
         if(count($syarat)>0){
             foreach ($syarat as $xx) {
-                echo " * " . $xx->ket;
+                echo " * " . $xx->ket . "</br>";
             }
         }
         ?>

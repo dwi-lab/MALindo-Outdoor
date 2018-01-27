@@ -3,6 +3,56 @@
 <script src="<?php echo base_url();?>assets/js/table-manage-responsive.demo.min.js"></script>
 <script src="<?php echo base_url();?>assets/js/booking.js"></script>
 <div class="row"> 
+	<div class="col-md-3 col-sm-6">
+		<div class="widget widget-stats bg-red">
+			<div class="stats-icon stats-icon-lg"><i class="fa fa-thumbs-up fa-fw"></i></div>
+			<div class="stats-title">Total Booking Finish</div>
+			<div class="stats-number"><?php echo number_format($this->db->get_where('tbl_booking',array('status_booking'=>'0'))->num_rows());?></div>
+			<div class="stats-progress progress">
+				<div class="progress-bar" style="width: 100%;"></div>
+			</div>
+			<div class="stats-desc">Total Booking Finish Sampai Saat Ini</div>
+		</div>
+	</div>
+	<div class="col-md-3 col-sm-6">
+		<div class="widget widget-stats bg-orange">
+			<div class="stats-icon stats-icon-lg"><i class="fa fa-cloud-upload fa-fw"></i></div>
+			<div class="stats-title">Total OnBooking</div>
+			<div class="stats-number"><?php echo number_format($this->db->get_where('tbl_booking',array('status_booking'=>'1'))->num_rows());?></div>
+			<div class="stats-progress progress">
+				<div class="progress-bar" style="width: 100%;"></div>
+			</div>
+			<div class="stats-desc">Total OnBooking Sampai Saat Ini</div>
+		</div>
+	</div>
+	<div class="col-md-3 col-sm-6">
+		<div class="widget widget-stats bg-blue">
+			<div class="stats-icon stats-icon-lg"><i class="fa fa-check-circle fa-fw"></i></div>
+			<div class="stats-title">Total Booking InProses</div>
+			<div class="stats-number"><?php echo number_format($this->db->get_where('tbl_booking',array('status_booking'=>'2'))->num_rows());?></div>
+			<div class="stats-progress progress">
+				<div class="progress-bar" style="width: 100%;"></div>
+			</div>
+			<div class="stats-desc">Total Booking InProses Sampai Saat Ini</div>
+		</div>
+	</div>
+	<div class="col-md-3 col-sm-6">
+		<div class="widget widget-stats bg-green">
+			<div class="stats-icon stats-icon-lg"><i class="icon-remove icon-white fa-fw"></i></div>
+			<div class="stats-title">Total Booking Cancel</div>
+			<div class="stats-number"><?php echo number_format($this->db->get_where('tbl_booking',array('status_booking'=>'3'))->num_rows());?></div>
+			<div class="stats-progress progress">
+				<div class="progress-bar" style="width: 100%;"></div>
+			</div>
+			<div class="stats-desc">Total Booking Cancel Sampai Saat Ini</div>
+		</div>
+	</div>
+	<div class="col-md-12"> 
+		<div class="alert alert-info fade in m-b-15">
+			<strong>Informasi Booking Barang !</strong><br/>
+			Total Booking Sampai saat ini mencapat <?php echo number_format($this->db->get('tbl_booking')->num_rows());?> dengan rincian seperti diatas.
+		</div>							
+     </div>
 	<div class="col-md-12"> 
 		<div class="panel panel-inverse"> 
 			<div class="panel-heading"> 
@@ -47,6 +97,13 @@
 						<option value="">Pilih Jenis Pembayaran</option>
 						<option value="1">Cash</option>
 						<option value="2">Poin</option>
+					</select>
+					<select name="status" class="default-select2 form-control" style="width:20%" id="status" name="status" data-live-search="true" data-style="btn-white">
+						<option value="">Pilih Status Booking</option>
+						<option value="1">OnBooking</option>
+						<option value="2">InProses</option>
+						<option value="3">Cancel Booking</option>
+						<option value="0">Booking Finish</option>
 					</select>
 				</div>
 			</div> 

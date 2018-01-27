@@ -11,8 +11,11 @@ class Booking_model extends CI_Model {
         $this->load->database();
     }
     private function _get_datatables_query(){
-        if($this->input->post('jns_bayar')){
-            $this->db->where("jns_bayar=",$this->input->post('jns_bayar'));
+        if($this->input->post('jns_bayar')!=""){
+            $this->db->where("jns_bayar",$this->input->post('jns_bayar'));
+        }
+        if($this->input->post('status')!=""){
+            $this->db->where("status_booking",$this->input->post('status'));
         }
         $this->db->from($this->table);
         $i = 0;

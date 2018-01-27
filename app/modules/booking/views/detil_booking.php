@@ -1,12 +1,23 @@
 <link href="<?php echo base_url();?>assets/plugins/bootstrap-datepicker/css/datepicker.css" rel="stylesheet" />
+<link href="<?php echo base_url();?>assets/plugins/bootstrap-datepicker/css/datepicker3.css" rel="stylesheet" />
 <link href="<?php echo base_url();?>assets/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet" />
-<link href="<?php echo base_url();?>assets/plugins/fullcalendar/fullcalendar/fullcalendar.css" rel="stylesheet" />
-<script type="text/javascript" src="<?php echo base_url();?>assets/highcharts/highcharts.js"></script>
-<script type="text/javascript" src="<?php echo base_url();?>assets/highcharts/themes/skies.js"></script>
+<link href="<?php echo base_url();?>assets/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
 <script src="<?php echo base_url();?>assets/plugins/DataTables/js/jquery.dataTables.js"></script>
 <script src="<?php echo base_url();?>assets/plugins/DataTables/js/dataTables.responsive.js"></script>
 <script src="<?php echo base_url();?>assets/js/table-manage-responsive.demo.min.js"></script>
+<script src="<?php echo base_url();?>assets/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+<script src="<?php echo base_url();?>assets/plugins/select2/dist/js/select2.min.js"></script>
+<script src="<?php echo base_url();?>assets/js/duit.js"></script>
+<script src="<?php echo base_url();?>assets/js/barang.js"></script>
 <script src="<?php echo base_url();?>assets/js/apps.min.js"></script>
+<script src="<?php echo base_url();?>assets/js/form-plugins.min.js"></script>
+<script src="<?php echo base_url();?>assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+<script src="<?php echo base_url();?>assets/js/booking_detil.js"></script>
+<style type="text/css">
+    .ui-autocomplete {
+        z-index: 5000;
+    }
+</style>
 <div class="profile-container">
     <div class="profile-section">
         <div class="profile-left">
@@ -123,21 +134,29 @@
                                 <td class="field">Poin Bayar</td>
                                 <td><?php echo "<b>" . number_format($poin_bayar) . "</b>";?></td>
                             </tr>
-                            <tr class="highlight">
+                           <!--  <tr class="highlight">
                                 <td class="field">Harga Poin</td>
                                 <td><?php echo "<b>Rp. " . number_format($harga_poin) . "</b>";?></td>
-                            </tr>
+                            </tr> -->
                             <tr class="highlight">
                                 <td class="field">Subtotal</td>
-                                <td><?php echo "<b>Rp. " . number_format($subtotal) . "</b>";?></td>
+                                <td><?php echo "<b>Rp. " . number_format($subtotal_x) . "</b>";?></td>
+                            </tr>
+                            <tr class="highlight">
+                                <td class="field">Potongan</td>
+                                <td><?php echo "<b>Rp. " . number_format($potongan) . "</b>";?></td>
                             </tr>
                             <tr class="highlight">
                                 <td class="field">Diskon Tetap</td>
-                                <td><?php echo "<b>" . number_format($diskon_pinjam) . " %" . "</b>";?></td>
+                                <td><?php echo "<b>" . number_format($diskon_pinjam) . " % = Rp. " . number_format($subtotal_x * $diskon_pinjam / 100) . " </b>&nbsp;dari Subtotal";?>&nbsp;&nbsp;<small><font color="red"><?php echo $nama_diskon_pinjam;?></small></td>
                             </tr>
                             <tr class="highlight">
                                 <td class="field">Diskon Khusus</td>
-                                <td><?php echo "<b>" . number_format($diskon_momen) . " %" . "</b>";?></td>
+                                <td><?php echo "<b>" . number_format($diskon_momen) . " % = Rp. " . number_format($subtotal_x * $diskon_momen / 100) . "</b>&nbsp;dari Subtotal";?>&nbsp;&nbsp;<small><font color="red"><?php echo $nama_diskon_momen;?></font></small></td>
+                            </tr>
+                            <tr class="highlight">
+                                <td class="field">Total</td>
+                                <td><?php echo "<b>Rp. " . number_format($subtotal) . "</b>";?></td>
                             </tr>
                             <tr class="highlight">
                                 <td class="field">Dibayar</td>
@@ -158,46 +177,79 @@
                                 <td>
                                     <?php 
                                     if($status_booking==1){
-// proses
                                         ?>
-                                        <a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-info" title="Sedang Dalam Proses">InProses</a>
+                                        <a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-warning" title="Sedang Proses Booking">OnBooking</a>
                                         <?php
-                                    }else if($status_booking==0){
-// cancel
+                                    }else if($status_booking==2){
                                         ?>
-                                        <a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-warning" title="Booking Selesai">Booking Finish</a>
+                                        <a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-info" title="Sedang Proses Peminjaman">InProses</a>
                                         <?php
-                                    }else{
-// Finish
+                                    }else if($status_booking==3){
                                         ?>
                                         <a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-danger" title="Booking Cancel">Booking Cancel</a>
+                                        <?php
+                                    }elseif($status_booking=='0'){
+                                        ?>
+                                        <a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-primary" title="Booking Finish">Booking Selesai</a>
                                         <?php
                                     }
                                     ?>
                                 </td>
                             </tr>
-                            
+                            <tr class="highlight">
+                                <td class="field">User</td>
+                                <td>
+                                    <b><?php echo $kasir;?></b>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+        <?php 
+        if($status_booking==1){
+            ?>
+            <div style="text-align: right;">
+                <button 
+                data-step         ="1" 
+                data-intro        ="Digunakan untuk menambah data."  
+                data-hint         ="Digunakan untuk menambah data." 
+                data-hintPosition ="top-middle" 
+                data-position     ="bottom-right-aligned"
+                class="btn btn-primary btn-xs m-r-5" onclick="edit_booking('Data Booking','booking','edit_data_booking','<?php echo $kode_booking;?>')">
+                    <i class="fa fa-pencil"></i> 
+                    Edit Data Booking
+                </button>&nbsp;
+            </div>
+            <?php
+        }
+        ?>
+        
     </div>
 </div>
 </br>
-<script src="<?php echo base_url();?>assets/plugins/DataTables/js/jquery.dataTables.js"></script>
-<script src="<?php echo base_url();?>assets/plugins/DataTables/js/dataTables.responsive.js"></script>
-<script src="<?php echo base_url();?>assets/js/table-manage-responsive.demo.min.js"></script>
-<script src="<?php echo base_url();?>assets/js/booking_detil.js"></script>
 <div class="row"> 
     <div class="col-md-12"> 
         <div class="panel panel-inverse"> 
             <div class="panel-heading"> 
                 <div class="panel-heading-btn">
-                    <a href="<?php echo base_url();?>booking/add_booking/<?php echo $kode_booking;?>" class="btn btn-primary btn-xs m-r-5" >
-                        <i class="fa fa-plus-circle"></i> 
-                        Tambah Data Barang
-                    </a>&nbsp;
+                    <?php 
+                    if($status_booking==1){
+                        ?>
+                        <button 
+                        data-step         ="1" 
+                        data-intro        ="Digunakan untuk menambah data."  
+                        data-hint         ="Digunakan untuk menambah data." 
+                        data-hintPosition ="top-middle" 
+                        data-position     ="bottom-right-aligned"
+                        class="btn btn-primary btn-xs m-r-5" onclick="tambah_data()">
+                            <i class="fa fa-plus-circle"></i> 
+                            Tambah Data
+                        </button>&nbsp;
+                        <?php
+                    }
+                    ?>
                     <button 
                     data-step         ="3" 
                     data-intro        ="Digunakan untuk reload data pada database."  
@@ -240,156 +292,485 @@
         </div> 
     </div>
 </div>
-<!-- 
-<div class="row"> 
-    <div class="col-md-12"> 
-        <script type="text/javascript">
-        function kirim_email($kode_booking) {
-            jQuery.post($BASE_URL+"booking/kirim_email/"+$kode_booking,
-            function(data){
-                if(data.response!='true'){
-                    $.gritter.add({title:"Informasi Invoice !",text: "Nota Pesanan Terkirim ke e-mail member !"});
-                    return false;
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".datepicker").datepicker({
+            todayHighlight: !0
+        });
+        jQuery("#ket_disc_lama").hide('');
+        jQuery("#b_poin").hide('');
+        jQuery("#b_cash").hide('');
+        jQuery("#warna").change(function(){
+            var warna = jQuery("#warna").val();
+            var kode  = jQuery("#kode_barang").val();
+            if(warna!=""){
+                jQuery.blockUI({
+                    css: { 
+                        border: 'none', 
+                        padding: '15px', 
+                        backgroundColor: '#000', 
+                        '-webkit-border-radius': '10px', 
+                        '-moz-border-radius': '10px', 
+                        opacity: 0.5, 
+                        color: '#fff' 
+                    },
+                    message : 'Sedang Melakukan Pengecekan Data, Mohon menunggu ... '
+                });
+                setTimeout(function(){
+                    jQuery.post($BASE_URL+"booking/getBarang/"+kode+"/"+warna,
+                    function(data){
+                        jQuery.unblockUI();
+                        var dt = data.split("|");
+                        jQuery("#stok_barang").val(dt[0]);
+                        jQuery("#warna_barang").val(dt[1]);
+                        jQuery("#foto_barang").val(dt[2]);
+                        var foto         = jQuery("#foto_barang").val();
+                        var warna_barang = jQuery("#warna_barang").val();
+                        var stok         = jQuery("#stok_barang").val();
+                        if(stok=='NotOk'){
+                            $.gritter.add({title:"Informasi Barang !",text: "Data Tidak Ditemukan Untuk Saat Ini !"});
+                            jQuery("#qty").val('');
+                            return false;
+                        }else if(stok <= 0){
+                            $.gritter.add({title:"Informasi Barang !",text: "Stok Barang Tersebut Tidak Tersedia"});return false;
+                        }else{
+                            document.getElementById('qty').focus();
+                            // jQuery("#qty").val('');
+                            $.gritter.add({title:"Informasi Barang !",text: "Warna Barang : " + warna_barang + "<br/> Stok Barang : " + stok,image:'<?php echo base_url();?>assets/foto/barang/'+foto});
+                            return false;
+                        }
+                    });
+                },500);
+                jQuery.unblockUI();
+            }
+        });
+        jQuery("#warnaX").change(function(){
+            var warna = jQuery("#warnaX").val();
+            var kode  = jQuery("#kodeAdd").val();
+            if(warna!=""){
+                jQuery.blockUI({
+                    css: { 
+                        border: 'none', 
+                        padding: '15px', 
+                        backgroundColor: '#000', 
+                        '-webkit-border-radius': '10px', 
+                        '-moz-border-radius': '10px', 
+                        opacity: 0.5, 
+                        color: '#fff' 
+                    },
+                    message : 'Sedang Melakukan Pengecekan Data, Mohon menunggu ... '
+                });
+                setTimeout(function(){
+                    jQuery.post($BASE_URL+"booking/getBarang/"+kode+"/"+warna,
+                    function(data){
+                        jQuery.unblockUI();
+                        var dt = data.split("|");
+                        jQuery("#stok_barangAdd").val(dt[0]);
+                        jQuery("#warna_barangAdd").val(dt[1]);
+                        jQuery("#foto_barangAdd").val(dt[2]);
+                        var foto         = jQuery("#foto_barangAdd").val();
+                        var warna_barang = jQuery("#warna_barangAdd").val();
+                        var stok         = jQuery("#stok_barangAdd").val();
+                        if(stok=='NotOk'){
+                            $.gritter.add({title:"Informasi Barang !",text: "Data Tidak Ditemukan Untuk Saat Ini !"});
+                            jQuery("#qtyAdd").val('');
+                            return false;
+                        }else if(stok <= 0){
+                            $.gritter.add({title:"Informasi Barang !",text: "Stok Barang Tersebut Tidak Tersedia"});return false;
+                        }else{
+                            document.getElementById('qtyAdd').focus();
+                            // jQuery("#qty").val('');
+                            $.gritter.add({title:"Informasi Barang !",text: "Warna Barang : " + warna_barang + "<br/> Stok Barang : " + stok,image:'<?php echo base_url();?>assets/foto/barang/'+foto});
+                            return false;
+                        }
+                    });
+                },500);
+                jQuery.unblockUI();
+            }
+        });
+        jQuery("#qty").change(function(){
+            var stok  = jQuery("#stok_barang").val();
+            var qty   = jQuery("#qty").val();
+            var warna = jQuery("#warna_barang").val();
+            if(warna!=""){
+                if(qty!="" || parseInt(qty)  > 0){
+                    if(parseInt(qty)  <= parseInt(stok)){
+                        $.gritter.add({title:"Informasi Barang !",text: "Silahkan Klik Tombol Simpan untuk Menyimpan Data."});
+                        return false;
+                    }else{
+                        $.gritter.add({title:"Informasi Barang !",text: "Jumlah Barang Melebihi Stok Barang !"});
+                        jQuery("#qty").val('0');
+                        document.getElementById('qty').focus();
+                        return false;
+                    }
                 }else{
-                    $.gritter.add({title:"Informasi Invoice !",text: "Nota Pesanan Gagal Terkirim ke e-mail member !"});
+                    $.gritter.add({title:"Informasi Barang !",text: "Masukan Jumlah Barang yang akan di booking !"});
+                    document.getElementById('qty').focus();
                     return false;
                 }
-            });
-        }
-        </script>
-        <link href="<?php echo base_url();?>assets/css/invoice-print.min.css" rel="stylesheet" />
-        <div class="invoice">
-            <div class="invoice-company">
-                <span class="pull-right hidden-print">
-                <a href="javascript:;" onclick="window.print();kirim_email('<?php echo $kode_booking;?>');" class="btn btn-sm btn-success m-b-10"><i class="fa fa-print m-r-5"></i> Print</a>
-                </span>
-                <b>MALindo Outdoor</b>
+            }else{
+                $.gritter.add({title:"Informasi Barang !",text: "Masukan Jumlah Barang yang akan di booking !"});
+                document.getElementById('warna').focus();
+                return false;
+            }
+        });
+        jQuery("#qtyAdd").change(function(){
+            var stok  = jQuery("#stok_barangAdd").val();
+            var qty   = jQuery("#qtyAdd").val();
+            var warna = jQuery("#warna_barangAdd").val();
+            if(warna!=""){
+                if(qty!="" || parseInt(qty)  > 0){
+                    if(parseInt(qty)  <= parseInt(stok)){
+                        $.gritter.add({title:"Informasi Barang !",text: "Silahkan Klik Tombol Simpan untuk Menyimpan Data."});
+                        return false;
+                    }else{
+                        $.gritter.add({title:"Informasi Barang !",text: "Jumlah Barang Melebihi Stok Barang !"});
+                        jQuery("#qtyAdd").val('0');
+                        document.getElementById('qtyAdd').focus();
+                        return false;
+                    }
+                }else{
+                    $.gritter.add({title:"Informasi Barang !",text: "Masukan Jumlah Barang yang akan di booking !"});
+                    document.getElementById('qtyAdd').focus();
+                    return false;
+                }
+            }else{
+                $.gritter.add({title:"Informasi Barang !",text: "Masukan Jumlah Barang yang akan di booking !"});
+                document.getElementById('warnaX').focus();
+                return false;
+            }
+        });
+        jQuery("#namaAdd").autocomplete({
+            source: function(req,add){
+                jQuery.ajax({
+                    url:"<?php echo base_url() . 'booking/get_barang';?>",
+                    dataType:'json',
+                    type:'POST',
+                    data:req,                                                   
+                    success:function(data){
+                        if(data.response=='true'){
+                            add(data.message); 
+                        }else{
+                            $.gritter.add({title:"Informasi !",text: "Data yang anda cari tidak ditemukan"});
+                            jQuery("#tombol").hide('');
+                            jQuery("#informasi_barang_detil").hide('');
+                            return false;
+                        }
+                    },
+                    error:function(XMLHttpRequest){
+                        alert(XMLHttpRequest.responseText);
+                    }
+                })
+            },
+            minLength:3,
+            select: function(event,ui){
+                jQuery('#kodeAdd').val(ui.item.kode);
+                jQuery('#namaAdd').val(ui.item.nama);
+                jQuery('#hrg_sewa').val(ui.item.harga);
+                jQuery('#hrg_poin').val(ui.item.poin);
+                document.getElementById('warnaX').focus();
+                return false;
+            }
+        })
+        jQuery("#tgl_selesai").change(function(){
+            var mulai   = jQuery("#tgl_mulai").val();
+            var selesai = jQuery("#tgl_selesai").val();
+            if(mulai != "" && selesai != ""){
+                jQuery.post($BASE_URL+"booking/cekLama/"+mulai+"/"+selesai,
+                function(data){
+                    var dt        = data.split("|");
+                    jQuery("#lama_pinjam").val(dt[0]);
+                    jQuery("#disc_lama_pinjam").val(dt[1]);
+                    jQuery("#id_disc_lama").val(dt[2]);
+                    var lama      = jQuery("#lama_pinjam").val();
+                    jQuery("#lama").val(lama);
+                    return false;
+                });
+            }else{
+                $.gritter.add({title:"Informasi !",text: "Pastikan Tanggal Pinjam dan Tanggal Selesai Pinjam Sudah Terisi"});
+            }
+        });
+    });
+</script>
+<div id="modal_form_add" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Basic modal</h4>
             </div>
-            <div class="invoice-header">
-                <div class="invoice-from">
-                    <small>dari</small>
-                    <address class="m-t-5 m-b-5">
-                        <strong>MALindo Outdoor.</strong><br />
-                        JL. DR. Moch. Hatta No. 168 Kel. Sukamanah <br />
-                        Kec. Cipedes Kota Tasikmalaya<br />
-                        Tlp : 0813-2014-7000<br />
-                        e-mail : malindooutdoor@gmail.com
-                    </address>
-                </div>
-                <div class="invoice-to">
-                    <small>ke</small>
-                    <address class="m-t-5 m-b-5">
-                        <strong><?php echo $nama_member;?></strong><br />
-                        <?php echo $alamat_member;?><br />
-                        <?php echo $alamat_detil;?><br />
-                        Tlp: <?php echo $tlp_member;?><br />
-                        e-mail: <?php echo $email_member;?>
-                    </address>
-                </div>
-                <div class="invoice-date">
-                    <small>Nota Pesanan</small>
-                    <div class="date m-t-5"><?php echo $tgl_booking;?></div>
-                    <div class="invoice-detail">
-                        #<?php echo $kode_booking;?><br />
-                        <b>Pesanan</b><br/>
-                        <small><font color="red"><?php echo $tgl_mulai;?> s/d <?php echo $tgl_selesai;?></font></small><br/>
-                        <b>Jenis Bayar : <font color="red"><?php echo $jns_bayar;?></font></b>
-                    </div>
-                </div>
-            </div>
-            <div class="invoice-content">
-                <div class="table-responsive">
-                    <table class="table table-invoice">
-                        <thead>
-                            <tr>
-                                <th>Rincian Pesanan</th>
-                                <th>Harga Sewa</th>
-                                <th>Lama Pinjam</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $detil = $this->db->query("SELECT * FROM tbl_booking a JOIN tbl_booking_detil b ON a.kode_booking = b.kode_booking JOIN view_barang_detil c ON b.kode_barang = c.kode WHERE a.kode_booking = '$kode_booking' GROUP BY b.kode_barang,b.kode_warna")->result();
-                            if(count($detil)>0){
-                                foreach ($detil as $row) {
-                                    ?>
-                                    <tr>
-                                        <td>
-                                            <?php echo $row->nama_barang;?><br />
-                                            <small>Warna Barang : <?php echo $row->warna;?> </small>
-                                            <small>Tipe Barang <?php echo $row->tipe;?> Merk Barang : <?php echo $row->merk;?> Warna Barang : <?php echo $row->warna;?> </small>
-                                        </td>
-                                        <td><?php echo number_format($row->hrg_sewa);?></td>
-                                        <td><?php echo number_format($row->lama) . " hari";?></td>
-                                        <td><?php echo number_format($row->hrg_sewa * $row->lama);?></td>
-                                    </tr>
-                                    <?php
-                                }
-                            }
-                            ?>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="invoice-price">
-                    <div class="invoice-price-left">
-                        <div class="invoice-price-row">
-                            <div class="sub-price">
-                                <small>Subtotal</small>
-                                <?php echo number_format($subtotal);?>
-                            </div>
-                            <div class="sub-price">
-                                <i class="fa fa-minus"></i>
-                            </div>
-                            <div class="sub-price">
-                                <small>Diskon Tetap (<?php echo number_format($diskon_pinjam);?> %)</small>
-                                <?php echo number_format($tot_diskon_pinjam);?>
-                                <small><font color="red"><?php echo $nama_diskon_pinjam;?></font></small>
-                            </div>
-                            <div class="sub-price">
-                                <i class="fa fa-minus"></i>
-                            </div>
-                            <div class="sub-price">
-                                <small>Diskon Khusus (<?php echo number_format($diskon_momen);?> %)</small>
-                                <?php echo number_format($tot_diskon_momen);?>
-                                <small><font color="red"><?php echo $nama_diskon_momen;?></font></small>
-                            </div>
-                            <div class="sub-price">
-                                <i class="fa fa-minus"></i>
-                            </div>
-                            <div class="sub-price">
-                                <small>Dibayar</small>
-                                <?php echo number_format($total_bayar);?>
-                                <small><font color="red"><?php echo $status;?></font></small>
+            <div class="modal-body">        
+                <div class="alert alert-info alert-styled-left">
+                    <small><span class="text-semibold">Pastikan Inputan Data Benar !</span></small>
+                </div>      
+                <form action="#" id="form_add" class="form-horizontal">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <input name="kodeAdd" id="kodeAdd" type="hidden">
+                            <input class="form-control" type="hidden" id="stok_barangAdd" name="stok_barangAdd" />
+                            <input class="form-control" type="hidden" id="foto_barangAdd" name="foto_barangAdd" />
+                            <input class="form-control" type="hidden" id="warna_barangAdd" name="warna_barangAdd" />
+                            <label class="control-label col-md-3">Informasi Barang  </label>
+                            <div class="col-md-8">
+                                <input name="namaAdd" id="namaAdd" maxlength="150" placeholder="Masukan Informasi Barang" class="form-control" type="text">
+                                <span class="help-block"></span>
                             </div>
                         </div>
                     </div>
-                    <div class="invoice-price-right">
-                        <small>SISA PEMBAYARAN</small> <?php echo number_format($sisa_bayar);?>
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Harga Sewa </label>
+                            <div class="col-md-5">
+                                <input class="form-control" type="text" style="text-align: right;" id="hrg_sewa" minlength="1" readonly="readonly" maxlength='20' name="hrg_sewa" data-type="text"/>
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Harga Poin </label>
+                            <div class="col-md-3">
+                                <input class="form-control" type="text" style="text-align: right;" id="hrg_poin" minlength="1" readonly="readonly" maxlength='20' name="hrg_poin" data-type="text"/>
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3">Warna Barang </label>
+                            <div class="col-md-6">
+                            <?php echo form_dropdown('warnaX',$option_warnaX,isset($default['warnaX']) ? $default['warnaX'] : '','class="default-select2 form-control" style="width:100%" id="warnaX" name="warnaX" data-live-search="true" data-style="btn-white"');?>
+                        </div>
+                    </div>
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Qty </label>
+                            <div class="col-md-2">
+                                <input name="qtyAdd" id="qtyAdd" maxlength="30" class="form-control" type="number">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>                 
             </div>
-            <div class="invoice-note">
-                <?php
-                $syarat = $this->db->get_where('tbl_syarat',array('status'=>'1'))->result();
-                if(count($syarat)>0){
-                    foreach ($syarat as $xx) {
-                        echo " * " . $xx->ket;
-                    }
-                }
-                ?>
-            </div>
-            <div class="invoice-footer text-muted">
-                <p class="text-center m-b-5">
-                    Terimakasih Atas Kepercayaan Yang Telah Diberikan
-                </p>
-                <p class="text-center">
-                    <span class="m-r-10"><i class="fa fa-globe"></i> malindooutdoor.com</span>
-                    <span class="m-r-10"><i class="fa fa-phone"></i> T:0813-2014-7000</span>
-                    <span class="m-r-10"><i class="fa fa-envelope"></i> malindooutdoor@gmail.com</span>
-                </p>
+            <div class="modal-footer">
+                <button type="button" id="btnSaveAdd" onclick="save_bookingx('<?php echo $link;?>')" class="btn btn-primary">Simpan</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
             </div>
         </div>
     </div>
 </div>
- -->
+<div id="modal_form" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Basic modal</h4>
+            </div>
+            <div class="modal-body">        
+                <div class="alert alert-info alert-styled-left">
+                    <small><span class="text-semibold">Pastikan Inputan Data Benar !</span></small>
+                </div>      
+                <form action="#" id="form" class="form-horizontal">
+                    <input type="hidden" value="" name="id"/> 
+                    <input type="hidden" value="" name="kode_barang" id="kode_barang" /> 
+                    <input class="form-control" type="hidden" id="stok_barang" name="stok_barang" />
+                    <input class="form-control" type="hidden" id="stok_awal" name="stok_awal" />
+                    <input class="form-control" type="hidden" id="warna_awal" name="warna_awal" />
+                    <input class="form-control" type="hidden" id="foto_barang" name="foto_barang" />
+                    <input class="form-control" type="hidden" id="warna_barang" name="warna_barang" />
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Nama Barang  </label>
+                            <div class="col-md-6">
+                                <input name="nama" id="nama" maxlength="30" placeholder="Masukan Nama Barang" class="form-control" type="text">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3">Warna Barang </label>
+                            <div class="col-md-6">
+                            <?php echo form_dropdown('warna',$option_warna,isset($default['warna']) ? $default['warna'] : '','class="default-select2 form-control" style="width:100%" id="warna" name="warna" data-live-search="true" data-style="btn-white"');?>
+                        </div>
+                    </div>
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Qty </label>
+                            <div class="col-md-2">
+                                <input name="qty" id="qty" maxlength="30" class="form-control" type="number">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>                 
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnSave" onclick="save_booking('<?php echo $link;?>')" class="btn btn-primary">Simpan</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modal_form_edit" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Basic modal</h4>
+            </div>
+            <div class="modal-body">        
+                <div class="alert alert-info alert-styled-left">
+                    <small><span class="text-semibold">Pastikan Inputan Data Benar !</span></small>
+                </div>      
+                <form action="#" id="form_edit" class="form-horizontal">
+                    <input class="form-control" type="hidden" id="lama_pinjam" name="lama_pinjam" />
+                    <input class="form-control" type="hidden" id="jns_bayar" name="jns_bayar" />
+                    <input class="form-control" type="hidden" id="subtotal_x" name="subtotal_x" />
+                    <input class="form-control" type="hidden" style="text-align: right;" id="subpoin" minlength="1" readonly="readonly" maxlength='20' name="subpoin" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Kode Booking  </label>
+                            <div class="col-md-4">
+                                <input name="kode_booking" id="kode_booking" maxlength="150" readonly="readonly" class="form-control" type="text">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3">Tanggal Mulai </label>
+                        <div class="col-md-4">
+                            <div class="input-group date" id="datepicker-default" data-date-format="dd-mm-yyyy">
+                                <input type="text" class="form-control" name="tgl_mulai" id="tgl_mulai" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3">Tanggal Selesai </label>
+                        <div class="col-md-4">
+                            <div class="input-group date" id="datepicker-default" data-date-format="dd-mm-yyyy">
+                                <input type="text" class="form-control" name="tgl_selesai" id="tgl_selesai" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Lama Pinjam  </label>
+                            <div class="col-md-3">
+                                <div class="input-group date" id="datepicker-default">
+                                    <input name="lama" id="lama" style="text-align: right;" readonly="readonly" maxlength="150" class="form-control" type="text">
+                                    <span class="input-group-addon"> hari</span>
+                                    <span class="help-block"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="b_poin">
+                        <div class="form-body">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Subtotal Poin  </label>
+                                <div class="col-md-4">
+                                    <input name="subtotal_poin" id="subtotal_poin" style="text-align: right;" maxlength="150" class="form-control" type="text">
+                                    <span class="help-block"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="b_cash">
+                        <!-- <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3">Diskon Tetap</label>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="input-group">
+                                    <input class="form-control" type="text" style="text-align: right;" id="disc_lama_pinjam" minlength="1" readonly="readonly" maxlength='20' name="disc_lama_pinjam" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="ket_disc_lama">
+                            <div class="form-group">
+                                <div class="col-md-8 col-sm-8">
+                                    <span style="color:red;" id="ket_diskon_lama"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3">Diskon Khusus</label>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="input-group">
+                                    <input class="form-control" type="text" style="text-align: right;" id="disc" minlength="1" readonly="readonly" maxlength='20' name="disc" data-parsley-minlength="1" data-parsley-maxlength="20"/>
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="ket_disc_lama">
+                            <div class="form-group">
+                                <div class="col-md-8 col-sm-8">
+                                    <span style="color:red;" id="ket_diskon_lama"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-body">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Subtotal  </label>
+                                <div class="col-md-4">
+                                    <div class="input-group date" id="datepicker-default">
+                                        <span class="input-group-addon">Rp.</span>
+                                        <input name="subtotal" id="subtotal" style="text-align: right;" maxlength="150" readonly="readonly" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                        <?php
+                        if($this->session->userdata('sett_')=='1'){
+                            ?>
+                            <div class="form-body">
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Potongan  </label>
+                                    <div class="col-md-4">
+                                        <div class="input-group date" id="datepicker-default">
+                                            <span class="input-group-addon">Rp.</span>
+                                            <input name="potongan" id="potongan" style="text-align: right;" maxlength="150" class="form-control" type="text">
+                                            <span class="help-block"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                        <div class="form-body">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Dibayar  </label>
+                                <div class="col-md-4">
+                                    <div class="input-group date" id="datepicker-default">
+                                        <span class="input-group-addon">Rp.</span>
+                                        <input name="dibayar" id="dibayar" style="text-align: right;" maxlength="150" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-body">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Sisa Bayar  </label>
+                                <div class="col-md-4">
+                                    <div class="input-group date" id="datepicker-default">
+                                        <span class="input-group-addon">Rp.</span>
+                                        <input name="sisa" id="sisa" style="text-align: right;" maxlength="150" readonly="readonly" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>                 
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnSaveAdd" onclick="save_bookingxx('<?php echo $link;?>')" class="btn btn-primary">Simpan</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
+            </div>
+        </div>
+    </div>
+</div>

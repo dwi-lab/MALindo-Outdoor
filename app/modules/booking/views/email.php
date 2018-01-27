@@ -95,7 +95,14 @@
                                 Kode Pesanan <b>#<?php echo $kode_booking;?></b><br>
                                 Tanggal Pesan: <?php echo $tgl_booking;?><br>
                                 <small><font color="red"><?php echo $tgl_mulai;?> s/d <?php echo $tgl_selesai;?></font></small><br/>
-                                <b>Jenis Bayar : <font color="red"><?php echo $jns_bayar;?></font></b>
+                                <b>Jenis Bayar : <font color="red"><?php echo $jns_bayar;?></font></b><br/>
+                                <?php
+                                if($jnsx_bayar=='2'){
+                                    ?>
+                                        <b><font color="red">* Pembayaran dengan poin diskon tidak berlaku.</font></b>
+                                    <?php
+                                }
+                                ?>
                             </td>
                         </tr>
                     </table>
@@ -110,7 +117,8 @@
                                 JL. DR. Moch. Hatta No. 168 Kel. Sukamanah <br />
                                 Kec. Cipedes Kota Tasikmalaya<br />
                                 Tlp : 0813-2014-7000<br />
-                                e-mail : malindooutdoor@gmail.com
+                                e-mail : malindooutdoor@gmail.com<br/>
+                                user : <?php echo "<b>".$kasir."</b>";?>
                             </td>
                             <td>
                                 <strong><?php echo $nama_member;?></strong><br />
@@ -124,39 +132,86 @@
                 </td>
             </tr>
             <tr class="heading">
-                <td>
-                    Rincian Pesanan
-                </td>
-                <td>
-                    Harga Sewa #
-                </td>
-                <td>
-                    Lama Pinjam
-                </td>
-                <td>
-                    Total
-                </td>
+                <?php
+                if($jnsx_bayar=='2'){
+                    ?>
+                    <td>
+                        Rincian Pesanan
+                    </td>
+                    <td>
+                        Harga Sewa #
+                    </td>
+                    <td>
+                        Harga Poin #
+                    </td>
+                    <td>
+                        Lama Pinjam
+                    </td>
+                    <td>
+                        Total
+                    </td>
+                    <?php
+                }else{
+                    ?>
+                    <td>
+                        Rincian Pesanan
+                    </td>
+                    <td>
+                        Harga Sewa #
+                    </td>
+                    <td>
+                        Lama Pinjam
+                    </td>
+                    <td>
+                        Total
+                    </td>
+                    <?php
+                }
+                ?>
+                
             </tr>
             <tr class="details">
                 <?php
-                $detil = $this->db->query("SELECT * FROM tbl_booking a JOIN tbl_booking_detil b ON a.kode_booking = b.kode_booking JOIN view_barang_detil c ON b.kode_barang = c.kode WHERE a.kode_booking = '$kode_booking' GROUP BY b.kode_barang,b.kode_warna")->result();
-                if(count($detil)>0){
-                    foreach ($detil as $row) {
-                        ?>
-                        <tr>
-                            <td>
-                                <?php echo $row->nama_barang;?><br />
-                                <small>Warna Barang : <?php echo $row->warna;?> </small>
-                                <!-- <small>Tipe Barang <?php echo $row->tipe;?> Merk Barang : <?php echo $row->merk;?> Warna Barang : <?php echo $row->warna;?> </small> -->
-                            </td>
-                            <td><?php echo number_format($row->hrg_sewa);?></td>
-                            <td><?php echo number_format($row->lama) . " hari";?></td>
-                            <td><?php echo number_format($row->hrg_sewa * $row->lama);?></td>
-                        </tr>
-                        <?php
+                if($jnsx_bayar=='2'){
+                    $detil = $this->db->query("SELECT * FROM tbl_booking a JOIN tbl_booking_detil b ON a.kode_booking = b.kode_booking JOIN view_barang_detil c ON b.kode_barang = c.kode WHERE a.kode_booking = '$kode_booking' GROUP BY b.kode_barang,b.kode_warna")->result();
+                    if(count($detil)>0){
+                        foreach ($detil as $row) {
+                            $ckpoin = $this->db->get_where('tbl_barang',array('kode'=>$row->kode_barang));
+                            $xx     = $ckpoin->row();
+                            ?>
+                            <tr>
+                                <td>
+                                    <?php echo $row->nama_barang;?><br />
+                                    <small>Warna Barang : <?php echo $row->warna;?> </small>
+                                    <!-- <small>Tipe Barang <?php echo $row->tipe;?> Merk Barang : <?php echo $row->merk;?> Warna Barang : <?php echo $row->warna;?> </small> -->
+                                </td>
+                                <td><?php echo number_format($row->hrg_sewa);?></td>
+                                <td><?php echo number_format($xx->poin);?></td>
+                                <td><?php echo number_format($row->lama) . " hari";?></td>
+                                <td><?php echo number_format($row->hrg_sewa * $row->lama);?></td>
+                            </tr>
+                            <?php
+                        }
                     }
-                }
-                ?>
+                }else{
+                    $detil = $this->db->query("SELECT * FROM tbl_booking a JOIN tbl_booking_detil b ON a.kode_booking = b.kode_booking JOIN view_barang_detil c ON b.kode_barang = c.kode WHERE a.kode_booking = '$kode_booking' GROUP BY b.kode_barang,b.kode_warna")->result();
+                    if(count($detil)>0){
+                        foreach ($detil as $row) {
+                            ?>
+                            <tr>
+                                <td>
+                                    <?php echo $row->nama_barang;?><br />
+                                    <small>Warna Barang : <?php echo $row->warna;?> </small>
+                                    <!-- <small>Tipe Barang <?php echo $row->tipe;?> Merk Barang : <?php echo $row->merk;?> Warna Barang : <?php echo $row->warna;?> </small> -->
+                                </td>
+                                <td><?php echo number_format($row->hrg_sewa);?></td>
+                                <td><?php echo number_format($row->lama) . " hari";?></td>
+                                <td><?php echo number_format($row->hrg_sewa * $row->lama);?></td>
+                            </tr>
+                            <?php
+                        }
+                    }
+                }?>
             </tr>
             <tr class="heading">
                 <td>
@@ -171,31 +226,74 @@
                 <td>
                     Total Bayar
                 </td>
-                <td>
-                    Sisa Bayar
-                </td>
+                <?php
+                if($jnsx_bayar!='2'){
+                    echo '<td>
+                        Sisa Bayar
+                    </td>';
+                }else{
+                    echo '<td>
+                        Sisa Poin Anda
+                    </td>';
+                }
+                ?>
             </tr>
             <tr class="details">
-               <tr>
-                  <td>
-                    <?php echo number_format($subtotal);?>
-                  </td>
-                  <td>
-                    <?php echo number_format($tot_diskon_pinjam);?><br/>
-                    <small><font color="red"><?php echo $nama_diskon_pinjam;?></font></small>
-                  </td>
-                  <td>
-                    <?php echo number_format($tot_diskon_momen);?><br/>
-                    <small><font color="red"><?php echo $nama_diskon_momen;?></font></small>
-                  </td>
-                  <td>
-                    <?php echo number_format($total_bayar);?><br/>
-                    <small><font color="red"><?php echo $status;?></font></small>
-                  </td>
-                  <td>
-                    <font color="red"><b><?php echo number_format($sisa_bayar);?></b></font>
-                  </td>
-              </tr> 
+                <?php
+                if($jnsx_bayar=='2'){
+                    ?>
+                        <tr>
+                          <td>
+                            <?php echo number_format($subtotal) . " Poin";?>
+                          </td>
+                          <td>
+                            <?php echo number_format(0);?><br/>
+                            <small><font color="red"><?php echo "";?></font></small>
+                          </td>
+                          <td>
+                            <?php echo number_format(0);?><br/>
+                            <small><font color="red"><?php echo "";?></font></small>
+                          </td>
+                          <td>
+                            <?php echo number_format($total_bayar) . " Poin";?><br/>
+                          </td>
+                          <td>
+                            <font color="red"><b><?php echo number_format($sisa_poin) . " Poin";?></b></font>
+                          </td>
+                        </tr> 
+                    <?php
+                }else{
+                    ?>
+                        <tr>
+                          <td>
+                            <?php echo number_format($subtotal);?><br/>
+                            <?php
+                            if($potongan!=""){
+                                ?>
+                                    <small><font color="red"><?php echo "Potongan : Rp. " . number_format($potongan);?></font></small>
+                                <?php
+                            }
+                            ?>
+                          </td>
+                          <td>
+                            <?php echo number_format($tot_diskon_pinjam);?><br/>
+                            <small><font color="red"><?php echo $nama_diskon_pinjam;?></font></small>
+                          </td>
+                          <td>
+                            <?php echo number_format($tot_diskon_momen);?><br/>
+                            <small><font color="red"><?php echo $nama_diskon_momen;?></font></small>
+                          </td>
+                          <td>
+                            <?php echo number_format($total_bayar);?><br/>
+                            <small><font color="red"><?php echo $status;?></font></small>
+                          </td>
+                          <td>
+                            <font color="red"><b><?php echo number_format($sisa_bayar);?></b></font>
+                          </td>
+                        </tr> 
+                    <?php
+                }
+                ?>
             </tr>
         </table>
         <br/>
