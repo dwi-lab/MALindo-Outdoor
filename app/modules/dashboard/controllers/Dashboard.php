@@ -8,6 +8,20 @@ class Dashboard extends CI_Controller {
 		date_default_timezone_set('Asia/Jakarta');
  	}
 	public function index(){
+		/*Update Booking Lewat Dari Perencanaan Tanggal Booking*/
+		$now                      = date("Y-m-d");
+		$ckbooking                = $this->db->query("SELECT * FROM tbl_booking WHERE tgl_perencanaan_sewa > '$now'")->result();
+		if(count($ckbooking)>0){
+			$isi['aya'] = "y";
+			$this->session->set_flashdata('info', 'Ada Beberapa Data Booking yang dibatalkan secara otomatis oleh sistem pada hari ini tanggal : <b>' .date("d-m-Y") . '</b> dikarenakan tidak ada informasi lanjut dari pihak penyewa.', 300);
+			foreach ($ckbooking as $key) {
+				$kode_booking = $key->kode_booking;
+				$updatecancel = array('status_booking'=>'3');
+				$this->db->update('tbl_booking',$updatecancel);
+			}
+		}else{
+			$isi['aya'] = "";
+		}
 		$isi['namamenu']          = "";
 		$isi['orderBulan']        = $this->dashboard_model->getOrderPerbulan();
 		$isi['sewaBulan']         = $this->dashboard_model->getSewaPerbulan();
@@ -84,6 +98,8 @@ class Dashboard extends CI_Controller {
 								<li><a href="javascript:;" onclick="detil_sewa('."'".$rowx->kode_booking."'".',\'Booking\',\'sewa\','."'".$rowx->kode_booking."'".')">Lihat Detil</a></li>
 								<li><a href="'.base_url().'sewa/invoice/'.$rowx->kode_booking.'">Lihat Nota</a></li>
 								<li class="divider"></li>
+								<li><a href="javascript:;" onclick="rbstatus(\'aktif\',\'Data Booking Barang\',\'booking\','."'".$rowx->kode_booking."'".')">Cancel Booking</a></li>
+								<li><a href="javascript:;" onclick="hapus_data(\'Data Booking Barang\',\'booking\',\'hapus_booking\','."'".$rowx->kode_booking."'".')">Hapus Booking</a></li>
 								<li><a onclick="kirim('."'".$rowx->email."'".')" href="javascript:;">Kirim Email</a></li>
 							</ul>
 						</div></center>';

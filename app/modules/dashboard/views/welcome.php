@@ -360,13 +360,29 @@ function kirimx_all(link) {
 			</div>
 		</div>
 	</div>
+    <?php
+    if($aya!=""){
+        ?>
+        <div class="col-md-12">
+            <div class="panel panel-inverse" data-sortable-id="ui-general-1">
+                <div class="panel-body">
+                    <div class="alert alert-danger fade in m-b-15">
+                        <strong>Informasi !</strong><br/>
+                        <?php echo $this->session->flashdata('info'); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+    ?>
 	<div class="col-md-8 col-sm-12">
 		<div class="panel panel-inverse" data-sortable-id="index-5">
 			<div class="panel-heading">
 				<div class="panel-heading-btn">
                     <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                 </div>
-				<h4 class="panel-title">Papan Informasi</h4>
+				<h4 class="panel-title"><i class="fa fa-bullhorn fa-fw"></i> Papan Informasi</h4>
 			</div>
 			<div class="panel-body">
 				<div class="height-sm" data-scrollbar="true">
@@ -436,7 +452,7 @@ function kirimx_all(link) {
                     ?>
                     <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                 </div>
-                <h4 class="panel-title">Member yang Berulang Tahun <?php echo number_format($this->db->query("SELECT * FROM view_member WHERE MONTH(tgl_lahir) = '$bln' ORDER BY tgl_lahir ASC")->num_rows());?> Orang</h4>
+                <h4 class="panel-title"><i class="fa fa-users fa-fw"></i> Member yang Berulang Tahun <?php echo number_format($this->db->query("SELECT * FROM view_member WHERE MONTH(tgl_lahir) = '$bln' ORDER BY tgl_lahir ASC")->num_rows());?> Orang</h4>
             </div>
             <div class="panel-body">
                 <div class="height-sm" data-scrollbar="true">
@@ -520,7 +536,7 @@ function kirimx_all(link) {
                         Reload Data
                     </button> 
                 </div> 
-                <h4 class="panel-title"><i class="fa fa-download fa-fw"></i> List Perencanaan Penyewaan untuk hari ini tanggal <b><?php echo date("d-m-Y");?></b></h4> 
+                <h4 class="panel-title"><i class="fa fa-download fa-fw"></i> List Perencanaan Penyewaan untuk hari ini tanggal : <b><?php echo date("d-m-Y");?></b></h4> 
                 <div id="filter_pencarian">
                     <br/>
                     <select name="jns_bayar" class="default-select2 form-control" style="width:20%" id="jns_bayar" name="jns_bayar" data-live-search="true" data-style="btn-white">
