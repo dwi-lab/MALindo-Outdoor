@@ -53,6 +53,8 @@ class Sewa extends CI_Controller {
 							<ul class="dropdown-menu">
 								<li><a href="javascript:;" onclick="detil_sewa('."'".$rowx->kode_booking."'".',\'Booking\',\'sewa\','."'".$rowx->kode_booking."'".')">Lihat Detil</a></li>
 								<li><a href="'.base_url().'sewa/invoice/'.$rowx->kode_booking.'">Lihat Nota</a></li>
+								<li class="divider"></li>
+								<li><a onclick="kirim('."'".$rowx->email."'".')" href="javascript:;">Kirim Email</a></li>
 							</ul>
 						</div></center>';
 				$data[] = $row;

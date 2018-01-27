@@ -556,7 +556,7 @@
                 </form>                 
             </div>
             <div class="modal-footer">
-                <button type="button" id="btnSaveAdd" onclick="save_bookingx('<?php echo $link;?>')" class="btn btn-primary">Simpan</button>
+                <button type="button" id="btnSaveAdd" onclick="save_bookingx('booking')" class="btn btn-primary">Simpan</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
             </div>
         </div>
@@ -608,7 +608,7 @@
                 </form>                 
             </div>
             <div class="modal-footer">
-                <button type="button" id="btnSave" onclick="save_booking('<?php echo $link;?>')" class="btn btn-primary">Simpan</button>
+                <button type="button" id="btnSave" onclick="save_booking('booking')" class="btn btn-primary">Simpan</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
             </div>
         </div>
@@ -771,7 +771,7 @@
                 </form>                 
             </div>
             <div class="modal-footer">
-                <button type="button" id="btnSaveAdd" onclick="save_bookingxx('<?php echo $link;?>')" class="btn btn-primary">Simpan</button>
+                <button type="button" id="btnSaveAdd" onclick="save_bookingxx('booking')" class="btn btn-primary">Simpan</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
             </div>
         </div>

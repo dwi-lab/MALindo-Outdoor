@@ -4,6 +4,7 @@ class Dashboard extends CI_Controller {
   		parent::__construct();
   		$this->service->login();
 		$this->load->model('dashboard_model');
+		$this->load->model('dashboard_booking');
 		date_default_timezone_set('Asia/Jakarta');
  	}
 	public function index(){
@@ -43,10 +44,10 @@ class Dashboard extends CI_Controller {
 		$config['mailtype']     = "html";
 		$config['newline']      = "\r\n";
 		$config['crlf']         = "\r\n";
-		$subject                = "Promo Ulang Tahun";
+		$subject                = $this->input->post('judul');
 		$from_email             = $x->email;
 		$ci->email->initialize($config);
-		$ci->email->from($from_email, 'MALindo Outdoor - [Selamat Ulang Tahun]');
+		$ci->email->from($from_email, 'MALindo Outdoor - ['.$this->input->post('judul').']');
 		$email_member     = $this->input->post('email');
 		$isi['deskripsi'] = $this->input->post('deskripsi');
 		$list             = array($email_member);
@@ -59,6 +60,45 @@ class Dashboard extends CI_Controller {
         }else{
 			echo json_encode(array("status" => FALSE));
         }
+	}
+	public function getBookingNow(){
+		if($this->input->is_ajax_request()){
+			$list = $this->dashboard_booking->get_datatables();
+			$data = array();
+			$no   = $_POST['start'];
+			foreach ($list as $rowx) {
+				$no++;
+				$row   = array();
+				$row[] = $no . ".";
+				$row[] = "<center><a class='fancybox' href='".base_url()."assets/foto/member/$rowx->foto' style='width:100px;text-align:center;height:102px;' data-fancybox-group='gallery' title='".$rowx->nama."'><img src='".base_url()."assets/foto/member/$rowx->foto' style='width:71px;' alt=''/></a></center>";
+				$row[] = "<right>" . $rowx->kode_booking . "</right>";
+				$row[] = $rowx->nama;
+				$row[] = date("d-m-Y",strtotime($rowx->tgl_booking));
+				$row[] = date("d-m-Y",strtotime($rowx->tgl_perencanaan_sewa));
+				$row[] = date("d-m-Y",strtotime($rowx->tgl_selesai));
+				$row[] = number_format($rowx->lama);
+				$row[] = '<center><a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-warning" title="Sedang Proses Booking">OnBooking</a></center>';
+				$row[] = '<center><div class="btn-group m-r-5 m-b-5">
+							<a href="javascript:;" data-toggle="dropdown" class="btn btn-xs m-r-5 btn-info dropdown-toggle">Action <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="javascript:;" onclick="detil_sewa('."'".$rowx->kode_booking."'".',\'Booking\',\'sewa\','."'".$rowx->kode_booking."'".')">Lihat Detil</a></li>
+								<li><a href="'.base_url().'sewa/invoice/'.$rowx->kode_booking.'">Lihat Nota</a></li>
+								<li class="divider"></li>
+								<li><a onclick="kirim('."'".$rowx->email."'".')" href="javascript:;">Kirim Email</a></li>
+							</ul>
+						</div></center>';
+				$data[] = $row;
+			}
+			$output = array(
+				"draw"            => $_POST['draw'],
+				"recordsTotal"    => $this->dashboard_booking->count_all(),
+				"recordsFiltered" => $this->dashboard_booking->count_filtered(),
+				"data"            => $data,
+				);
+			echo json_encode($output);
+		}else{
+			redirect("_404","refresh");
+		}
 	}
 	public function kirim_email_all(){
 		date_default_timezone_set('Asia/Jakarta');
@@ -87,10 +127,10 @@ class Dashboard extends CI_Controller {
 			$config['mailtype']     = "html";
 			$config['newline']      = "\r\n";
 			$config['crlf']         = "\r\n";
-			$subject                = "Promo Ulang Tahun";
+			$subject                = $this->input->post('judul');
 			$from_email             = $x->email;
 			$ci->email->initialize($config);
-			$ci->email->from($from_email, 'MALindo Outdoor - [Selamat Ulang Tahun]');
+			$ci->email->from($from_email, 'MALindo Outdoor - ['.$this->input->post('judul').']');
 			foreach ($ultah as $key) {
 				$email_member     = $key->email;
             }
