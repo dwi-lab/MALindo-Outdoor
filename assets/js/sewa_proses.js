@@ -101,7 +101,7 @@ function edit_sewa(id,page,link){
         } 
     });
 }
-function detil_sewa(id,page,link){ 
+function detil_sewax(id,page,link){ 
     bootbox.confirm("Yakin Akan Melihat Detil " +page+ " Berikut ?", 
     function(result) { 
         if (result) { 

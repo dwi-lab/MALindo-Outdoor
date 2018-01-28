@@ -90,7 +90,7 @@ class Sewa extends CI_Controller {
 				$row[] = '<center><div class="btn-group m-r-5 m-b-5">
 							<a href="javascript:;" data-toggle="dropdown" class="btn btn-xs m-r-5 btn-info dropdown-toggle">Action <span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<li><a href="javascript:;" onclick="detil_sewa('."'".$rowx->kode_transaksi."'".',\'Sewa\',\'sewa\','."'".$rowx->kode_transaksi."'".')">Lihat Detil</a></li>
+								<li><a href="javascript:;" onclick="detil_sewax('."'".$rowx->kode_transaksi."'".',\'Sewa\',\'sewa\','."'".$rowx->kode_transaksi."'".')">Lihat Detil</a></li>
 								<li><a href="'.base_url().'sewa/invoice_sewa/'.$rowx->kode_transaksi.'">Lihat Nota</a></li>
 							</ul>
 						</div></center>';

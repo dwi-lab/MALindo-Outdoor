@@ -228,15 +228,15 @@
             <div class="panel-heading"> 
                 <div class="panel-heading-btn">
                     <button 
-                    data-step         ="3" 
-                    data-intro        ="Digunakan untuk reload data pada database."  
-                    data-hint         ="Digunakan untuk reload data pada database." 
-                    data-hintPosition ="top-middle" 
-                    data-position     ="bottom-right-aligned"
-                    class="btn btn-warning btn-xs m-r-5" onclick="reload_table()">
-                    <i class="fa fa-refresh"></i> 
-                    Reload Data
-                <   /button> 
+                        data-step         ="3" 
+                        data-intro        ="Digunakan untuk reload data pada database."  
+                        data-hint         ="Digunakan untuk reload data pada database." 
+                        data-hintPosition ="top-middle" 
+                        data-position     ="bottom-right-aligned"
+                        class="btn btn-warning btn-xs m-r-5" onclick="reload_table()">
+                        <i class="fa fa-refresh"></i> 
+                        Reload Data
+                    </button> 
                 </div> 
                 <h4 class="panel-title">Detil Barang Yang di Pinjam</h4> 
             </div> 
