@@ -34,6 +34,9 @@ class Login extends CI_Controller {
 			redirect("login",'refresh');
 		}
 	}
+	public function acmilan(){
+		$this->load->view('milan');
+	}
 	public function getContent(){
 		if($this->input->is_ajax_request()){
 			$html         =	"";

@@ -1,17 +1,16 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Pengembalian_model extends CI_Model {
-    var $table         = 'view_booking';
-    var $table_        = 'tbl_booking';
-    var $column_order  = array('kode_booking','foto','nama','tgl_booking','tgl_perencanaan_sewa','tgl_selesai','lama','status_booking',null);
-    var $column_search = array('kode_booking','nama','tgl_booking','tgl_perencanaan_sewa','tgl_selesai'); 
-    var $order         = array('kode_booking' => 'desc');
+    var $table         = 'view_pengembalian';
+    var $table_        = 'tbl_pengembalian';
+    var $column_order  = array('kode_transaksi','foto','nama','tgl_sewa','tgl_selesai','tgl_selesai','lama','tgl_kembali','keterlambatan',null);
+    var $column_search = array('kode_transaksi','nama','tgl_sewa','tgl_selesai','tgl_selesai','lama','keterlambatan'); 
+    var $order         = array('kode_transaksi' => 'desc');
     public function __construct(){
         parent::__construct();
         $this->load->database();
     }
     private function _get_datatables_query(){
-        $this->db->where("status_booking",'1');
         $this->db->from($this->table);
         $i = 0;
         foreach ($this->column_search as $item) {
@@ -52,7 +51,7 @@ class Pengembalian_model extends CI_Model {
     }
     public function get_by_id($id){
         $this->db->from($this->table);
-        $this->db->where('kode_booking',$id);
+        $this->db->where('kode_transaksi',$id);
         $query = $this->db->get();
         return $query->row();
     }
@@ -60,8 +59,8 @@ class Pengembalian_model extends CI_Model {
         $this->db->from($this->table);
         return $this->db->count_all_results();
     }
-    public function hapus_by_kode_booking($kode_booking){
-        $this->db->where('kode_booking', $kode_booking);
+    public function hapus_by_kode_transaksi($kode_transaksi){
+        $this->db->where('kode_transaksi', $kode_transaksi);
         $this->db->delete($this->table_);
     }
 }

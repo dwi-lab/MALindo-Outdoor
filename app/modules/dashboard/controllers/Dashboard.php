@@ -10,7 +10,7 @@ class Dashboard extends CI_Controller {
 	public function index(){
 		/*Update Booking Lewat Dari Perencanaan Tanggal Booking*/
 		$now                      = date("Y-m-d");
-		$ckbooking                = $this->db->query("SELECT * FROM tbl_booking WHERE tgl_perencanaan_sewa > '$now'")->result();
+		$ckbooking                = $this->db->query("SELECT * FROM tbl_booking WHERE tgl_perencanaan_sewa > '$now' AND status_booking = '1'")->result();
 		if(count($ckbooking)>0){
 			$isi['aya'] = "y";
 			$this->session->set_flashdata('info', 'Ada Beberapa Data Booking yang dibatalkan secara otomatis oleh sistem pada hari ini tanggal : <b>' .date("d-m-Y") . '</b> dikarenakan tidak ada informasi lanjut dari pihak penyewa.', 300);

@@ -173,7 +173,7 @@
             <tr class="details">
                 <?php
                 if($jnsx_bayar=='2'){
-                    $detil = $this->db->query("SELECT * FROM tbl_trans a JOIN tbl_trans_detil b ON a.kode_transaksi = b.kode_transaksi JOIN view_barang_detil c ON b.kode_barang = c.kode WHERE a.kode_transaksi = '$kode_transaksi' GROUP BY b.kode_barang,b.kode_warna")->result();
+                    $detil = $this->db->query("SELECT * FROM tbl_trans a JOIN tbl_trans_detil b ON a.kode_transaksi = b.kode_transaksi JOIN view_barang_detil c ON b.kode_barang = c.kode JOIN tbl_warna d ON b.kode_warna = d.id WHERE a.kode_transaksi = '$kode_transaksi'  GROUP BY b.kode_barang,b.kode_warna")->result();
                     if(count($detil)>0){
                         foreach ($detil as $row) {
                             $ckpoin = $this->db->get_where('tbl_barang',array('kode'=>$row->kode_barang));
@@ -194,7 +194,7 @@
                         }
                     }
                 }else{
-                    $detil = $this->db->query("SELECT * FROM tbl_trans a JOIN tbl_trans_detil b ON a.kode_transaksi = b.kode_transaksi JOIN view_barang_detil c ON b.kode_barang = c.kode WHERE a.kode_transaksi = '$kode_transaksi' GROUP BY b.kode_barang,b.kode_warna")->result();
+                    $detil = $this->db->query("SELECT * FROM tbl_trans a JOIN tbl_trans_detil b ON a.kode_transaksi = b.kode_transaksi JOIN view_barang_detil c ON b.kode_barang = c.kode JOIN tbl_warna d ON b.kode_warna = d.id WHERE a.kode_transaksi = '$kode_transaksi' GROUP BY b.kode_barang,b.kode_warna")->result();
                     if(count($detil)>0){
                         foreach ($detil as $row) {
                             ?>

@@ -58,7 +58,7 @@
         ?>
         <div id="content" class="content">
             <?php
-            if($page=="booking"){
+            if($page=="booking" || $page=="sewa" || $page=="pengembalian" || $page == "pemeliharaan" || $page == "penyewaan"){
                 ?>
                     <h1 class="page-header hidden-print"><?php echo $halaman;?> <small><?php echo $judul;?></small></h1>
                 <?php

@@ -11,7 +11,7 @@ class Sewa_proses_model extends CI_Model {
         $this->load->database();
     }
     private function _get_datatables_query(){
-        $this->db->where("status_transaksi",'1');
+        // $this->db->where("status_transaksi",'1');
         $this->db->from($this->table);
         $i = 0;
         foreach ($this->column_search as $item) {

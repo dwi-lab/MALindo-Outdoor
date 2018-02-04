@@ -86,7 +86,20 @@ class Sewa extends CI_Controller {
 				$row[] = date("d-m-Y",strtotime($rowx->tgl_perencanaan_sewa));
 				$row[] = date("d-m-Y",strtotime($rowx->tgl_selesai));
 				$row[] = number_format($rowx->lama);
-				$row[] = '<center><a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-warning" title="Sedang Proses Penyewaan">OnPenyewaan</a></center>';
+				$status = $rowx->status_transaksi;
+				if($status=='1'){
+/*Onbooking Belum Jadi Peminjaman*/
+					$row[] = '<center><a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-warning" title="Sedang Proses Penyewaan">OnSewa</a></center>';
+				}elseif($status=='2'){
+/*InProses Barang Sedang dipinjam*/
+					$row[] = '<center><a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-info" title="Sedang Proses Peminjaman">InProses</a></center>';
+				}elseif($status=='3'){
+/*Cancel Booking*/
+					$row[] = '<center><a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-danger" title="Penyewaan Cancel">Sewa Cancel</a></center>';
+				}elseif($status=='0'){
+/*Booking Selesai Barang Sudah dikembalikan oleh peminjam*/
+					$row[] = '<center><a href="javascript:void(0)" data-toggle="tooltip" class="btn btn-xs m-r-5 btn-primary" title="Penyewaan Finish">Penyewaan Selesai</a></center>';
+				}
 				$row[] = '<center><div class="btn-group m-r-5 m-b-5">
 							<a href="javascript:;" data-toggle="dropdown" class="btn btn-xs m-r-5 btn-info dropdown-toggle">Action <span class="caret"></span></a>
 							<ul class="dropdown-menu">
