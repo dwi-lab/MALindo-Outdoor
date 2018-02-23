@@ -1,6 +1,9 @@
 var host = window.location.host;
 $BASE_URL = 'http://' + host + '/';
 jQuery(document).ready(function() {
+    jQuery("#tombollaporan").hide();
+    jQuery("#lapperbulan").hide();
+    jQuery("#lappertanggal").hide();
     jQuery("#tambahstok").click(function() {
         var no    = jQuery("#tbladdstok tr").length;
         var stok  = jQuery("#stok").val();
@@ -17,6 +20,18 @@ jQuery(document).ready(function() {
                 text: " Data Tidak Boleh Kosong !"
             });
             return false;
+        }
+    });
+    jQuery(".lap").click(function (){
+        var checked_value = jQuery(".lap:checked").val();
+        if(checked_value==1){
+            jQuery("#tombollaporan").show("slow");
+            jQuery("#lapperbulan").show("slow");
+            jQuery("#lappertanggal").hide("slow");
+        }else{
+            jQuery("#tombollaporan").show("slow");
+            jQuery("#lapperbulan").hide();
+            jQuery("#lappertanggal").show("slow");
         }
     });
     jQuery("#tambahbooking").click(function() {
@@ -59,22 +74,22 @@ jQuery(document).ready(function() {
             });
             if(subtotal!=""){
                 jQuery.post($BASE_URL+"booking/cekDiskon",
-                function(data){
-                    var dt = data.split("|");
-                    jQuery("#disc").val(dt[0]);
-                    jQuery("#nama_diskon").val(dt[1]);
-                    jQuery("#id_disc_momen").val(dt[2]);
-                    var nama_diskon = jQuery("#nama_diskon").val();
-                    var tot_diskon  = jQuery("#disc").val();
-                    if(tot_diskon=='NotOk'){
-                        jQuery("#disc").val('');
-                        document.getElementById("ket_diskon").innerHTML = "<b>Tidak Ada Diskon Khusus</b>";
-                    }else{
-                        document.getElementById("ket_diskon").innerHTML = "<b>" + nama_diskon + "</b>";
-                    }
-                    jQuery("#ket_disc").show('slow');
-                    return false;
-                });
+                    function(data){
+                        var dt = data.split("|");
+                        jQuery("#disc").val(dt[0]);
+                        jQuery("#nama_diskon").val(dt[1]);
+                        jQuery("#id_disc_momen").val(dt[2]);
+                        var nama_diskon = jQuery("#nama_diskon").val();
+                        var tot_diskon  = jQuery("#disc").val();
+                        if(tot_diskon=='NotOk'){
+                            jQuery("#disc").val('');
+                            document.getElementById("ket_diskon").innerHTML = "<b>Tidak Ada Diskon Khusus</b>";
+                        }else{
+                            document.getElementById("ket_diskon").innerHTML = "<b>" + nama_diskon + "</b>";
+                        }
+                        jQuery("#ket_disc").show('slow');
+                        return false;
+                    });
             }
         } else {
             $.gritter.add({
@@ -87,6 +102,132 @@ jQuery(document).ready(function() {
 })
 function delrowx(id) {
     jQuery("#" + id).remove();
+}
+function tampilkan(link) {
+    if(jQuery('#pertgl').is(':checked')) { 
+        var tgl_a = jQuery("#mulaip").val();
+        var tgl_b = jQuery("#selesaip").val();
+        if(tgl_a!='' && tgl_b!=""){
+            $.ajax({ 
+                url : $BASE_URL+link+'/cekdata/'+tgl_a+'/'+tgl_b, 
+                dataType : 'json', 
+                type : 'post', 
+                success : function(json) { 
+                    $.unblockUI(); 
+                    if(json.say == "1") { 
+                        $.gritter.add({title:"Informasi Laporan!",text: " Tidak Ada Transaksi Penyewaan Pada Tanggal " + tgl});
+                        return false; 
+                    }else if(json.say=="0"){ 
+                        window.location.href = $BASE_URL+link+'/pertanggal/'+tgl_a+'/'+tgl_b
+                    }
+                } 
+            }); 
+        }else{
+            $.gritter.add({
+                title: "Informasi !",
+                text: "Tanggal Laporan Tidak Boleh Kosong !"
+            });
+        }
+    }else if (jQuery('#perbulan').is(':checked')) { 
+        var bln = jQuery('#lapbln').val();
+        var thn = jQuery("#lapthnbln").val();
+        if(bln!="" && thn!=""){
+            $.ajax({ 
+                url : $BASE_URL+link+'/cekdataBln/'+bln+'/'+thn, 
+                dataType : 'json', 
+                type : 'post', 
+                success : function(json) { 
+                    $.unblockUI(); 
+                    if(json.say == "1") { 
+                        $.gritter.add({title:"Informasi Laporan!",text: " Tidak Ada Transaksi Penyewaan Pada Tanggal " + tgl});
+                        return false; 
+                    }else if(json.say=="0"){ 
+                        window.location.href = $BASE_URL+link+'/perbulan/'+bln+'/'+thn
+                    }
+                } 
+            });
+        }else{
+            $.gritter.add({
+                title: "Informasi !",
+                text: "Bulan dan Tahun Pada Laporan Tidak Boleh Kosong !"
+            });
+        }
+    }
+}
+function tampilkan_member(link) {
+    var prov      = jQuery("#provinsi").val();
+    var kota      = jQuery("#kota").val();
+    var kecamatan = jQuery("#kecamatan").val();
+    var kelurahan = jQuery("#kelurahan").val();
+    if(prov != "" && kota == "" && kecamatan == "" && kelurahan == ""){
+        /*provinsi*/
+        $.ajax({ 
+            url : $BASE_URL+link+'/cekdata', 
+            dataType : 'json', 
+            type : 'post', 
+            success : function(json) { 
+                $.unblockUI(); 
+                if(json.say == "1") { 
+                    $.gritter.add({title:"Informasi Laporan!",text: " Tidak Ada Transaksi Penyewaan Pada Tanggal "});
+                    return false; 
+                }else if(json.say=="0"){ 
+                    window.location.href = $BASE_URL+link+'/perProvinsi/'+prov
+                }
+            } 
+        });
+    }else if(prov!="" && kota!="" && kecamatan == "" && kelurahan == ""){
+        /*Kota*/
+        $.ajax({ 
+            url : $BASE_URL+link+'/cekdata', 
+            dataType : 'json', 
+            type : 'post', 
+            success : function(json) { 
+                $.unblockUI(); 
+                if(json.say == "1") { 
+                    $.gritter.add({title:"Informasi Laporan!",text: " Tidak Ada Transaksi Penyewaan Pada Tanggal "});
+                    return false; 
+                }else if(json.say=="0"){ 
+                    window.location.href = $BASE_URL+link+'/perKota/'+prov+'/'+kota
+                }
+            } 
+        });
+    }else if(prov!="" && kota!="" && kecamatan != "" && kelurahan == ""){
+        /*Kecamatan*/
+        $.ajax({ 
+            url : $BASE_URL+link+'/cekdata', 
+            dataType : 'json', 
+            type : 'post', 
+            success : function(json) { 
+                $.unblockUI(); 
+                if(json.say == "1") { 
+                    $.gritter.add({title:"Informasi Laporan!",text: " Tidak Ada Transaksi Penyewaan Pada Tanggal "});
+                    return false; 
+                }else if(json.say=="0"){ 
+                    window.location.href = $BASE_URL+link+'/perKecamatan/'+prov+'/'+kota+'/'+kecamatan
+                }
+            } 
+        });
+    }else if(prov!="" && kota!="" && kecamatan != "" && kelurahan != ""){
+        $.ajax({ 
+            url : $BASE_URL+link+'/cekdata', 
+            dataType : 'json', 
+            type : 'post', 
+            success : function(json) { 
+                $.unblockUI(); 
+                if(json.say == "1") { 
+                    $.gritter.add({title:"Informasi Laporan!",text: " Tidak Ada Transaksi Penyewaan Pada Tanggal "});
+                    return false; 
+                }else if(json.say=="0"){ 
+                    window.location.href = $BASE_URL+link+'/perKelurahan/'+prov+'/'+kota+'/'+kecamatan+'/'+kelurahan
+                }
+            } 
+        });
+    }else{
+        $.gritter.add({
+            title: "Informasi !",
+            text: "Lokasi Member Tidak Boleh Kosong !"
+        });
+    }
 }
 function delrowb(id,total) {
     var sub = jQuery('#subtotal').unmask();

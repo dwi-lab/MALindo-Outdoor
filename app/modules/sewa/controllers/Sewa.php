@@ -868,7 +868,7 @@ class Sewa extends CI_Controller {
 			$isi['link']      = 'sewa';
 			$isi['halaman']   = "Data Penyewaan";
 			$isi['judul']     = "Halaman Data Penyewaan";
-			$isi['content']   = "cek_view";
+			$isi['content']   = "cek_view_langsung";
 			$this->load->view("dashboard/dashboard_view",$isi);
 		}else{
 			$ckdata = $this->db->get_where('tbl_booking',array('kode_booking'=>$kode,'status_booking'=>'1'));
@@ -913,6 +913,14 @@ class Sewa extends CI_Controller {
 					$ckdatabooking = $this->db->get_where('tbl_booking',array('kode_booking'=>$this->session->userdata('kode_booking'),'status_booking'=>'1'));
 					if(count($ckdatabooking->result())>0){
 						$row                  = $ckdatabooking->row();
+						$blain                = str_replace(".", "", $this->input->post('blain'));
+						if($blain!=""){
+							$subtotal   = $row->subtotal + $blain;
+							$sisa_bayar = $row->sisa_bayar + $blain;
+						}else{
+							$subtotal   = $row->subtotal;
+							$sisa_bayar = $row->sisa_bayar;
+						}
 						$kode_member          = $row->kode_member;
 						$tgl_booking          = $row->tgl_booking;
 						$tgl_perencanaan_sewa = $row->tgl_perencanaan_sewa;
@@ -921,7 +929,6 @@ class Sewa extends CI_Controller {
 						$subtotal_poin        = $row->subtotal_poin;
 						$poin_bayar           = $row->poin_bayar;
 						$subtotal_x           = $row->subtotal_x;
-						$subtotal             = $row->subtotal;
 						$disc_pinjam          = $row->disc_pinjam;
 						$disc_momen           = $row->disc_momen;
 						$total_bayar          = $row->total_bayar;
@@ -931,7 +938,7 @@ class Sewa extends CI_Controller {
 						$status_booking       = $row->status_booking;
 						$jns_bayar            = $row->jns_bayar;
 						$user                 = $row->user;
-						$simpantransaksi = array(
+						$simpantransaksi      = array(
 							'kode_transaksi'       =>$this->session->userdata('kode_transaksi_temp'),
 							'kode_booking'         =>$this->session->userdata('kode_booking'),
 							'kode_member'          =>$kode_member,
@@ -952,6 +959,8 @@ class Sewa extends CI_Controller {
 							'status_transaksi'     =>'1',
 							'jns_bayar'            =>$jns_bayar,
 							'user'                 =>$this->session->userdata('kode'),
+							'biaya_lainnya'        =>$blain,
+							'keterangan'           =>$this->input->post('blain_detil'),
 							'note'                 =>$this->input->post('note')
 						);
 						$this->db->insert('tbl_trans',$simpantransaksi);
@@ -1068,8 +1077,10 @@ class Sewa extends CI_Controller {
 		$subtotal_x    = str_replace(".", "", $this->input->post('subtotal_x'));
 		if($jns==1){
 /*Cash*/	
-			$dibayar       = str_replace(".", "", $this->input->post('b_cash'));
-			$sisa          = $total_bayar - $dibayar;
+			$blain    = str_replace(".", "", $this->input->post('blain'));
+			$ketblain = $this->input->post('blain_detil');
+			$dibayar  = str_replace(".", "", $this->input->post('b_cash'));
+			$sisa     = $total_bayar - $dibayar;
 			if($dibayar    >= $total_bayar){
 				$sesa          = "0";
 			}else{
@@ -1086,7 +1097,9 @@ class Sewa extends CI_Controller {
 					'kode_transaksi'       =>$kode_transaksi,
 					'kode_booking'         =>NULL,
 					'kode_member'          =>$kode_member,
-					'tgl_transaksi'          =>date('Y-m-d H:i:s'),
+					'keterangan'           =>$ketblain,
+					'biaya_lainnya'        =>$blain,
+					'tgl_transaksi'        =>date('Y-m-d H:i:s'),
 					'tgl_perencanaan_sewa' =>$mulai,
 					'tgl_selesai'          =>$selesai,
 					'lama'                 =>$lama,
@@ -1101,13 +1114,15 @@ class Sewa extends CI_Controller {
 					'sisa_bayar'           =>$sesa,
 					'jns_bayar'            =>'1',
 					'user'                 =>$this->session->userdata('kode'),
-					'status_transaksi'       =>'1');
+					'status_transaksi'     =>'1');
 			}else if($id_disc_lama !="" && $id_disc_momen ==""){
 				$simpanbooking = array(
 					'kode_transaksi'       =>$kode_transaksi,
 					'kode_booking'         =>NULL,
 					'kode_member'          =>$kode_member,
-					'tgl_transaksi'          =>date('Y-m-d H:i:s'),
+					'keterangan'           =>$ketblain,
+					'biaya_lainnya'        =>$blain,
+					'tgl_transaksi'        =>date('Y-m-d H:i:s'),
 					'tgl_perencanaan_sewa' =>$mulai,
 					'tgl_selesai'          =>$selesai,
 					'lama'                 =>$lama,
@@ -1122,13 +1137,15 @@ class Sewa extends CI_Controller {
 					'sisa_bayar'           =>$sesa,
 					'jns_bayar'            =>'1',
 					'user'                 =>$this->session->userdata('kode'),
-					'status_transaksi'       =>'1');
+					'status_transaksi'     =>'1');
 			}else if($id_disc_lama =="" && $id_disc_momen !=""){
 				$simpanbooking = array(
 					'kode_transaksi'       =>$kode_transaksi,
 					'kode_booking'         =>NULL,
 					'kode_member'          =>$kode_member,
-					'tgl_transaksi'          =>date('Y-m-d H:i:s'),
+					'keterangan'           =>$ketblain,
+					'biaya_lainnya'        =>$blain,
+					'tgl_transaksi'        =>date('Y-m-d H:i:s'),
 					'tgl_perencanaan_sewa' =>$mulai,
 					'tgl_selesai'          =>$selesai,
 					'lama'                 =>$lama,
@@ -1143,12 +1160,14 @@ class Sewa extends CI_Controller {
 					'sisa_bayar'           =>$sesa,
 					'user'                 =>$this->session->userdata('kode'),
 					'jns_bayar'            =>'1',
-					'status_transaksi'       =>'1');
+					'status_transaksi'     =>'1');
 			}else{
 				$simpanbooking = array(
 					'kode_transaksi'       =>$kode_transaksi,
 					'kode_booking'         =>NULL,
 					'kode_member'          =>$kode_member,
+					'keterangan'           =>$ketblain,
+					'biaya_lainnya'        =>$blain,
 					'tgl_transaksi'        =>date('Y-m-d H:i:s'),
 					'tgl_perencanaan_sewa' =>$mulai,
 					'tgl_selesai'          =>$selesai,
@@ -1164,7 +1183,7 @@ class Sewa extends CI_Controller {
 					'sisa_bayar'           =>$sesa,
 					'user'                 =>$this->session->userdata('kode'),
 					'jns_bayar'            =>'1',
-					'status_transaksi'       =>'1');
+					'status_transaksi'     =>'1');
 			}
 			$this->db->insert('tbl_trans',$simpanbooking);
 		}else{
@@ -1185,6 +1204,8 @@ class Sewa extends CI_Controller {
 					'kode_transaksi'       =>$kode_transaksi,
 					'kode_booking'         =>NULL,
 					'kode_member'          =>$kode_member,
+					'keterangan'           =>$ketblain,
+					'biaya_lainnya'        =>$blain,
 					'tgl_booking'          =>date('Y-m-d H:i:s'),
 					'tgl_perencanaan_sewa' =>$mulai,
 					'tgl_selesai'          =>$selesai,
@@ -1206,6 +1227,8 @@ class Sewa extends CI_Controller {
 					'kode_transaksi'       =>$kode_transaksi,
 					'kode_booking'         =>NULL,
 					'kode_member'          =>$kode_member,
+					'keterangan'           =>$ketblain,
+					'biaya_lainnya'        =>$blain,
 					'tgl_booking'          =>date('Y-m-d H:i:s'),
 					'tgl_perencanaan_sewa' =>$mulai,
 					'tgl_selesai'          =>$selesai,
@@ -1227,6 +1250,8 @@ class Sewa extends CI_Controller {
 					'kode_transaksi'       =>$kode_transaksi,
 					'kode_booking'         =>NULL,
 					'kode_member'          =>$kode_member,
+					'keterangan'           =>$ketblain,
+					'biaya_lainnya'        =>$blain,
 					'tgl_booking'          =>date('Y-m-d H:i:s'),
 					'tgl_perencanaan_sewa' =>$mulai,
 					'tgl_selesai'          =>$selesai,
@@ -1248,6 +1273,8 @@ class Sewa extends CI_Controller {
 					'kode_transaksi'       =>$kode_transaksi,
 					'kode_booking'         =>NULL,
 					'kode_member'          =>$kode_member,
+					'keterangan'           =>$ketblain,
+					'biaya_lainnya'        =>$blain,
 					'tgl_booking'          =>date('Y-m-d H:i:s'),
 					'tgl_perencanaan_sewa' =>$mulai,
 					'tgl_selesai'          =>$selesai,

@@ -18,26 +18,26 @@
         $(".datepicker").datepicker({
             todayHighlight: !0
         });
-        jQuery('
+        jQuery('#hrgbeli').priceFormat({
 	        prefix: '',
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
 	    });
-	    jQuery('
+	    jQuery('#hrgsusut').priceFormat({
 	        prefix: '',
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
 	    });
-	    jQuery('
+	    jQuery('#hrgsewa').priceFormat({
 	        prefix: '',
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
-	    });   
-	    jQuery('
+	    });
+	    jQuery('#poin').priceFormat({
 	        prefix: '',
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
-	    });               
+	    });         
     });
 </script>
 <div class="row">

@@ -1,12 +1,22 @@
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/dropzone.min.css') ?>">
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/basic.min.css') ?>">
 <script type="text/javascript" src="<?php echo base_url('assets/dropzone.min.js') ?>"></script>
+<script src="<?php echo base_url();?>assets/js/duit.js"></script>
 <style type="text/css">
 .dropzone {
     margin-top: 0px;
     border: 2px dashed #0087F7;
 }
 </style>
+<script type="text/javascript">
+$(document).ready(function() {
+    jQuery('#blain').priceFormat({
+        prefix: '',
+        centsSeparator: ',',
+        thousandsSeparator: '.'
+    });
+});
+</script>
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-inverse" data-sortable-id="form-dropzone-1">
@@ -27,13 +37,28 @@
                     <br/>
                     <form class="form-horizontal" method="post" action="<?php echo base_url();?>sewa/proses_add">
                         <div class="form-group">
-                            <label class="col-md-2 control-label">Tambahkan Catatan ?</label>
+                            <label class="control-label col-md-3 col-sm-3">Keterangan Biaya Lainnya</label>
+                            <div class="col-md-8">
+                                <input class="form-control" type="text" id="blain_detil" minlength="1" name="blain_detil"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3">Biaya Lainnnya</label>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Rp.</span>
+                                    <input class="form-control" type="text" style="text-align: right;" id="blain" name="blain"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Tambahkan Catatan ?</label>
                             <div class="col-md-9">
                                 <textarea class="form-control" name="note" placeholder="Masukan Catatan Penyewaan" rows="5"></textarea>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-2 control-label"></label>
+                            <label class="col-md-3 control-label"></label>
                             <div class="col-md-9">
                                 <button type="submit" class="btn btn-sm btn-success">Simpan Data</button>
                             </div>

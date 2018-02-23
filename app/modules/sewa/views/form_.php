@@ -43,6 +43,11 @@
 	        centsSeparator: ',',
 	        thousandsSeparator: '.'
 	    });
+	    jQuery('#blain').priceFormat({
+	        prefix: '',
+	        centsSeparator: ',',
+	        thousandsSeparator: '.'
+	    });
 	    jQuery('#b_sisa').priceFormat({
 	        prefix: '',
 	        centsSeparator: ',',
@@ -230,6 +235,19 @@
 					
                     return false;
 	            });
+	        }
+	    });
+	    jQuery("#blain").change(function(){
+			var blain  = jQuery("#blain").unmask();
+			var subtotal_ = jQuery("#subtotal_").unmask();
+	        if(blain!=""){
+	            var tot_x = parseInt(subtotal_) + parseInt(blain);
+	            jQuery("#subtotal_").val(tot_x);
+	            jQuery('#subtotal_').priceFormat({
+			        prefix: '',
+			        centsSeparator: ',',
+			        thousandsSeparator: '.'
+			    });
 	        }
 	    });
 	    jQuery("#b_cash").change(function(){
@@ -713,6 +731,21 @@
 								<?php
 							}
 							?>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Biaya Lainnnya</label>
+								<div class="col-md-3 col-sm-3">
+									<div class="input-group">
+		                                <span class="input-group-addon">Rp.</span>
+										<input class="form-control" type="text" style="text-align: right;" id="blain" name="blain"/>
+		                            </div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3">Keterangan Biaya Lainnya</label>
+								<div class="col-md-8">
+									<input class="form-control" type="text" id="kode_barang" minlength="1" name="blain_detil"/>
+								</div>
+							</div>
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3">Jenis Bayar</label>
 								<div class="col-md-15 col-sm-3">

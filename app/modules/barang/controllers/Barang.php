@@ -173,7 +173,7 @@ class Barang extends CI_Controller {
 		$isi['action']       = "proses_add";
 		$ahhhhhh             = $this->db->query("SELECT SUBSTR(MAX(kode),-6) as nona FROM tbl_barang")->result();
 		foreach ($ahhhhhh as $zzz) {
-			$xx = substr($zzz->nona, 3, 6);
+			$xx = substr($zzz->nona, 4, 6);
 		}
 		if($xx==''){
 			$newID = 'B-0001';
@@ -805,13 +805,13 @@ class Barang extends CI_Controller {
 				if(count($cktipe->result())>0){
 					$rowtipe = $cktipe->row();
 					$id_tipe = $rowtipe->id;
-					$ckmerk = $this->db->get_where('tbl_merk',array('merk'=>$rowData[0][6]));
+					$ckmerk  = $this->db->get_where('tbl_merk',array('merk'=>$rowData[0][6]));
 					if(count($ckmerk->result())>0){
 						$rowMerk = $ckmerk->row();
 						$id_merk = $rowMerk->id;
 						$ahhhhhh             = $this->db->query("SELECT SUBSTR(MAX(kode),-6) as nona FROM tbl_barang")->result();
 						foreach ($ahhhhhh as $zzz) {
-							$xx = substr($zzz->nona, 3, 6);
+							$xx = substr($zzz->nona, 1, 6);
 						}
 						if($xx==''){
 							$newID = 'B-0001';

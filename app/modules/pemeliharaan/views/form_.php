@@ -38,6 +38,7 @@
                     success:function(data){
                         if(data.response=='true'){
                             add(data.message); 
+						    jQuery("#tombol").show('');
                         }else{
                             $.gritter.add({title:"Informasi !",text: "Data yang anda cari tidak ditemukan"});
 						    jQuery("#tombol").hide('');

@@ -222,7 +222,7 @@ class Pengembalian extends CI_Controller {
 					<?php
 				}else{*/
 					/*Update Total Pembayran Transaksi*/
-					$updatetransaksi = array('dibayar'=>$totalx,'sisa_bayar'=>'0');
+					$updatetransaksi = array('dibayar'=>$total_bayar,'sisa_bayar'=>'0');
 					$this->db->where('kode_transaksi',$kode);
 					$this->db->update('tbl_trans',$updatetransaksi);
 					$cksub       = $this->db->get_where('tbl_trans',array('kode_transaksi'=>$kode,'status_transaksi'=>'1'));

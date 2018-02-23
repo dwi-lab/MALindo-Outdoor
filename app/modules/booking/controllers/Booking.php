@@ -570,13 +570,13 @@ class Booking extends CI_Controller {
 		if($this->input->is_ajax_request()){
 			$keyword          = $this->service->anti($this->input->post('term'));
 			$data['response'] = 'false';
-			$cari_member      = $this->db->query("SELECT a.kode_member,a.nama,a.foto,a.no_handphone,a.no_identitas,a.alamat FROM view_member a WHERE a.kode_member LIKE '%$keyword%' OR a.nama LIKE '%$keyword%' OR a.no_identitas LIKE '%$keyword%' OR a.no_handphone LIKE '%$keyword%' ORDER BY a.nama ASC")->result();
+			$cari_member      = $this->db->query("SELECT a.kode_member,a.nama,a.foto,a.no_handphone,a.no_identitas,a.alamat FROM view_member a WHERE a.kode_member LIKE '%$keyword%' OR a.nama LIKE '%$keyword%' OR a.no_identitas LIKE '%$keyword%' OR a.no_handphone LIKE '%$keyword%' GROUP BY a.kode_member ORDER BY a.nama ASC")->result();
 			if( ! empty($cari_member) ){
 				$data['response']  = 'true';
 				$data['message']   = array();
 				foreach ($cari_member as $row) {
-					$kode      = $row->kode_member;
-					$ckbarang          = $this->db->query("SELECT * FROM tbl_trans WHERE kode_member = '$kode'")->result();
+					$kode     = $row->kode_member;
+					$ckbarang = $this->db->query("SELECT * FROM tbl_trans WHERE kode_member = '$kode' GROUP BY kode_member")->result();
 					if(count($ckbarang)>0){
 						foreach ($ckbarang as $key) {
 							$status = $key->status_transaksi;
