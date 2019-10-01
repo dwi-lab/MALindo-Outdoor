@@ -4,7 +4,7 @@ Apliakasi Rental Peralatan Gunung - MALindo Outdoor Menggunakan Framework Codeig
 Bagi yang membutuhkan databasenya monggo kontak ane langsung
 
 fb : https://www.facebook.com/hackerlocalhost
-wa : 082320967006
+wa : 082117711166
 
 untuk tester
 malindo.coder-01.com
